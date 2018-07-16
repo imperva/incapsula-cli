@@ -1,5 +1,6 @@
 import json
 import os
+from Sites.incaprule import IncapRule
 from Sites.site import Site
 from Sites.cSite import create
 import Utils.log
@@ -15,7 +16,7 @@ def c_site_restore(args):
         "api_id": args.api_id,
         "api_key": args.api_key,
         "account_id": args.account_id,
-        "domain": None
+        "domain": args.domain
     }
     output = 'Creating bulk sites from {0}'. format(args.path)
     logger.debug(output)
@@ -37,17 +38,19 @@ def c_site_restore(args):
 
 def recover_site(file, param):
     old_site = Site(json.load(file))
-    param['domain'] = old_site.domain
-    new_site = Site(create(param)) or None
-    if new_site.site_id is None:
-        logger.warning('%s was not created, please review logs.' % old_site.domain)
-        exit(1)
-    logger.debug('Created %s, Site_ID=%s, Status=%s' % (new_site.domain, new_site.site_id, new_site.status))
+    # param['domain'] = old_site.domain
+    # new_site = Site(create(param)) or None
+    # if new_site.site_id is None:
+    #     logger.warning('%s was not created, please review logs.' % old_site.domain)
+    #     exit(1)
+    # logger.debug('Created %s, Site_ID=%s, Status=%s' % (new_site.domain, new_site.site_id, new_site.status))
 
-    acl = ACL(old_site.security, new_site.site_id)
-    acl.update()
-    sec = Security(old_site.security, new_site.site_id)
-    sec.update()
+    # acl = ACL(old_site.security, new_site.site_id)
+    # acl.update()
+    # sec = Security(old_site.security, new_site.site_id)
+    # sec.update()
+    incaprule = IncapRule(old_site.incap_rules)
+    print('here is my incap rule {}'.format(incaprule.name))
     exit(0)
 
 

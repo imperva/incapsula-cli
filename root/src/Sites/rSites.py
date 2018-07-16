@@ -1,7 +1,6 @@
 import json
 import os
 from pprint import pprint
-
 from Utils.executeRest import execute
 from Utils.incapError import IncapError
 import Utils.log

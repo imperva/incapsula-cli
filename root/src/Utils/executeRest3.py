@@ -1,10 +1,11 @@
 import json
-import requests
 from urllib.parse import urlencode
+import urllib3
 from urllib3 import PoolManager, exceptions
 from Config.configuration import IncapConfigurations
 import Utils.log
 logger = Utils.log.setup_custom_logger(__name__)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def execute(resturl, param):
@@ -18,12 +19,14 @@ def execute(resturl, param):
                 param["account_id"] = config.get_account()
 
     try:
-        data = urlencode(param)
+        print(param)
+        data = json.dumps(param)
         headers = {'content-type': "application/x-www-form-urlencoded"}
-        reponse = requests.get
-        reponse = PoolManager().request('POST', str(config.get_baseurl()) + resturl + data,
-                                        headers=headers, timeout=10)
-        return json.loads(reponse.read().decode('utf8'))
+        response = PoolManager().request_encode_body('POST', str(config.get_baseurl()) + resturl, fields=param,
+                                         headers=headers)
+        from pprint import pprint
+        pprint(response.read())
+        return json.loads(response.read().decode('utf8'))
 
     except exceptions.HTTPError as error:
         logger.debug('Data was not received from %s\nError: %s' % (str(config.baseurl) + resturl, error))

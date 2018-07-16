@@ -3,3 +3,5 @@ DS_Store
 .idea
 *.log
 admin_api
+.vscode
+py3.6.5_1

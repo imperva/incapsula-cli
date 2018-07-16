@@ -87,6 +87,7 @@ site_restore_parser.add_argument('--account_id', default='',
                                  help='Numeric identifier of the account to operate on. '
                                       'If not specified, operation will be performed on the account '
                                       'identified by the authentication parameters.')
+site_restore_parser.add_argument('--domain', help='The new domain/site you would like to add.')
 site_restore_parser.add_argument('path', help='The file or directory with multiple files.')
 site_restore_parser.set_defaults(func=c_site_restore)
 
