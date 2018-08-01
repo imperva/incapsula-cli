@@ -2,13 +2,14 @@ from Utils.executeRest import execute
 import Utils.log
 from Accounts.account import Account
 from Utils.incapError import IncapError
-
+import logging
 logger = Utils.log.setup_custom_logger(__name__)
 
 
-def r_account(args):
+def r_accounts(args):
     output = 'Get accounts!'
-    logger.debug(output)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -24,7 +25,7 @@ def r_account(args):
     else:
         for accounts in result['accounts']:
             account = Account(accounts)
-            account.log()
+            print(account.log())
 
 
 def read(params):

@@ -1,5 +1,4 @@
-import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 class IncapError:
@@ -10,10 +9,10 @@ class IncapError:
         self.debug_info = err.get('debug_info')
 
     def log(self):
-        logger.error('Result Code: %s - Result Message: %s' % (
+        logging.error('Result Code: %s - Result Message: %s' % (
             str(self.data.get('res')), self.data.get('res_message')))
         for k, v in self.data['debug_info'].items():
-            logger.error('%s - %s' % (str.upper(k), str.replace(v, '<br/>', '\n')))
+            logging.error('%s - %s' % (str.upper(k), str.replace(v, '<br/>', '\n')))
 
     def get_res(self):
         return self.res

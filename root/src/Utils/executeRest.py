@@ -28,7 +28,7 @@ def execute(resturl, param):
             return json.loads(response.read().decode('utf8'))
 
     except (HTTPError, URLError) as error:
-        logger.debug('Data was not received from %s\nError: %s' % (str(config.baseurl) + resturl, error))
+        logger.error('Data was not received from %s\nError: %s' % (str(config.baseurl) + resturl, error))
         exit(1)
 
     except timeout:

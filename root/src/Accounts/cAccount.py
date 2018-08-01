@@ -5,7 +5,9 @@ logger = Utils.log.setup_custom_logger(__name__)
 
 def c_account(args):
     output = 'With API_ID{0}, API Key={1} lets add {2}!'. format(args.api_id, args.api_key, args.account_name)
-    logger.debug(output)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    logging.info(output)
+
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,

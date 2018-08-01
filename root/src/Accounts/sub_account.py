@@ -14,8 +14,6 @@ class SubAccount:
         self.support_level = data.get('support_level') or ''
 
     def log(self):
-        divide = '-------------------------------------------------------------------------------------------------'
-        logger.debug(divide)
-        logger.debug('Sub Account Name: %s' % self.sub_account_name)
-        logger.debug('Sub Account ID: %s' % self.sub_account_id)
-        logger.debug('Support Level: %s' % self.support_level)
+        return '-------------------------------------------------------------------------------------------------\n' \
+               'Sub Account Name: %s\nSub Account ID: %s\nSupport Level: %s' \
+               % (self.sub_account_name, self.sub_account_id, self.support_level)

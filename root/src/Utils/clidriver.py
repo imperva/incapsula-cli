@@ -18,14 +18,16 @@ from Sites.uIncapRule import u_incaprule
 from Sites.dIncapRule import d_incaprule
 from Config.configuration import configure
 from Sites.cSite_restore import c_site_restore
-from Accounts.rAccounts import r_account
+from Accounts.rAccounts import r_accounts
+from Accounts.rAccount import r_account
 from Accounts.rSubAccounts import r_subaccount
+from _version import __version__
 
 
 parser = argparse.ArgumentParser(prog='incap',
                                  usage='%(prog)s <resource> <command> [options]',
                                  description="CLI for site, account and security CRUD on Incapsula via API.")
-parser.add_argument('--version', action='version', version='1.0.0.0')
+parser.add_argument('--version', action='version', version=__version__)
 subparsers = parser.add_subparsers()
 
 cli_config_parser = subparsers.add_parser('config', help='Use config to add the default API_ID,'
@@ -38,6 +40,7 @@ cli_config_parser.add_argument('account_id', help='Numeric identifier of the acc
                                                   'performed on the account identified by the '
                                                   'authentication parameters.')
 cli_config_parser.add_argument('--baseUrl', default='https://my.incapsula.com')
+cli_config_parser.add_argument('--log', default='INFO')
 cli_config_parser.set_defaults(func=configure)
 
 site_parser = subparsers.add_parser('site', help='Used to add, delete and configure Incapsula sites.',
@@ -77,6 +80,7 @@ site_add_parser.add_argument('--logs_account_id', default='',
                                   'be performed on the account identified by the authentication parameters')
 site_add_parser.add_argument('domain', help='The domain name of the site. '
                                             'For example: www.example.com, hello.example.com, example.com')
+site_add_parser.add_argument('--log', default='INFO')
 site_add_parser.set_defaults(func=c_site)
 
 site_restore_parser = site_subparsers.add_parser('restore', help='Use this operation to bulk add sites.',
@@ -89,6 +93,7 @@ site_restore_parser.add_argument('--account_id', default='',
                                       'identified by the authentication parameters.')
 site_restore_parser.add_argument('--domain', help='The new domain/site you would like to add.')
 site_restore_parser.add_argument('path', help='The file or directory with multiple files.')
+site_restore_parser.add_argument('--log', default='INFO')
 site_restore_parser.set_defaults(func=c_site_restore)
 
 site_delete_parser = site_subparsers.add_parser('delete', help='Use this operation to delete a site.',
@@ -96,6 +101,7 @@ site_delete_parser = site_subparsers.add_parser('delete', help='Use this operati
 site_delete_parser.add_argument('--api_id', help='API authentication identifier.')
 site_delete_parser.add_argument('--api_key', help='API authentication identifier.')
 site_delete_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_delete_parser.add_argument('--log', default='INFO')
 site_delete_parser.set_defaults(func=d_site)
 
 site_status_parser = site_subparsers.add_parser('status', help='Use this operation to get the status of a site.',
@@ -107,6 +113,7 @@ site_status_parser.add_argument('--tests', default='', help='List of tests to ru
                                                             'A comma separated list of one of: '
                                                             'domain_validation, services, dns. '
                                                             'See detailed description below.')
+site_status_parser.add_argument('--log', default='INFO')
 site_status_parser.set_defaults(func=r_site)
 
 site_list_parser = site_subparsers.add_parser('list', help='Use this operation to delete a site.',
@@ -122,8 +129,9 @@ site_list_parser.add_argument('--page_size',
 site_list_parser.add_argument('--page_num', help='The page to return starting from 0, Default is 0.')
 site_list_parser.add_argument('--export', default=False, help='Set to true to export files locally. '
                                                               '(Current folder where script is run)')
-site_list_parser.add_argument('--path', default=None, help='If export is select, you can specify an '
-                                                           'optional path; default is current dir.')
+site_list_parser.add_argument('--path', default=None, help='If export is select, you can specify the '
+                                                           'FULL path; default is current dir.')
+site_list_parser.add_argument('--log', default='INFO')
 site_list_parser.set_defaults(func=r_sites)
 
 site_configure_parser = site_subparsers.add_parser('configure',
@@ -135,6 +143,7 @@ site_configure_parser.add_argument('--api_key', help='API authentication identif
 site_configure_parser.add_argument('param', help='According to the param value, see table below.')
 site_configure_parser.add_argument('value', help='Name of configuration parameter to set.')
 site_configure_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_configure_parser.add_argument('--log', default='INFO')
 site_configure_parser.set_defaults(func=u_configuration)
 
 site_security_parser = site_subparsers.add_parser('security',
@@ -171,6 +180,7 @@ site_security_parser.add_argument('--ddos_traffic_threshold', default='',
                                   help='Consider site to be under DDoS if the request rate is above this threshold. '
                                        'The valid values are 10, 20, 50, 100, 200, '
                                        '500, 750, 1000, 2000, 3000, 4000, 5000. i.e. --ddos_traffic_threshold=<10')
+site_security_parser.add_argument('--log', default='INFO')
 site_security_parser.set_defaults(func=u_security)
 
 site_acl_parser = site_subparsers.add_parser('acl', help='Use this operation to change ACL configuration of a site.\n'
@@ -198,6 +208,7 @@ site_acl_parser.add_argument('--countries', default='', help='A comma separated 
 site_acl_parser.add_argument('--continents', default='', help='A comma separated list of continent codes')
 site_acl_parser.add_argument('--ips', default='', help='A comma separated list of IPs or IP ranges, '
                                                        'e.g: 192.168.1.1, 192.168.1.1- 192.168.1.100 or 192.168.1.1/24')
+site_acl_parser.add_argument('--log', default='INFO')
 site_acl_parser.set_defaults(func=u_acl)
 
 site_add_incaprule_parser = site_subparsers.add_parser('add_incaprule',
@@ -243,7 +254,7 @@ site_add_incaprule_parser.add_argument('--lb_algorithm', default='',
                                             'LB_LEAST_PENDING_REQUESTS - Server with least pending requests '
                                             'LB_LEAST_OPEN_CONNECTIONS - Server with least open connections '
                                             'LB_SOURCE_IP_HASH - Server by IP hash RANDOM - Random server')
-
+site_add_incaprule_parser.add_argument('--log', default='INFO')
 site_add_incaprule_parser.set_defaults(func=c_incaprule)
 
 site_edit_incaprule_parser = site_subparsers.add_parser('edit_incaprule',
@@ -290,6 +301,7 @@ site_edit_incaprule_parser.add_argument('--lb_algorithm', default='',
                                         ' LB_LEAST_OPEN_CONNECTIONS - Server with least open connections'
                                         ' LB_SOURCE_IP_HASH - Server by IP hash'
                                         ' RANDOM - Random server')
+site_edit_incaprule_parser.add_argument('--log', default='INFO')
 site_edit_incaprule_parser.set_defaults(func=u_incaprule)
 
 site_delete_incaprule_parser = site_subparsers.add_parser('del_incaprule', help='Use this operation to delete a '
@@ -298,6 +310,7 @@ site_delete_incaprule_parser = site_subparsers.add_parser('del_incaprule', help=
 site_delete_incaprule_parser.add_argument('--api_id', help='API authentication identifier.')
 site_delete_incaprule_parser.add_argument('--api_key', help='API authentication identifier.')
 site_delete_incaprule_parser.add_argument('rule_id', help='Numeric identifier of the site to operate on.')
+site_delete_incaprule_parser.add_argument('--log', default='INFO')
 site_delete_incaprule_parser.set_defaults(func=d_incaprule)
 
 site_list_incaprule_parser = site_subparsers.add_parser('list_incaprule',
@@ -315,6 +328,7 @@ site_list_incaprule_parser.add_argument('--page_size', default='',
                                         help='The number of objects to return in the response. Default is 50.')
 site_list_incaprule_parser.add_argument('--page_num', default='',
                                         help='The page to return starting from 0. Default is 0.')
+site_list_incaprule_parser.add_argument('--log', default='INFO')
 site_list_incaprule_parser.set_defaults(func=r_incaprule)
 
 site_whitelist_parser = site_subparsers.add_parser('whitelist', help='Use this operation to set whitelists '
@@ -357,6 +371,7 @@ site_whitelist_parser.add_argument('--client_app_types', default='',
 site_whitelist_parser.add_argument('--client_apps', default='', help='Comma separated list of client application ids.')
 site_whitelist_parser.add_argument('--parameters', default='', help='Comma separated list of encoded parameters.')
 site_whitelist_parser.add_argument('--user_agents', default='', help='Comma separated list of encoded user agents.')
+site_whitelist_parser.add_argument('--log', default='INFO')
 site_whitelist_parser.set_defaults(func=u_whitelist)
 
 site_cache_mode_parser = site_subparsers.add_parser('cache-mode', help='Use this operation to edit basic site '
@@ -373,6 +388,7 @@ site_cache_mode_parser.add_argument('--dynamic_cache_duration', default='',
 site_cache_mode_parser.add_argument('--aggressive_cache_duration', default='',
                                help="Cache resource duration, pass number followed by"
                                     " '_' and one of: hr | min | sec | days | weeks: default: 1_hr.")
+site_cache_mode_parser.add_argument('--log', default='INFO')
 site_cache_mode_parser.set_defaults(func=u_cachemode)
 
 site_cache_rule_parser = site_subparsers.add_parser('cache-rule', help='Use this operation to edit basic '
@@ -410,6 +426,7 @@ site_cache_rule_parser.add_argument('--clear_never_cache_rules', default='',
 site_cache_rule_parser.add_argument('--clear_cache_headers_rules', default='',
                                     help="An optional boolean parameter. If set to 'true', "
                                          "the site's cache header rules will be cleared.")
+site_cache_rule_parser.add_argument('--log', default='INFO')
 site_cache_rule_parser.set_defaults(func=u_cacherule)
 
 site_advanced_cache_parser = site_subparsers.add_parser('advanced-cache',
@@ -420,12 +437,14 @@ site_advanced_cache_parser.add_argument('--api_key', help='API authentication id
 site_advanced_cache_parser.add_argument('param', help="Name of configuration parameter to set. See table below.")
 site_advanced_cache_parser.add_argument('value', help="According to the param value. See table below.")
 site_advanced_cache_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_advanced_cache_parser.add_argument('--log', default='INFO')
 site_advanced_cache_parser.set_defaults(func=u_advanced)
 
 account_parser = subparsers.add_parser('account',
                                        help='Used to add, delete and configure Incapsula accounts.',
                                        usage='incap account <command> [options]')
-account_subparsers = account_parser.add_subparsers()
+account_subparsers = account_parser.add_subparsers(description='valid subcommands',
+                                                   help='additional help')
 account_add_parser = account_subparsers.add_parser('add',
                                                    help='Use this operation to add a new account that '
                                                         'should be managed by the account of the API client '
@@ -457,6 +476,7 @@ account_add_parser.add_argument('--logs_account_id', default='',
                                      'logs integration SKU and which collects the logs. '
                                      'If not specified, operation will be performed on the account '
                                      'identified by the authentication parameters')
+account_add_parser.add_argument('--log', default='INFO')
 account_add_parser.set_defaults(func=c_account)
 
 account_audit_parser = account_subparsers.add_parser('audit',
@@ -483,7 +503,22 @@ account_audit_parser.add_argument('--type', default='',
 account_audit_parser.add_argument('--page_size', default='50',
                                   help='The number of objects to return in the response. Default: 50.')
 account_audit_parser.add_argument('--page_num', default='0', help='The page to return starting from 0. Default: 0.')
+account_audit_parser.add_argument('--log', default='INFO')
 account_audit_parser.set_defaults(func=r_audit)
+
+account_status_parser = account_subparsers.add_parser('status',
+                                                      help='Use this operation to get information '
+                                                           'about the account of the API client or '
+                                                           'one of its managed accounts.',
+                                                      usage='incap account status [options]')
+account_status_parser.add_argument('--api_id', help='API authentication identifier.')
+account_status_parser.add_argument('--api_key', help='API authentication identifier.')
+account_status_parser.add_argument('--account_id', default='',
+                                   help='Numeric identifier of the account to operate on. If not specified, '
+                                        'operation will be performed on the account identified by '
+                                        'the authentication parameters.')
+account_status_parser.add_argument('--log', default='INFO')
+account_status_parser.set_defaults(func=r_account)
 
 account_list_parser = account_subparsers.add_parser('list',
                                                     help='Use this operation to get audit events for an account.',
@@ -497,7 +532,8 @@ account_list_parser.add_argument('--account_id', default='',
 account_list_parser.add_argument('--page_size', default='50',
                                  help='The number of objects to return in the response. Default: 50.')
 account_list_parser.add_argument('--page_num', default='0', help='The page to return starting from 0. Default: 0.')
-account_list_parser.set_defaults(func=r_account)
+account_list_parser.add_argument('--log', default='INFO')
+account_list_parser.set_defaults(func=r_accounts)
 
 account_subList_parser = account_subparsers.add_parser('sublist',
                                                        help='Use this operation to get audit events for an account.',
@@ -511,6 +547,7 @@ account_subList_parser.add_argument('--account_id', default='',
 account_subList_parser.add_argument('--page_size', default='50',
                                     help='The number of objects to return in the response. Default: 50.')
 account_subList_parser.add_argument('--page_num', default='0', help='The page to return starting from 0. Default: 0.')
+account_subList_parser.add_argument('--log', default='INFO')
 account_subList_parser.set_defaults(func=r_subaccount)
 
 

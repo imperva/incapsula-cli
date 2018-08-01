@@ -1,13 +1,14 @@
-import time
-from pprint import pprint
 from Utils.executeRest import execute
-import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
+import json
+from Utils.incapError import IncapError
+from Accounts.account_audit import Audit
 
 
 def r_audit(args):
     output = 'Get account audit events.'
-    logger.debug(output)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
 
     param = {
         "api_id": args.api_id,
@@ -22,19 +23,16 @@ def r_audit(args):
     }
 
     result = read(param)
-    plogger.debug(result)
+    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
     if result.get('res') != 0:
-        logger.debug('Result Code: %s\nResult Message: %s\nDebug Id-Info: %s' % (
-            str(result.get('res')), result.get('res_message'), result.get('debug_info').get('id-info')))
+        err = IncapError(result)
+        err.log()
     elif 'audit_events' in result:
-        logger.debug('Account audit events following:\n')
-        for event in result.get('audit_events'):
-            created = time.strftime('%Y-%m-%d %H:%M:%S %Z', time.localtime(int(event.get('createdAt'))/1000.0))
-            logger.debug('Audit Details:\nTime:%s - Account:%s\nDescription:%s\nContext:%s - '
-                  'Changes:%s' % (created, event.get('account_id'),
-                                  event.get('type_description'), event.get('context'),
-                                  event.get('changes')))
+        print('Account audit events following:\n')
+        for events in result.get('audit_events'):
+            audit = Audit(events)
+            print(audit.log())
 
 
 def read(params):
@@ -44,6 +42,6 @@ def read(params):
         if "account_id" in params:
             return execute(resturl, params)
         else:
-            logger.error('No domain parameter has been passed in.')
+            logging.error('No domain parameter has been passed in.')
     else:
-        logger.error('No parameters where passed in.')
+        logging.error('No parameters where passed in.')

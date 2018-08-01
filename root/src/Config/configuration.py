@@ -44,6 +44,6 @@ class IncapConfigurations:
 
 
 def configure(args):
-    self = IncapConfigurations(api_id=args.api_id, api_key=args.api_key, account=args.account_id,
+    return IncapConfigurations(api_id=args.api_id, api_key=args.api_key, account=args.account_id,
                                baseUrl=args.baseUrl)
-    return self
+

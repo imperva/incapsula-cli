@@ -20,15 +20,11 @@ class Account:
         self.user_name = data.get('user_name') or ''
         self.account_name = data.get('account_name') or ''
         self.support_level = data.get('support_level') or ''
-        self.support_all_tls_versions = data.get('support_all_tls_versions') or ''
+        self.support_all_tls_versions = str(data.get('support_all_tls_versions')) or ''
 
     def log(self):
-        divide = '-------------------------------------------------------------------------------------------------'
-        logger.debug(divide)
-        #logger.debug('Website details below:')
-        logger.debug('Plan Name: %s' % self.plan_name)
-        logger.debug('Account Name: %s' % self.account_name)
-        logger.debug('Account ID: %s' % self.account_id)
-        logger.debug('Trial End Dates: %s' % self.trial_end_date)
-        logger.debug('Support Level: %s' % self.support_level)
-        logger.debug('Current DNS information is set to the following:')
+        return '-------------------------------------------------------------------------------------------------\n' \
+               'Plan Name: %s\nAccount Name: %s\nAccount Admin Email: %s' \
+               '\nAccount ID: %s\nTrial End Dates: %s\nSupport Level: %s\nSupport all TLS Versions: %s'\
+               % (self.plan_name, self.account_name,self.email, self.account_id, self.trial_end_date, self.support_level,
+                  self.support_all_tls_versions)

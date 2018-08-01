@@ -20,14 +20,13 @@ def r_sites(args):
 
     result = read(param)
 
-    pprint(result)
     if result.get('res') != 0:
         err = IncapError(result)
         err.log()
     else:
         for site in result['sites']:
             try:
-                logger.debug(args.export)
+                logger.debug("Export results: {}.".format(args.export))
                 if args.export:
                     if not os.path.exists(args.path):
                         os.makedirs(args.path)
@@ -39,14 +38,14 @@ def r_sites(args):
                 for aclRules in site['security']['acls']['rules']:
                     logger.debug(aclRules['id'])
                     if aclRules['id'] == 'api.acl.blacklisted_ips':
-                        logger.debug('The following IPs are blacklisted: %s' % ', '.join(aclRules['ips']))
+                        logger.info('The following IPs are blacklisted: %s' % ', '.join(aclRules['ips']))
                     elif aclRules['id'] == 'api.acl.whitelisted_ips':
-                        logger.debug('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
+                        logger.infp('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
                     else:
-                        logger.debug("Nothing is being blacklisted or whitelisted.")
+                        logger.info("Nothing is being blacklisted or whitelisted.")
             else:
                 logger.debug("No ACLs here...")
-            logger.debug(' Domain: %s\n    Status: %s\n    Site ID: %s'
+            logger.info('Domain Status Info:\n    FQDN: %s\n    Status: %s\n    Site ID: %s'
                   % (site.get('domain'), site.get('status'), site.get('site_id')))
         return result.get('res')
 
