@@ -26,7 +26,7 @@ def execute(resturl, param):
         headers = {'content-type': "application/x-www-form-urlencoded"}
         req = urllib.request.Request(str(config.get_baseurl()) + resturl, data, headers, method='POST')
 
-        with urllib.request.urlopen(req, timeout=10, context=ctx) as response:
+        with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
             return json.loads(response.read().decode('utf8'))
 
     except (HTTPError, URLError) as error:

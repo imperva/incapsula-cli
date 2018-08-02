@@ -34,22 +34,29 @@ def r_sites(args):
                         json.dump(site, outfile)
             except OSError as e:
                 logging.error(e.strerror)
-            if 'acls' in site['security']:
-                for aclRules in site['security']['acls']['rules']:
-                    logging.debug(aclRules['id'])
-                    if aclRules['id'] == 'api.acl.blacklisted_ips':
-                        logging.info('The following IPs are blacklisted: %s' % ', '.join(aclRules['ips']))
-                    elif aclRules['id'] == 'api.acl.whitelisted_ips':
-                        logging.info('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
-                    else:
-                        logging.info("Nothing is being blacklisted or whitelisted.")
-            else:
-                logging.debug("No ACLs here...")
-            logging.info('Domain Status Info:\n    FQDN: %s\n    Status: %s\n    Site ID: %s'
+            # if 'acls' in site['security']:
+            #     for aclRules in site['security']['acls']['rules']:
+            #         logging.debug(aclRules['id'])
+            #         if aclRules['id'] == 'api.acl.blacklisted_ips':
+            #             logging.info('The following IPs are blacklisted: %s' % ', '.join(aclRules['ips']))
+            #         elif aclRules['id'] == 'api.acl.whitelisted_ips':
+            #             logging.info('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
+            #         else:
+            #             logging.info("Nothing is being blacklisted or whitelisted.")
+            # else:
+            #     logging.debug("No ACLs here...")
+            print('FQDN: %s - Status: %s - Site ID: %s'
                   % (site.get('domain'), site.get('status'), site.get('site_id')))
         return result.get('res')
 
 
 def read(params):
     resturl = '/api/prov/v1/sites/list'
-    return execute(resturl, params)
+
+    if params:
+        if "account_id" in params:
+            return execute(resturl, params)
+        else:
+            logging.error('No account_id parameter has been passed in.')
+    else:
+        logging.error('No parameters where passed in.')

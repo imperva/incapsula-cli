@@ -52,7 +52,7 @@ site_add_parser = site_subparsers.add_parser('add',
                                              usage='incap site add [options] domain')
 site_add_parser.add_argument('--api_id', help='API authentication identifier.')
 site_add_parser.add_argument('--api_key', help='API authentication identifier.')
-site_add_parser.add_argument('--account_id', default='',
+site_add_parser.add_argument('--account_id',
                              help='Numeric identifier of the account to operate on. '
                                   'If not specified, operation will be performed on the account '
                                   'identified by the authentication parameters.')
@@ -87,7 +87,7 @@ site_restore_parser = site_subparsers.add_parser('restore', help='Use this opera
                                                  usage='incap site restore [options] path')
 site_restore_parser.add_argument('--api_id', help='API authentication identifier.')
 site_restore_parser.add_argument('--api_key', help='API authentication identifier.')
-site_restore_parser.add_argument('--account_id', default='',
+site_restore_parser.add_argument('--account_id',
                                  help='Numeric identifier of the account to operate on. '
                                       'If not specified, operation will be performed on the account '
                                       'identified by the authentication parameters.')
@@ -120,7 +120,7 @@ site_list_parser = site_subparsers.add_parser('list', help='Use this operation t
                                               usage='incap site list [options]')
 site_list_parser.add_argument('--api_id', help='API authentication identifier.')
 site_list_parser.add_argument('--api_key', help='API authentication identifier.')
-site_list_parser.add_argument('--account_id', default='',
+site_list_parser.add_argument('--account_id',
                               help='Numeric identifier of the account to operate on. If not specified, '
                                    'operation will be performed on the account identified '
                                    'by the authentication parameters.')
@@ -484,7 +484,7 @@ account_audit_parser = account_subparsers.add_parser('audit',
                                                      usage='incap account audit [options]')
 account_audit_parser.add_argument('--api_id', help='API authentication identifier.')
 account_audit_parser.add_argument('--api_key', help='API authentication identifier.')
-account_audit_parser.add_argument('--account_id', default='',
+account_audit_parser.add_argument('--account_id',
                                   help='Numeric identifier of the account to operate on. If not specified, '
                                        'operation will be performed on the account identified by the authentication'
                                        ' parameters.')
@@ -513,7 +513,7 @@ account_status_parser = account_subparsers.add_parser('status',
                                                       usage='incap account status [options]')
 account_status_parser.add_argument('--api_id', help='API authentication identifier.')
 account_status_parser.add_argument('--api_key', help='API authentication identifier.')
-account_status_parser.add_argument('--account_id', default='',
+account_status_parser.add_argument('--account_id',
                                    help='Numeric identifier of the account to operate on. If not specified, '
                                         'operation will be performed on the account identified by '
                                         'the authentication parameters.')
@@ -525,7 +525,7 @@ account_list_parser = account_subparsers.add_parser('list',
                                                     usage='incap account audit [options]')
 account_list_parser.add_argument('--api_id', help='API authentication identifier.')
 account_list_parser.add_argument('--api_key', help='API authentication identifier.')
-account_list_parser.add_argument('--account_id', default='',
+account_list_parser.add_argument('--account_id',
                                  help='Numeric identifier of the account to operate on. If not specified, '
                                       'operation will be performed on the account identified by the authentication '
                                       'parameters.')
@@ -540,7 +540,7 @@ account_subList_parser = account_subparsers.add_parser('sublist',
                                                        usage='incap account audit [options]')
 account_subList_parser.add_argument('--api_id', help='API authentication identifier.')
 account_subList_parser.add_argument('--api_key', help='API authentication identifier.')
-account_subList_parser.add_argument('--account_id', default='',
+account_subList_parser.add_argument('--account_id',
                                     help='Numeric identifier of the account to operate on. If not specified, '
                                          'operation will be performed on the account identified by the authentication'
                                          ' parameters.')

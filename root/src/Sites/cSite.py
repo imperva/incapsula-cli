@@ -1,12 +1,12 @@
 from Utils.executeRest import execute
 from Sites.site import Site
 from Utils.incapError import IncapError
-import logging
 import json
+import logging
 
 
 def c_site(args):
-    output = 'Creating site = {0}'. format(args.domain)
+    output = 'Creating site: {0}'. format(args.domain)
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     print(output)
 
@@ -32,7 +32,7 @@ def c_site(args):
         return err
     else:
         site = Site(result)
-        site.log()
+        print('Created: %s, ID: %s ' % (site.get_domain(), str(site.get_id())))
         return site
 
 
