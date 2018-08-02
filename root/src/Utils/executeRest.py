@@ -4,13 +4,15 @@ from urllib import request, parse
 from urllib.error import HTTPError, URLError
 from socket import timeout
 from Config.configuration import IncapConfigurations
-import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
+import ssl
 
 
 def execute(resturl, param):
 
     config = IncapConfigurations()
+    ctx = ssl._create_unverified_context()
+    ctx.check_hostname = False
 
     if param.get('api_id') is None:
         param["api_id"] = config.get_api_id()
@@ -24,14 +26,14 @@ def execute(resturl, param):
         headers = {'content-type': "application/x-www-form-urlencoded"}
         req = urllib.request.Request(str(config.get_baseurl()) + resturl, data, headers, method='POST')
 
-        with urllib.request.urlopen(req, timeout=10) as response:
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as response:
             return json.loads(response.read().decode('utf8'))
 
     except (HTTPError, URLError) as error:
-        logger.error('Data was not received from %s\nError: %s' % (str(config.baseurl) + resturl, error))
+        logging.error('Data was not received from %s\nError: %s' % (str(config.baseurl) + resturl, error))
         exit(1)
 
     except timeout:
-        logger.error('Socket timed out - URL %s' % str(config.baseurl) + resturl)
+        logging.error('Socket timed out - URL %s' % str(config.baseurl) + resturl)
         exit(1)
 

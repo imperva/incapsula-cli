@@ -1,13 +1,17 @@
 from Utils.executeRest import execute
-import Utils.log
+from Sites.adr_incaprule import IncapRule
+from Sites.adr_incaprule import ADRuleRewrite
+from Sites.adr_incaprule import ADRuleRedirect
+from Sites.adr_incaprule import ADRuleForward
 from Utils.incapError import IncapError
-
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
+import json
 
 
 def r_incaprule(args):
     output = 'Get incapRules for site: {0}'. format(args.site_id)
-    logger.debug(output)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -20,34 +24,35 @@ def r_incaprule(args):
     }
 
     result = read(param)
-    from pprint import pprint
-    pprint(result)
-    if result.get('res') != '0':
-        IncapError(result).log()
+    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
+
+    if result.get('res') != 0:
+        err = IncapError(result)
+        err.log()
     else:
         if 'incap_rules' in result:
             if 'All' in result['incap_rules']:
                 for rule in result['incap_rules']['All']:
-                    logger.debug('TEST------IncapRule ID={id} --name="{name}" --filter=\'{filter}\' --action={action} :: Enable={enabled}'
-                             .format(**rule))
-        if 'ad_rules_data' in result['incap_rules']:
-            if 'Redirect' in result['incap_rules']['ad_rules_data']:
-                for rule in result['incap_rules']['ad_rules_data']['Redirect']:
-                    logger.debug('Redirect ID={id} -- Name={name} -- Enable={enabled}'
-                                 ' -- Priority={priority} -- response_code={response_code}'
-                                 ' from={from} -> to:{to} -- Filter={filter}'.format(**rule))
-            if 'Forward' in result['incap_rules']['ad_rules_data']:
-                for rule in result['incap_rules']['ad_rules_data']['Forward']:
-                    logger.debug('Forward ID={id} -- Name={name} -- Enable={enabled}'
-                                 ' -- Priority={priority} -- response_code={response_code}'
-                                 ' from={from} -> to:{to} -- Filter={filter}'.format(**rule))
-            if 'Rewrite' in result['incap_rules']['ad_rules_data']:
-                for rule in result['incap_rules']['ad_rules_data']['Rewrite']:
-                    logger.debug('Rewrite ID={id} -- Name={name} -- Enable={enabled}'
-                                 ' -- Priority={priority} -- response_code={response_code}'
-                                 ' from={from} -> to:{to} -- Filter={filter}'.format(**rule))
+                    incap_rule = IncapRule(rule)
+                    print(incap_rule.log())
+
+        if 'delivery_rules' in result:
+            if 'Redirect' in result['delivery_rules']:
+                for rule in result['delivery_rules']['Redirect']:
+                    adr_rule = ADRuleRedirect(rule)
+                    print(adr_rule.log())
+
+            if 'Forward' in result['delivery_rules']:
+                for rule in result['delivery_rules']['Forward']:
+                    adr_rule = ADRuleForward(rule)
+                    print(adr_rule.log())
+
+            if 'Rewrite' in result['delivery_rules']:
+                for rule in result['delivery_rules']['Rewrite']:
+                    adr_rule = ADRuleRewrite(rule)
+                    print(adr_rule.log())
         else:
-            logger.info('You have no IncapRules!!!')
+            logging.info('You have no IncapRules!!!')
         return result
 
 
@@ -55,9 +60,9 @@ def read(params):
     resturl = '/api/prov/v1/sites/incapRules/list'
     if params:
         if "site_id" in params:
-            logger.info('Get IncapRule(s) for site ID:{}'.format(params.get('site_id')))
+            logging.info('Get IncapRule(s) for site ID:{}'.format(params.get('site_id')))
             return execute(resturl, params)
         else:
-            logger.error('No site ID parameter has been passed in.')
+            logging.error('No site ID parameter has been passed in.')
     else:
-        logger.error('No parameters where passed in.')
+        logging.error('No parameters where passed in.')

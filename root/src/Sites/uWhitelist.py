@@ -3,12 +3,12 @@ from Sites.site import Site
 import Utils.log
 from Utils.incapError import IncapError
 
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 def u_whitelist(args):
     output = 'Update whitelist rule ID={0} with whitelist ID={1}.'. format(args.rule_id, args.whitelist_id)
-    logger.debug(output)
+    logging.debug(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -32,16 +32,16 @@ def update(params):
     resturl = '/api/prov/v1/sites/configure/whitelists'
     if params:
         if "site_id" in params and "rule_id" in params:
-            logger.info('Create a {} exception rule for site ID:{}'.format(str.replace(params.get('rule_id')
+            logging.info('Create a {} exception rule for site ID:{}'.format(str.replace(params.get('rule_id')
                         .replace('_', ' '), 'api.threats.', ''), params.get('site_id')))
             result = execute(resturl, params)
             if result.get('res') != 0:
                 IncapError(result).log()
             else:
-                logger.info('Created a {} exception rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_',
+                logging.info('Created a {} exception rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_',
                             ' '), 'api.threats.', ''), params.get('site_id')))
                 return Site(result)
         else:
-            logger.error('No site_id or rule_id parameter has been passed in.')
+            logging.error('No site_id or rule_id parameter has been passed in.')
     else:
-        logger.error('No parameters where applied.')
+        logging.error('No parameters where applied.')

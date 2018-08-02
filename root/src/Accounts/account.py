@@ -1,12 +1,3 @@
-import time
-from pprint import pprint
-
-from Integration.clapps import r_clapps
-import Utils.log
-from Utils.incapError import IncapError
-logger = Utils.log.setup_custom_logger(__name__, fmt='%(message)s')
-
-
 class Account:
     def __init__(self, data):
         self.email = data.get('email') or ''

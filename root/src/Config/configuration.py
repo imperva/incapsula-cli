@@ -1,7 +1,7 @@
 import configparser
 import os
 import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 class IncapConfigurations:
@@ -19,7 +19,7 @@ class IncapConfigurations:
                     self.account = config.get('api', 'account')
                     self.baseurl = config.get('api', 'baseUrl')
             except configparser.Error as err:
-                logger.error('{}'.format(err.message))
+                logging.error('{}'.format(err.message))
                 exit(1)
         else:
             config['api'] = {'id': api_id,

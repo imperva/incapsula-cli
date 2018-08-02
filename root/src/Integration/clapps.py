@@ -1,11 +1,11 @@
 from Utils.executeRest import execute
 import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 def r_clapps():
     output = 'Retrieving client apps list for client_app_id to Client Application Name.'
-    logger.debug(output)
+    logging.debug(output)
     param = {
         "api_id": None,
         "api_key": None
@@ -14,7 +14,7 @@ def r_clapps():
     result = read(param)
 
     if result['res'] != 0:
-        logger.debug('Result Code: %s\nResult Message: %s\nDebug Id-Info: %s' % (
+        logging.debug('Result Code: %s\nResult Message: %s\nDebug Id-Info: %s' % (
             str(result['res']), result['res_message'], result['debug_info']['id-info']))
     else:
         return result

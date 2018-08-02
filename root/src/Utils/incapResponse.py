@@ -1,7 +1,3 @@
-import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
-
-
 class IncapResponse:
     def __init__(self, err):
         self.data = err
@@ -9,11 +5,11 @@ class IncapResponse:
         self.res_message = err.get('res_message')
         self.debug_info = err.get('debug_info')
 
-    def logger.debug(self):
-        logger.debug('Result Code: %s\nResult Message: %s' % (
+    def log(self):
+        print('Result Code: %s - Result Message: %s' % (
             str(self.data.get('res')), self.data.get('res_message')))
         for k, v in self.data['debug_info'].items():
-            logger.debug('DEBUG INFO:%s-%s' % (k, v))
+            print('%s - %s' % (str.upper(k), str.replace(v, '<br/>', '\n')))
 
     def get_res(self):
         return self.res

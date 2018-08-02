@@ -1,6 +1,8 @@
+from Accounts.account import Account
 from Utils.executeRest import execute
-import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
+import json
+from Utils.incapError import IncapError
 
 
 def c_account(args):
@@ -21,10 +23,14 @@ def c_account(args):
         "account_name": args.account_name
     }
     result = create(param)
+    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
-    if result['res'] != 0:
-        logger.debug('Result Code: %s\nResult Message: %s\nDebug Id-Info: %s' % (
-            str(result['res']), result['res_message'], result['debug_info']['id-info']))
+    if result.get('res') != 0:
+        err = IncapError(result)
+        err.log()
+    else:
+        account = Account(result)
+        print(account.log())
 
 
 def create(params):
@@ -33,6 +39,6 @@ def create(params):
         if "email" in params:
             return execute(resturl, params)
         else:
-            logger.debug("Error: No email parameter has been passed in for %s." % __name__)
+            logging.debug("Error: No email parameter has been passed in for %s." % __name__)
     else:
-        logger.error('No parameters where passed in.')
+        logging.error('No parameters where passed in.')

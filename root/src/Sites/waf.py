@@ -1,7 +1,7 @@
 from Sites.exception import IncapException
 from Sites.uWaf import update
 import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 class Security:
@@ -10,7 +10,7 @@ class Security:
         if 'waf' in data:
             waf_rule = {}
             for wafRules in data["waf"]["rules"]:
-                logger.info('Add WAF rule name: {} to {}'.format(wafRules['name'], wafRules.get('action_text')))
+                logging.info('Add WAF rule name: {} to {}'.format(wafRules['name'], wafRules.get('action_text')))
                 waf_rule['site_id'] = site_id
                 waf_rule['rule_id'] = wafRules['id']
                 if wafRules.get('action'):

@@ -2,15 +2,15 @@ from Utils.executeRest import execute
 from Sites.site import Site
 from Utils.incapError import IncapError
 import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 def u_security(args):
     output = 'Update site {0} security configuration.'. format(args.site_id)
-    logger.debug(output)
+    logging.debug(output)
 
     if args.rule_id == 'ddos' and args.activation_mode == '':
-        logger.warning('Activation mode param is required:\n'
+        logging.warning('Activation mode param is required:\n'
                      'activation_mode=api.threats.ddos.activation_mode.auto\n'
                      'activation_mode=api.threats.ddos.activation_mode.off\n'
                      'activation_mode=api.threats.ddos.activation_mode.on')
@@ -47,16 +47,16 @@ def update(params):
     resturl = '/api/prov/v1/sites/configure/security'
     if params:
         if "site_id" in params and "rule_id" in params:
-            logger.info('Create a {} rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_', ' '),
+            logging.info('Create a {} rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_', ' '),
                         'api.threats.', ''), params.get('site_id')))
             result = execute(resturl, params)
             if result.get('res') != 0:
                 IncapError(result).log()
             else:
-                logger.info('Created a {} rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_', ' '),
+                logging.info('Created a {} rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_', ' '),
                             'api.threats.', ''), params.get('site_id')))
                 return Site(result)
         else:
-                logger.error('No domain parameter has been passed in.')
+                logging.error('No domain parameter has been passed in.')
     else:
-        logger.error('No parameters where applied.')
+        logging.error('No parameters where applied.')

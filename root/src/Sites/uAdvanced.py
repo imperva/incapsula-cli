@@ -2,12 +2,12 @@ from Utils.executeRest import execute
 import Utils.log
 from Utils.incapError import IncapError
 
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 def u_advanced(args):
     output = 'Update advanced cache setting on {0}.'. format(args.site_id)
-    logger.debug(output)
+    logging.debug(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -21,7 +21,7 @@ def u_advanced(args):
         err = IncapError(result)
         err.log()
     else:
-        logger.debug('Result Message: %s' % (result.get('res_message')))
+        logging.debug('Result Message: %s' % (result.get('res_message')))
 
 
 def update(params):
@@ -30,6 +30,6 @@ def update(params):
         if "site_id" in params and "param" in params and "value" in params:
             return execute(resturl, params)
         else:
-            logger.error('No site ID, parameter or value has been passed in.')
+            logging.error('No site ID, parameter or value has been passed in.')
     else:
-        logger.error('No parameters where applied.')
+        logging.error('No parameters where applied.')

@@ -1,7 +1,5 @@
 from Sites.exception import IncapException
 from Sites.uACL import update
-import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
 
 
 class ACL:
@@ -10,7 +8,7 @@ class ACL:
         if 'acls' in data:
             acl_rule = {}
             for aclRules in data['acls']['rules']:
-                logger.info('Add Security rule: {}'.format(aclRules['name']))
+                logging.info('Add Security rule: {}'.format(aclRules['name']))
                 acl_rule['site_id'] = site_id
                 acl_rule['rule_id'] = aclRules['id']
                 if 'geo' in aclRules:

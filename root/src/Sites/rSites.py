@@ -1,15 +1,14 @@
 import json
 import os
-from pprint import pprint
 from Utils.executeRest import execute
 from Utils.incapError import IncapError
-import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 def r_sites(args):
     output = 'Getting site list.'
-    logger.debug(output)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -19,6 +18,7 @@ def r_sites(args):
     }
 
     result = read(param)
+    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
     if result.get('res') != 0:
         err = IncapError(result)
@@ -26,26 +26,26 @@ def r_sites(args):
     else:
         for site in result['sites']:
             try:
-                logger.debug("Export results: {}.".format(args.export))
+                logging.debug("Export results: {}.".format(args.export))
                 if args.export:
                     if not os.path.exists(args.path):
                         os.makedirs(args.path)
                     with open(args.path + '/' + site.get('domain')+'.json' or 'none.json', 'w') as outfile:
                         json.dump(site, outfile)
             except OSError as e:
-                logger.error(e.strerror)
+                logging.error(e.strerror)
             if 'acls' in site['security']:
                 for aclRules in site['security']['acls']['rules']:
-                    logger.debug(aclRules['id'])
+                    logging.debug(aclRules['id'])
                     if aclRules['id'] == 'api.acl.blacklisted_ips':
-                        logger.info('The following IPs are blacklisted: %s' % ', '.join(aclRules['ips']))
+                        logging.info('The following IPs are blacklisted: %s' % ', '.join(aclRules['ips']))
                     elif aclRules['id'] == 'api.acl.whitelisted_ips':
-                        logger.infp('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
+                        logging.info('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
                     else:
-                        logger.info("Nothing is being blacklisted or whitelisted.")
+                        logging.info("Nothing is being blacklisted or whitelisted.")
             else:
-                logger.debug("No ACLs here...")
-            logger.info('Domain Status Info:\n    FQDN: %s\n    Status: %s\n    Site ID: %s'
+                logging.debug("No ACLs here...")
+            logging.info('Domain Status Info:\n    FQDN: %s\n    Status: %s\n    Site ID: %s'
                   % (site.get('domain'), site.get('status'), site.get('site_id')))
         return result.get('res')
 

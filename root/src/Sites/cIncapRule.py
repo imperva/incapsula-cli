@@ -1,12 +1,12 @@
 from Utils.executeRest import execute
 from Utils.incapError import IncapError
 import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 def c_incaprule(args):
     output = 'Create incapRule = {0} for site: {1}'. format(args.name, args.site_id)
-    logger.debug(output)
+    logging.debug(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -32,14 +32,14 @@ def create(params):
     resturl = '/api/prov/v1/sites/incapRules/add'
     if params:
         if "site_id" in params:
-            logger.info('Create IncapRule for site ID:{}'.format(params.get('site_id')))
+            logging.info('Create IncapRule for site ID:{}'.format(params.get('site_id')))
             result = execute(resturl, params)
             if result.get('res') != '0':
                 IncapError(result).log()
             else:
-                logger.info('Created the following incapRule Id: {}'.format(result.get('rule_id')))
+                logging.info('Created the following incapRule Id: {}'.format(result.get('rule_id')))
                 return result
         else:
-            logger.error('No site ID parameter has been passed in.')
+            logging.error('No site ID parameter has been passed in.')
     else:
-        logger.error('No parameters where passed in.')
+        logging.error('No parameters where passed in.')

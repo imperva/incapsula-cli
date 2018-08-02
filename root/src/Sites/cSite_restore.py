@@ -1,6 +1,6 @@
 import json
 import os
-from Sites.incaprule import IncapRule
+from Sites.adr_incaprule import IncapRule
 from Sites.site import Site
 from Sites.cSite import create
 import Utils.log
@@ -8,7 +8,7 @@ from Utils.incapError import IncapError
 from Sites.acl import ACL
 from Sites.waf import Security
 
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 def c_site_restore(args):
@@ -19,7 +19,7 @@ def c_site_restore(args):
         "domain": args.domain
     }
     output = 'Creating bulk sites from {0}'. format(args.path)
-    logger.debug(output)
+    logging.debug(output)
 
     dir_file = args.path
 
@@ -32,7 +32,7 @@ def c_site_restore(args):
                 with open(files, 'r') as file:
                     recover_site(file, param)
     except OSError as e:
-        logger.error(e.strerror)
+        logging.error(e.strerror)
         exit(e.errno)
 
 
@@ -41,9 +41,9 @@ def recover_site(file, param):
     # param['domain'] = old_site.domain
     # new_site = Site(create(param)) or None
     # if new_site.site_id is None:
-    #     logger.warning('%s was not created, please review logs.' % old_site.domain)
+    #     logging.warning('%s was not created, please review logs.' % old_site.domain)
     #     exit(1)
-    # logger.debug('Created %s, Site_ID=%s, Status=%s' % (new_site.domain, new_site.site_id, new_site.status))
+    # logging.debug('Created %s, Site_ID=%s, Status=%s' % (new_site.domain, new_site.site_id, new_site.status))
 
     # acl = ACL(old_site.security, new_site.site_id)
     # acl.update()
@@ -59,7 +59,7 @@ def set_incapRules(data, site_id):
     for incapRule in data:
         print('--------------------------------------------------------------------------------------------')
         name = incapRule['name']
-        logger.info("Add %s InacapRule." % name)
+        logging.info("Add %s InacapRule." % name)
         del incapRule['creation_date']
         del incapRule['id']
         incapRule['filter'] = incapRule['rule']
@@ -71,8 +71,8 @@ def set_incapRules(data, site_id):
         result = create(incapRule)
         #pprint(result)
         if result['res'] == '0':
-            logger.info("Successfully added %s!" % name)
+            logging.info("Successfully added %s!" % name)
         else:
-            logger.error('Failed to add %s - %s' % (name, incapRule))
+            logging.error('Failed to add %s - %s' % (name, incapRule))
             err = IncapError(result)
             err.log()

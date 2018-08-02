@@ -1,6 +1,6 @@
 from Sites.uWhitelist import update
 import Utils.log
-logger = Utils.log.setup_custom_logger(__name__)
+import logging
 
 
 class IncapException:
@@ -26,7 +26,7 @@ class IncapException:
                         if 'continents' in v:
                             except_value['continents'] = ','.join(v['continents'])
 
-                logger.info("Add {} exception to {}.".format(value['name'], rule_name))
+                logging.info("Add {} exception to {}.".format(value['name'], rule_name))
             self.exceptions.append(except_value)
 
     def update(self):
