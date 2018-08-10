@@ -52,7 +52,6 @@ https://www.python.org/downloads/
 ##List all incap_rules
     incap site list_incaprule SITE_ID
 
-
 ##Add an IncapRule to a site
     incap site add_incaprule --name="Testing block crawlers" --action=RULE_ACTION_ALERT --filter="ClientType == Crawler" SITE_ID
 
@@ -69,7 +68,16 @@ https://www.python.org/downloads/
     incap site acl --ips=107.232.12.4,102.232.22.99 blacklisted_ips SITE_ID
 
 ##Add whitelist exceptions to XSS Rule
-    incap site whitelist  --urls='/home,/example'  --countries='JM,CA' --continents='AF' --ips='192.168.1.1,172.21.12.0/24' --client_app_types='Browser' --client_apps='68'  --user_agents='curl' --log=debug api.threats.cross_site_scripting 3568726
+    incap site whitelist  --urls='/home,/example'  --countries='JM,CA' --continents='AF' --ips='192.168.1.1,172.21.12.0/24' --client_app_types='Browser' --client_apps='68'  --user_agents='curl' --log=debug api.threats.cross_site_scripting SITE_ID
+
+##Add never cache resource rule
+    incap site cache-rule --never_cache_resource_url=/help,login --never_cache_resource_pattern=prefix,contains SITE_ID
+
+##Add cache durations and cache mode
+    incap site cache-mode --aggressive_cache_duration=5_hr --dynamic_cache_duration=5_days static_and_dynamic SITE_ID
+
+##Set advanced cache async validation to true
+    incap site advanced-cache async_validation true SITE_ID
 
 ##Backup full config (does not include ADR rules yet)
     incap site list --export=true –path=/Users/<name>/backups

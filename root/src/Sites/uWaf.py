@@ -6,7 +6,8 @@ import logging
 
 def u_security(args):
     output = 'Update site {0} security configuration.'. format(args.site_id)
-    logging.debug(output)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
 
     if args.rule_id == 'ddos' and args.activation_mode == '':
         logging.warning('Activation mode param is required:\n'
@@ -39,7 +40,16 @@ def u_security(args):
         "ddos_traffic_threshold": args.ddos_traffic_threshold
     }
 
-    update(param)
+    result = update(param)
+
+    if result.get('res') != 0:
+        err = IncapError(result)
+        err.log()
+    else:
+        site = Site(result)
+        print('Updated {} Security(WAF) Rule for {} to {}.'.format(args.rule_id.replace('_', ' '), site.get_domain()
+                                                                   , args.security_rule_action.replace('_', ' ')))
+        return site
 
 
 def update(params):
@@ -47,12 +57,8 @@ def update(params):
     if params:
         if "site_id" in params and "rule_id" in params:
             result = execute(resturl, params)
-            if result.get('res') != 0:
-                err = IncapError(result)
-                err.log()
-            else:
-                return Site(result)
+            return result
         else:
-                logging.error('No site_id or rule_id parameter has been passed in.')
+            logging.warning("No site_id or rule_id parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where applied.')
