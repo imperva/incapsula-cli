@@ -26,6 +26,7 @@ class Site:
         self.performance_configuration = data.get('performance_configuration') or {}
         self.sealLocation = data.get('sealLocation') or {}
         self.security = data.get('security') or None
+        self.waf_rules = self.security['waf']['rules'] or []
         self.siteDualFactorSettings = data.get('siteDualFactorSettings') or {}
         self.ssl = data.get('ssl') or {}
         self.warnings = data.get('warnings') or []
@@ -42,6 +43,9 @@ class Site:
         else:
             client = self.clapps['clientAppTypes'][cl_id[0]] + ' with client name ' + self.clapps['clientApps'][cl_id[0]]
             return client
+
+    def get_waf_rules(self):
+        return self.waf_rules
 
     def get_domain(self):
         return self.domain

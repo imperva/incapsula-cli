@@ -1,14 +1,14 @@
 from Utils.executeRest import execute
 from Sites.site import Site
-import Utils.log
 from Utils.incapError import IncapError
-
+from Sites.exception import IncapException
 import logging
 
 
 def u_whitelist(args):
-    output = 'Update whitelist rule ID={0} with whitelist ID={1}.'. format(args.rule_id, args.whitelist_id)
-    logging.debug(output)
+    output = 'Update whitelist rule ID={0}.'. format(args.rule_id)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -25,23 +25,35 @@ def u_whitelist(args):
         "parameters": args.parameters,
         "user_agents": args.user_agents
     }
-    update(param)
+
+    result = update(param)
+
+    if result.get('res') != 0:
+        err = IncapError(result)
+        err.log()
+    else:
+        site = Site(result)
+        for rule in site.waf_rules:
+            if rule['id'] == args.rule_id:
+                logging.debug('WAF Rules: {}'.format(site.get_waf_rules()))
+                print('WAF Rule Name: {} has the following exceptions:'.format(rule['name']))
+                for exceptions in rule['exceptions']:
+                    logging.debug('Exception ID: {}'.format(exceptions['id']))
+                    for exception in exceptions['values']:
+                        value = IncapException(exception)
+                        print("Exception Type: {}".format(value.id.replace('api.rule_exception_type.', '').replace('_', ' ')))
+                #logging.debug('WAF Rules: {}'.format(site.get_waf_rules()))
+        print('Updated successful')
+        return site
 
 
 def update(params):
     resturl = '/api/prov/v1/sites/configure/whitelists'
     if params:
         if "site_id" in params and "rule_id" in params:
-            logging.info('Create a {} exception rule for site ID:{}'.format(str.replace(params.get('rule_id')
-                        .replace('_', ' '), 'api.threats.', ''), params.get('site_id')))
             result = execute(resturl, params)
-            if result.get('res') != 0:
-                IncapError(result).log()
-            else:
-                logging.info('Created a {} exception rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_',
-                            ' '), 'api.threats.', ''), params.get('site_id')))
-                return Site(result)
+            return result
         else:
-            logging.error('No site_id or rule_id parameter has been passed in.')
+            logging.warning("No site_id or rule_id parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where applied.')

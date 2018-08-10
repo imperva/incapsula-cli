@@ -1,8 +1,6 @@
 from Utils.executeRest import execute
-import Utils.log
 from Accounts.account import Account
 from Utils.incapError import IncapError
-import json
 import logging
 
 
@@ -18,7 +16,6 @@ def r_accounts(args):
         "page_num": args.page_num
     }
     result = read(param)
-    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
     if result.get('res') != 0:
         err = IncapError(result)

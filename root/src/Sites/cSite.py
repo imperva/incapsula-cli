@@ -24,7 +24,6 @@ def c_site(args):
     }
 
     result = create(param)
-    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
     if result.get('res') != 0:
         err = IncapError(result)
@@ -38,11 +37,10 @@ def c_site(args):
 
 def create(params):
     resturl = '/api/prov/v1/sites/add'
-
     if params:
         if "domain" in params:
             return execute(resturl, params)
         else:
-            logging.error('No domain parameter has been passed in.')
+            logging.warning("No domain parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where passed in.')

@@ -1,13 +1,13 @@
 from Utils.executeRest import execute
-import Utils.log
 from Utils.incapError import IncapError
-
 import logging
+from Utils.incapResponse import IncapResponse
 
 
 def u_cacherule(args):
-    output = 'Update cache setting on {0}.'. format(args.site_id)
-    logging.debug(output)
+    output = 'Update cache rules on {0}.'. format(args.site_id)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -28,7 +28,14 @@ def u_cacherule(args):
         err = IncapError(result)
         err.log()
     else:
-        logging.debug('Result Message: %s' % (result.get('res_message')))
+        resp = IncapResponse(result)
+        print('Updated cache rule(s) on site ID: {}'.format(param.get('site_id')))
+        for k, v in param.items():
+
+            if len(k) > 10 and len(v) > 0:
+                print('Setting {} to {}'.format(k.replace('_', ' '), v))
+        resp.log()
+        return resp
 
 
 def update(params):
@@ -37,6 +44,6 @@ def update(params):
         if "site_id" in params:
             return execute(resturl, params)
         else:
-            logging.error('No site ID parameter has been passed in.')
+            logging.warning("No site_id parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where applied.')

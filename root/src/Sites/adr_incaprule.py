@@ -1,3 +1,9 @@
+from Sites.cIncapRule import create
+from Sites.dIncapRule import delete
+from Sites.uIncapRule import update
+import logging
+
+
 class ADRuleRedirect:
     def __init__(self, data):
         self.to = data['to']
@@ -71,14 +77,39 @@ class IncapRule:
             self.id = data['id']
             self.name = data['name']
             self.filter = data['filter']
-            self.action = str.upper(data['action'])
+            self.action = str.upper(data['action'].replace('api.rule_action_type.', ''))
         elif 'rule' in data:
             self.id = data['id']
             self.name = data['name']
             self.filter = data['rule']
-            self.action = str.upper(data['action'])
+            self.action = str.upper(data['action'].replace('api.rule_action_type.', ''))
+
+    def set_param(self, site_id):
+        return {
+            "api_id": None,
+            "api_key": None,
+            "site_id": site_id,
+            "name": self.name,
+            "action": self.action,
+            "filter": self.filter,
+            "response_code": '',
+            "protocol": '',
+            "add_missing": '',
+            "from": '',
+            "to": '',
+            "rewrite_name": '',
+            "dc_id": '',
+            "is_test_mode": '',
+            "lb_algorithm": ''
+        }
+
+    @staticmethod
+    def create_incap_rule(param):
+        print('Create IncapRule: {}'.format(param['name']))
+        logging.debug('IncaRule Param: {}'.format(param))
+        create(param)
 
     def log(self):
         return '-------------------------------------------------------------------------------------------------\n' \
-               'Rule ID: %s\n--name="%s" --filter="%s" --action=%s'\
+               "Rule ID: %s\n--name='%s' --filter='%s' --action=%s"\
                % (self.id, self.name, self.filter, self.action)

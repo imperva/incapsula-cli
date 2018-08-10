@@ -1,19 +1,19 @@
 from Utils.executeRest import execute
 from Sites.site import Site
 from Utils.incapError import IncapError
-import Utils.log
 import logging
 
 
 def u_acl(args):
     output = 'Update ACL rule: {0}'. format(args.rule_id)
-    logging.debug(output)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
 
     if args.rule_id == 'blacklisted_countries' and args.countries is None:
-        logging.debug("Black listing countries and/or continents requires --countries or --continent option.")
+        logging.warning("Black listing countries and/or continents requires --countries or --continent option.")
         exit(0)
     if args.rule_id == 'blacklisted_urls' and (args.url_patterns is None and args.urls != ''):
-        logging.debug("Black listing urls requires --url_patterns or --urls option.")
+        logging.warning("Black listing urls requires --url_patterns or --urls option.")
         exit(0)
 
     param = {
@@ -28,23 +28,24 @@ def u_acl(args):
         "ips": args.ips
     }
 
-    update(param)
+    result = update(param)
+
+    if result.get('res') != 0:
+        err = IncapError(result)
+        err.log()
+    else:
+        site = Site(result)
+        print('Updated {} ACL Rule for {}.'.format(args.rule_id.replace('_', ' '), site.get_domain()))
+        return site
 
 
 def update(params):
     resturl = '/api/prov/v1/sites/configure/acl'
     if params:
         if "site_id" in params and "rule_id" in params:
-            logging.info('Create a {} ACL rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_', ' '),
-                        'api.acl.', ''), params.get('site_id')))
             result = execute(resturl, params)
-            if result.get('res') != 0:
-                IncapError(result).log()
-            else:
-                logging.info('Created a {} ACL rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_', ' '),
-                            'api.acl.', ''), params.get('site_id')))
-                return Site(result)
+            return result
         else:
-                logging.error('No site_id or rule_id parameter has been passed in.')
+            logging.warning("No site_id or rule_id parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where applied.')

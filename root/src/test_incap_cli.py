@@ -2,7 +2,6 @@ import unittest
 from Sites.site import Site
 from Utils.incapResponse import IncapResponse
 from Utils.clidriver import testing
-import Utils.log
 import logging
 
 

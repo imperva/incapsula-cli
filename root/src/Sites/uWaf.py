@@ -1,7 +1,6 @@
 from Utils.executeRest import execute
 from Sites.site import Site
 from Utils.incapError import IncapError
-import Utils.log
 import logging
 
 
@@ -47,16 +46,13 @@ def update(params):
     resturl = '/api/prov/v1/sites/configure/security'
     if params:
         if "site_id" in params and "rule_id" in params:
-            logging.info('Create a {} rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_', ' '),
-                        'api.threats.', ''), params.get('site_id')))
             result = execute(resturl, params)
             if result.get('res') != 0:
-                IncapError(result).log()
+                err = IncapError(result)
+                err.log()
             else:
-                logging.info('Created a {} rule for site ID:{}'.format(str.replace(params.get('rule_id').replace('_', ' '),
-                            'api.threats.', ''), params.get('site_id')))
                 return Site(result)
         else:
-                logging.error('No domain parameter has been passed in.')
+                logging.error('No site_id or rule_id parameter has been passed in.')
     else:
         logging.error('No parameters where applied.')

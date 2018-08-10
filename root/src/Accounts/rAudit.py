@@ -23,7 +23,6 @@ def r_audit(args):
     }
 
     result = read(param)
-    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
     if result.get('res') != 0:
         err = IncapError(result)
@@ -42,6 +41,6 @@ def read(params):
         if "account_id" in params:
             return execute(resturl, params)
         else:
-            logging.error('No domain parameter has been passed in.')
+            logging.warning("No account_id parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where passed in.')

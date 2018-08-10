@@ -1,18 +1,26 @@
+import logging
+
+
 class IncapResponse:
-    def __init__(self, err):
-        self.data = err
-        self.res = err.get('res')
-        self.res_message = err.get('res_message')
-        self.debug_info = err.get('debug_info')
+    def __init__(self, data):
+        self.data = data
+        self.res = data.get('res')
+        self.res_message = data.get('res_message')
+        self.debug_info = data.get('debug_info')
+        self.rule_id = data.get('rule_id')
 
     def log(self):
-        print('Result Code: %s - Result Message: %s' % (
+        logging.debug('Result Code: %s - Result Message: %s' % (
             str(self.data.get('res')), self.data.get('res_message')))
-        for k, v in self.data['debug_info'].items():
-            print('%s - %s' % (str.upper(k), str.replace(v, '<br/>', '\n')))
+        if self.debug_info is not None:
+            for k, v in self.data['debug_info'].items():
+                logging.debug('%s - %s' % (str.upper(k), str.replace(v, '<br/>', '\n')))
 
     def get_res(self):
         return self.res
+
+    def get_rule_id(self):
+        return self.rule_id
 
     def get_res_message(self):
         return self.res_message

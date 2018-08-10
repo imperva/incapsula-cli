@@ -3,23 +3,20 @@ import os
 from Sites.adr_incaprule import IncapRule
 from Sites.site import Site
 from Sites.cSite import create
-import Utils.log
 from Utils.incapError import IncapError
 from Sites.acl import ACL
 from Sites.waf import Security
-
 import logging
 
 
 def c_site_restore(args):
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
         "account_id": args.account_id,
         "domain": args.domain
     }
-    output = 'Creating bulk sites from {0}'. format(args.path)
-    logging.debug(output)
 
     dir_file = args.path
 
@@ -36,43 +33,29 @@ def c_site_restore(args):
         exit(e.errno)
 
 
-def recover_site(file, param):
+def recover_site(file, params):
     old_site = Site(json.load(file))
-    # param['domain'] = old_site.domain
-    # new_site = Site(create(param)) or None
-    # if new_site.site_id is None:
-    #     logging.warning('%s was not created, please review logs.' % old_site.domain)
-    #     exit(1)
-    # logging.debug('Created %s, Site_ID=%s, Status=%s' % (new_site.domain, new_site.site_id, new_site.status))
-
-    # acl = ACL(old_site.security, new_site.site_id)
-    # acl.update()
-    # sec = Security(old_site.security, new_site.site_id)
-    # sec.update()
-    incaprule = IncapRule(old_site.incap_rules)
-    print('here is my incap rule {}'.format(incaprule.name))
-    exit(0)
-
-
-def set_incapRules(data, site_id):
-    from Sites.cIncapRule import create
-    for incapRule in data:
-        print('--------------------------------------------------------------------------------------------')
-        name = incapRule['name']
-        logging.info("Add %s InacapRule." % name)
-        del incapRule['creation_date']
-        del incapRule['id']
-        incapRule['filter'] = incapRule['rule']
-        del incapRule['rule']
-        incapRule['site_id'] = site_id
-        incapRule['action'] = str.upper(incapRule.get('action').replace('api.rule_action_type.', ''))
-        from pprint import pprint
-        #pprint(incapRule)
-        result = create(incapRule)
-        #pprint(result)
-        if result['res'] == '0':
-            logging.info("Successfully added %s!" % name)
-        else:
-            logging.error('Failed to add %s - %s' % (name, incapRule))
+    if params['domain'] is None:
+        print('Restoring {0}'. format(old_site.domain))
+        params['domain'] = old_site.domain
+    else:
+        print('Creating {0} from {1} template'.format(params['domain'], old_site.domain))
+        result = create(params)
+        if result.get('res') != 0:
+            logging.error('%s was not created, please review logs.' % params['domain'])
             err = IncapError(result)
             err.log()
+        else:
+            new_site = Site(result) or None
+            print('Created: %s, ID: %s ' % (new_site.get_domain(), str(new_site.get_id())))
+            acl = ACL(old_site.security, new_site.site_id)
+            acl.update()
+            sec = Security(old_site.security, new_site.site_id)
+            sec.update()
+            if old_site.incap_rules is not []:
+                for rule in old_site.incap_rules:
+                    logging.debug('Incap Rule JSON Response: {}'.format(json.dumps(rule, indent=4)))
+                    incap_rule = IncapRule(rule)
+                    incap_rule_params = incap_rule.set_param(new_site.site_id)
+                    incap_rule.create_incap_rule(incap_rule_params)
+

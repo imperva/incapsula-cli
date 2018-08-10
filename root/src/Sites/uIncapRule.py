@@ -1,13 +1,14 @@
-from Sites.site import Site
 from Utils.executeRest import execute
-import Utils.log
 from Utils.incapError import IncapError
 import logging
+
+from Utils.incapResponse import IncapResponse
 
 
 def u_incaprule(args):
     output = 'Update incapRule Id: {}'. format(args.rule_id)
-    logging.debug(output)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -26,21 +27,24 @@ def u_incaprule(args):
         "lb_algorithm": args.lb_algorithm
     }
 
-    update(param)
+    result = update(param)
+    if result.get('res') != 0:
+        err = IncapError(result)
+        err.log()
+    else:
+        resp = IncapResponse(result)
+        print('Updated IncapRule ID: {}'.format(param.get('rule_id')))
+        resp.log()
+        return resp
 
 
 def update(params):
     resturl = '/api/prov/v1/sites/incapRules/edit'
     if params:
         if "rule_id" in params:
-            logging.info('Update IncapRule for ID:{}'.format(params.get('rule_id')))
             result = execute(resturl, params)
-            if result.get('res') != '0':
-                IncapError(result).log()
-            else:
-                logging.info('Updated the following incapRule Id: {}"'.format(result.get('rule_id')))
-                return result
+            return result
         else:
-            logging.error('No rule ID parameter has been passed in.')
+            logging.warning("No rule_id parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where passed in.')

@@ -22,12 +22,15 @@ def execute(resturl, param):
                 param["account_id"] = config.get_account()
 
     try:
+        logging.debug('Request Data: {}'.format(param))
         data = urllib.parse.urlencode(param).encode()
         headers = {'content-type': "application/x-www-form-urlencoded"}
         req = urllib.request.Request(str(config.get_baseurl()) + resturl, data, headers, method='POST')
 
         with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
-            return json.loads(response.read().decode('utf8'))
+            result = json.loads(response.read().decode('utf8'))
+            logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
+            return result
 
     except (HTTPError, URLError) as error:
         logging.error('Data was not received from %s\nError: %s' % (str(config.baseurl) + resturl, error))

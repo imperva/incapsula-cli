@@ -15,7 +15,6 @@ def r_account(args):
         "account_id": args.account_id
     }
     result = read(param)
-    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
     if result.get('res') != 0:
         err = IncapError(result)

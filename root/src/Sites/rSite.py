@@ -17,7 +17,6 @@ def r_site(args):
     }
 
     result = read(param)
-    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
     if result.get('res') != 0:
         err = IncapError(result)
@@ -30,11 +29,10 @@ def r_site(args):
 
 def read(params):
     resturl = '/api/prov/v1/sites/status'
-
     if params:
         if "site_id" in params:
             return execute(resturl, params)
         else:
-            logging.error('No site_id parameter has been passed in.')
+            logging.warning("No site_id parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where passed in.')

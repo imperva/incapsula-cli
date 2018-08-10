@@ -1,12 +1,14 @@
 from Utils.executeRest import execute
 from Utils.incapError import IncapError
-import Utils.log
 import logging
+
+from Utils.incapResponse import IncapResponse
 
 
 def u_configuration(args):
     output = 'Update site {0} with configuration param={1} and value={2}.'. format(args.site_id, args.param, args.value)
-    logging.debug(output)
+    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    print(output)
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
@@ -20,10 +22,10 @@ def u_configuration(args):
         err = IncapError(result)
         err.log()
     else:
-        logging.debug('Result Code: %s\nResult Message: %s\nDebug Id-Info: %s' % (
-            str(result.get('res')), result.get('res_message'), result.get('debug_info').get('id-info')))
-
-    return result.get('res')
+        resp = IncapResponse(result)
+        print('Updated Site ID: {} {} configuration to {}'.format(args.site_id, args.param.replace('_', ' '), args.value))
+        resp.log()
+        return resp
 
 
 def update(params):
@@ -32,6 +34,6 @@ def update(params):
         if "param" in params and "value" in params:
             return execute(resturl, params)
         else:
-            logging.error('No domain parameter has been passed in.')
+            logging.warning("No (param : value) parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where applied.')

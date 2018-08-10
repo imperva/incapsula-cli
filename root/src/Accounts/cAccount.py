@@ -23,7 +23,6 @@ def c_account(args):
         "account_name": args.account_name
     }
     result = create(param)
-    logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
     if result.get('res') != 0:
         err = IncapError(result)
@@ -39,6 +38,6 @@ def create(params):
         if "email" in params:
             return execute(resturl, params)
         else:
-            logging.debug("Error: No email parameter has been passed in for %s." % __name__)
+            logging.warning("No email parameter has been passed in for %s." % __name__)
     else:
         logging.error('No parameters where passed in.')
