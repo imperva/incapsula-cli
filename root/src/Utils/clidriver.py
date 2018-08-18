@@ -2,6 +2,7 @@ import argparse
 from Accounts.cAccount import c_account
 from Accounts.rAudit import r_audit
 from Sites.cSite import c_site
+from Sites.dCertificate import d_certificate
 from Sites.dSite import d_site
 from Sites.rSite import r_site
 from Sites.rSites import r_sites
@@ -9,6 +10,7 @@ from Sites.uACL import u_acl
 from Sites.uCacheMode import u_cachemode
 from Sites.uAdvanced import u_advanced
 from Sites.uCachingRules import u_cacherule
+from Sites.uCertificate import u_certificate
 from Sites.uConfigration import u_configuration
 from Sites.uWaf import u_security
 from Sites.uWhitelist import u_whitelist
@@ -39,9 +41,25 @@ cli_config_parser.add_argument('account_id', help='Numeric identifier of the acc
                                                   ' on. If not specified, operation will be '
                                                   'performed on the account identified by the '
                                                   'authentication parameters.')
-cli_config_parser.add_argument('--baseUrl', default='https://my.incapsula.com')
+cli_config_parser.add_argument('--repo', default='', help='This is optional if you have a '
+                                                            'repository where backups and templates can be storied.')
+cli_config_parser.add_argument('--baseurl', default='https://my.incapsula.com',
+                               help='Optionally set the URL for the API domain.')
 cli_config_parser.add_argument('--log', default='INFO')
 cli_config_parser.set_defaults(func=configure)
+
+# cli_archive_parser = subparsers.add_parser('archive', help='Use config to add the default API_ID,'
+#                                                            ' API_KEY and Account_ID.',
+#                                            usage='incap config [options] api_id api_key account_id')
+# cli_archive_parser.add_argument('api_id', help='API authentication identifier.')
+# cli_archive_parser.add_argument('api_key', help='API authentication identifier.')
+# cli_archive_parser.add_argument('account_id', help='Numeric identifier of the account to operate'
+#                                                   ' on. If not specified, operation will be '
+#                                                   'performed on the account identified by the '
+#                                                   'authentication parameters.')
+# cli_archive_parser.add_argument('--baseUrl', default='https://my.incapsula.com')
+# cli_archive_parser.add_argument('--log', default='INFO')
+# cli_archive_parser.set_defaults(func=create_repo)
 
 site_parser = subparsers.add_parser('site', help='Used to add, delete and configure Incapsula sites.',
                                     usage='incap site <command> [options]')
@@ -115,6 +133,32 @@ site_status_parser.add_argument('--tests', default='', help='List of tests to ru
                                                             'See detailed description below.')
 site_status_parser.add_argument('--log', default='INFO')
 site_status_parser.set_defaults(func=r_site)
+
+site_ucertificate_parser = site_subparsers.add_parser('upcert', help='Use this operation to upload custom '
+                                                                    'certificate for your site. The following SSL '
+                                                                    'certificate file formats are supported:'
+                                                                    ' PFX, PEM, CER.',
+                                                     usage='incap site upcert [options] certificate site_id')
+site_ucertificate_parser.add_argument('--api_id', help='API authentication identifier.')
+site_ucertificate_parser.add_argument('--api_key', help='API authentication identifier.')
+site_ucertificate_parser.add_argument('certificate', help='The certificate file in base64 format (location)')
+site_ucertificate_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_ucertificate_parser.add_argument('--private_key', help='The private key of the certificate in base64 format.'
+                                                           ' Optional in case of PFX certificate file format')
+site_ucertificate_parser.add_argument('--passphrase', help='The passphrase used to protect your SSL certificate')
+site_ucertificate_parser.add_argument('--log', default='INFO')
+site_ucertificate_parser.set_defaults(func=u_certificate)
+
+site_dcertificate_parser = site_subparsers.add_parser('delcert', help='Use this operation to upload custom '
+                                                                    'certificate for your site. The following SSL '
+                                                                    'certificate file formats are supported:'
+                                                                    ' PFX, PEM, CER.',
+                                                     usage='incap site upcert [options] certificate site_id')
+site_dcertificate_parser.add_argument('--api_id', help='API authentication identifier.')
+site_dcertificate_parser.add_argument('--api_key', help='API authentication identifier.')
+site_dcertificate_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_dcertificate_parser.add_argument('--log', default='INFO')
+site_dcertificate_parser.set_defaults(func=d_certificate)
 
 site_list_parser = site_subparsers.add_parser('list', help='Use this operation to delete a site.',
                                               usage='incap site list [options]')

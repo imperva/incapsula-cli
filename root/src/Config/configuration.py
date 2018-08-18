@@ -4,7 +4,7 @@ import logging
 
 
 class IncapConfigurations:
-    def __init__(self, api_id=None, api_key=None, account=None, baseUrl=None):
+    def __init__(self, api_id=None, api_key=None, account=None, baseurl=None, repo=None):
         config = configparser.ConfigParser()
         home = os.path.expanduser('~')
         filename = home + '/.incap/config.ini'
@@ -17,6 +17,7 @@ class IncapConfigurations:
                     self.api_key = config.get('api', 'key')
                     self.account = config.get('api', 'account')
                     self.baseurl = config.get('api', 'baseUrl')
+                    self.repo = config.get('api', 'repo')
             except configparser.Error as err:
                 logging.error('{}'.format(err.message))
                 exit(1)
@@ -24,7 +25,8 @@ class IncapConfigurations:
             config['api'] = {'id': api_id,
                              'key': api_key,
                              'account': account,
-                             'baseUrl': baseUrl}
+                             'baseUrl': baseurl,
+                             'repo': repo}
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             with open(filename, 'w') as configFile:
                 config.write(configFile)
@@ -41,8 +43,11 @@ class IncapConfigurations:
     def get_account(self):
         return self.account
 
+    def get_repo(self):
+        return self.repo
+
 
 def configure(args):
     return IncapConfigurations(api_id=args.api_id, api_key=args.api_key, account=args.account_id,
-                               baseUrl=args.baseUrl)
+                               baseurl=args.baseurl, repo=args.repo)
 

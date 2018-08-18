@@ -6,6 +6,7 @@ from Sites.cSite import create
 from Utils.incapError import IncapError
 from Sites.acl import ACL
 from Sites.waf import Security
+from Config.configuration import IncapConfigurations
 import logging
 
 
@@ -18,7 +19,12 @@ def c_site_restore(args):
         "domain": args.domain
     }
 
-    dir_file = args.path
+    config = IncapConfigurations()
+
+    if args.path == '':
+        dir_file = config.get_repo()
+    else:
+        dir_file = args.path
 
     try:
         if os.path.isfile(dir_file):

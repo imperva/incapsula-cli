@@ -31,6 +31,7 @@ def u_incaprule(args):
     if result.get('res') != 0:
         err = IncapError(result)
         err.log()
+        return err
     else:
         resp = IncapResponse(result)
         print('Updated IncapRule ID: {}'.format(param.get('rule_id')))

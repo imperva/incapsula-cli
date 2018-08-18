@@ -1,19 +1,22 @@
 from Utils.executeRest import execute
+from Sites.site import Site
 from Utils.incapError import IncapError
-from Utils.incapResponse import IncapResponse
 import logging
-import json
+
+from Utils.incapResponse import IncapResponse
 
 
-def d_site(args):
-    output = 'Delete site ID = {0}!'. format(args.site_id)
+def d_certificate(args):
+    output = 'Delete Certificate to: {0}'. format(args.site_id)
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     print(output)
+
     param = {
         "api_id": args.api_id,
         "api_key": args.api_key,
         "site_id": args.site_id
     }
+
     result = delete(param)
 
     if result.get('res') != 0:
@@ -22,12 +25,13 @@ def d_site(args):
         return err
     else:
         resp = IncapResponse(result)
+        print('Deleted certificate from site ID: {}'.format(args.site_id))
         resp.log()
         return resp
 
 
 def delete(params):
-    resturl = '/api/prov/v1/sites/delete'
+    resturl = '/api/prov/v1/sites/customCertificate/remove'
     if params:
         if "site_id" in params:
             return execute(resturl, params)

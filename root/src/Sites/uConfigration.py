@@ -21,6 +21,7 @@ def u_configuration(args):
     if result.get('res') != 0:
         err = IncapError(result)
         err.log()
+        return err
     else:
         resp = IncapResponse(result)
         print('Updated Site ID: {} {} configuration to {}'.format(args.site_id, args.param.replace('_', ' '), args.value))

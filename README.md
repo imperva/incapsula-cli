@@ -39,6 +39,10 @@ https://www.python.org/downloads/
     incap site acl --help
     incap site add www.saic.com
     incap site list_incaprule 26621616
+    
+## Adding your configuration info locally for easy use
+    incap config --repo=/Users/<username>/your_repo_location --baseurl=https://api.incapsula.com 26012 ejf903rie-3983030ie23r2r39j0 2398
+View the config with - *cat ~/.incap/config*
 
 ## Add a site
     incap site add www.saic.com
@@ -68,7 +72,7 @@ https://www.python.org/downloads/
     incap site acl --ips=107.232.12.4,102.232.22.99 blacklisted_ips SITE_ID
 
 ## Add whitelist exceptions to XSS Rule
-    incap site whitelist  --urls='/home,/example'  --countries='JM,CA' --continents='AF' --ips='192.168.1.1,172.21.12.0/24' --client_app_types='Browser' --client_apps='68'  --user_agents='curl' --log=debug api.threats.cross_site_scripting SITE_ID
+    incap site whitelist  --urls='/home,/example'  --countries='JM,CA' --continents='AF' --ips='192.168.1.1,172.21.12.0/24' --client_app_types='Browser' --client_apps='68'  --user_agents='curl' --log=debug cross_site_scripting SITE_ID
 
 ## Add never cache resource rule
     incap site cache-rule --never_cache_resource_url=/help,login --never_cache_resource_pattern=prefix,contains SITE_ID
@@ -80,7 +84,17 @@ https://www.python.org/downloads/
     incap site advanced-cache async_validation true SITE_ID
 
 ## Backup full config (does not include ADR rules yet)
-    incap site list --export=true –path=/Users/<name>/backups
+    incap site list --export=true –-path=/Users/<name>/backups
+*Path in the backup is option and will use the repo path in the config file.*
 
 ## Restore site config
     incap site restore --domain=www.example.com /Users/<name>/backups/www.template.com.json
+
+## Upload certificate to site
+    incap site upcert --private_key="/<cert_location>/mooreassistance_net_apache-selfsigned.key" "/<cert_location>/www_mooreassistance_net_apache-selfsigned.crt" --passphrase=password SITE_ID
+
+## Delte certificate from site
+    incap site delcert SITE_ID
+
+# Unit Testing
+    python3 -m unittest test_incap_cli.py

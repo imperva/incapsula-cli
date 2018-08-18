@@ -1,4 +1,6 @@
 import json
+
+import Sites.rIncapRule
 from Utils.executeRest import execute
 from Sites.site import Site
 from Utils.incapError import IncapError
@@ -21,6 +23,7 @@ def r_site(args):
     if result.get('res') != 0:
         err = IncapError(result)
         err.log()
+        return err
     else:
         site = Site(result)
         site.log()

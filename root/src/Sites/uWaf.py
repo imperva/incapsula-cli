@@ -47,8 +47,7 @@ def u_security(args):
         err.log()
     else:
         site = Site(result)
-        print('Updated {} Security(WAF) Rule for {} to {}.'.format(args.rule_id.replace('_', ' '), site.get_domain()
-                                                                   , args.security_rule_action.replace('_', ' ')))
+        print('Updated {} Security(WAF) Rule for {}.'.format(args.rule_id.replace('_', ' '), site.get_domain()))
         return site
 
 

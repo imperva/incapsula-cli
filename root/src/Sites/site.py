@@ -6,12 +6,13 @@ import logging
 
 class Site:
     def __init__(self, data):
+        self.res_message = data.get('res_message') or None
         self.domain = data.get('domain') or ''
         self.site_id = data.get('site_id') or int
         self.account_id = data.get('account_id') or ''
         self.active = data.get('active') or ''
         self.extended_ddos = data.get('extended_ddos') or int
-        self.res = data.get('res') or int
+        self.res = data['res']
         self.response_message = data.get('res_message') or ''
         self.display_name = data.get('display_name') or ''
         self.acceleration_level = data.get('acceleration_level') or ''
@@ -31,7 +32,13 @@ class Site:
         self.ssl = data.get('ssl') or {}
         self.warnings = data.get('warnings') or []
         self.authentication_methods = self.login_protect.get('authentication_methods') or []
-        self.incap_rules = data.get('incap_rules') or []
+        self.policies = data.get('policies') or None
+        if self.policies is not None:
+            self.incap_rules = self.policies['incap_rules']['All'] or []
+            self.adr_rules = self.policies['delivery_rules'] or {}
+        else:
+            self.incap_rules = None
+            self.adr_rules = None
         self.clapps = None
         self.cache = Cache(self.performance_configuration)
 

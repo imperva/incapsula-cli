@@ -27,3 +27,19 @@ class IncapResponse:
 
     def get_debug_info(self):
         return self.debug_info
+
+
+class CertResponse:
+    def __init__(self, data):
+        self.data = data
+        self.res = data.get('res')
+        self.res_message = data.get('res_message')
+        self.debug_info = data.get('debug_info')
+        self.details = self.debug_info.get('details')
+
+    def log(self):
+        logging.debug('Result Code: %s - Result Message: %s' % (
+            str(self.data.get('res')), self.data.get('res_message')))
+        print('Certificate Deatils: Active: {active}, Experation Date: {expirationDate}, '
+              'Revocation Error: {revocationError}, Validity Error: {validityError}, '
+              'Chain Error: {chainError}, Coverage Error: {coverageError}'. format(**self.details))
