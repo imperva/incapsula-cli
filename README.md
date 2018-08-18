@@ -41,7 +41,7 @@ https://www.python.org/downloads/
     incap site list_incaprule 26621616
     
 ## Adding your configuration info locally for easy use
-    incap config --repo=/Users/<username>/your_repo_location --baseurl=https://api.incapsula.com 26012 ejf903rie-3983030ie23r2r39j0 2398
+    incap config --repo=/Users/<username>/your_repo_location --baseurl=https://my.incapsula.com 26012 ejf903rie-3983030ie23r2r39j0 2398
 View the config with - *cat ~/.incap/config*
 
 ## Add a site
