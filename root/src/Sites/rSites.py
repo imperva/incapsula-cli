@@ -3,6 +3,7 @@ import os
 import time
 import Sites.rIncapRule
 from Config.configuration import IncapConfigurations
+from Sites.site import Site
 from Utils.executeRest import execute
 from Utils.incapError import IncapError
 import logging
@@ -33,42 +34,53 @@ def r_sites(args):
         if args.export:
             config = IncapConfigurations()
             if args.path is None:
-                dir_file = config.get_repo()
+                path = config.get_repo()
             else:
-                dir_file = args.path
-            export_site(result, dir_file, param)
+                path = args.path
+            filename = args.filename
+            export_site(result, path, filename, param)
         return result.get('res_message')
 
 
-def export_site(sites, path, param):
-    #print(path)
+def export_site(sites, path, filename, param):
     file_time = time.strftime("%Y%m%d-%H%M%S")
-    #param.pop('tests', None)
-
-    #print(incap_rules['incap_rules'])
-
-    # logging.debug('Incap Rules Response: {}', format(json.dumps(incap_rules, indent=4)))
-
-    # print(result)
-    #logging.debug('Incap Rules Response: {}'.format(json.dumps(result, indent=4)))
     del param['account_id']
     for site in sites['sites']:
         try:
-            param['site_id'] = site['site_id']
-            incap_rules = Sites.rIncapRule.read(param)
-            print(incap_rules)
-            if incap_rules['res'] == '0':
-                incap_rules.pop('res', None)
-                del site['incap_rules']
-                site['policies'] = incap_rules
-            file_name = path + '/' + site.get('domain') + '.json-{}'.format(file_time)
-            if not os.path.exists(path):
-                os.makedirs(path)
-            with open(file_name, 'w') as outfile:
-                json.dump(site, outfile)
-                print("Exported results to {}...".format(file_name))
+            if 'incap_rules' in site:
+                param['site_id'] = site['site_id']
+                print(len(site['incap_rules']))
+                incap_rules = Sites.rIncapRule.read(param)
+                print(len(incap_rules))
+                if incap_rules['res'] == '0':
+                    incap_rules.pop('res', None)
+                    del site['incap_rules']
+                    site['policies'] = incap_rules
+                #file_name = path + '/' + site.get('domain') + '.json-{}'.format(file_time)
+                _filename = path + '/' + create_filename(filename, site)
+                print("Export file name: {}". format(_filename))
+                if not os.path.exists(path):
+                    os.makedirs(path)
+                with open(_filename, 'w') as outfile:
+                    json.dump(site, outfile)
+                    print("Exported results to {}...".format(_filename))
         except OSError as e:
             logging.error(e.strerror)
+
+
+def create_filename(filename, site):
+    site = Site(site)
+    if filename == "{site_id}_{domain}":
+        return "{}_{}".format(site.domain, site.site_id)
+    elif filename == "{domain}":
+        return "{}".format(site.domain)
+    elif filename == "{site_id}":
+        return "{}".format(site.site_id)
+    elif filename.startswith("{site_id}_{domain}") and not filename.endswith("_{date}"):
+        return "{}_{}_{}".format(site.site_id, site.domain,
+                                 filename.replace("{site_id}_{domain}", '').replace('.', '_'))
+    else:
+        return "{}_{}_{}".format(site.site_id, site.domain, time.strftime("%Y%m%d-%H%M%S"))
 
 
 def read(params):

@@ -36,8 +36,8 @@ class Site:
         if self.policies is not None:
             self.incap_rules = self.policies['incap_rules']['All'] or []
             self.adr_rules = self.policies['delivery_rules'] or {}
-        else:
-            self.incap_rules = None
+        elif data.get('incap_rules') or None:
+            self.incap_rules = data.get('incap_rules')
             self.adr_rules = None
         self.clapps = None
         self.cache = Cache(self.performance_configuration)

@@ -84,7 +84,14 @@ View the config with - *cat ~/.incap/config*
     incap site advanced-cache async_validation true SITE_ID
 
 ## Backup full config (does not include ADR rules yet)
-    incap site list --export=true –-path=/Users/<name>/backups
+    incap site list --export=true –-path=/Users/<name>/backups --filename={site_id}_{domain}_{date}
+    incap site list --export=true –-path=/Users/<name>/backups --filename={site_id}_{date}
+    incap site list --export=true –-path=/Users/<name>/backups --filename={domain}_{date}
+    incap site list --export=true –-path=/Users/<name>/backups --filename={site_id}
+    incap site list --export=true –-path=/Users/<name>/backups --filename={domain}_{date}
+    incap site list --export=true –-path=/Users/<name>/backups --filename={site_id}_{domain}_REV3_1B
+
+
 *Path in the backup is option and will use the repo path in the config file.*
 
 ## Restore site config
@@ -93,7 +100,7 @@ View the config with - *cat ~/.incap/config*
 ## Upload certificate to site
     incap site upcert --private_key="/<cert_location>/mooreassistance_net_apache-selfsigned.key" "/<cert_location>/www_mooreassistance_net_apache-selfsigned.crt" --passphrase=password SITE_ID
 
-## Delte certificate from site
+## Delete certificate from site
     incap site delcert SITE_ID
 
 # Unit Testing

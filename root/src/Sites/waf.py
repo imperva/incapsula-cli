@@ -1,4 +1,4 @@
-from Sites.exception import IncapExceptions
+from Integration.exception import IncapExceptions
 from Sites.uWaf import update
 import logging
 

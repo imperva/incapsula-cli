@@ -1,10 +1,6 @@
 import unittest
-import urllib
-from urllib import parse
 from Utils.incapError import IncapError
-from Utils.incapResponse import IncapResponse
 from Utils.clidriver import testing
-import logging
 
 
 class TestIncapCLI(unittest.TestCase):
@@ -96,15 +92,30 @@ class TestIncapCLI(unittest.TestCase):
             self.assertEqual("OK", test_incap_cli.res_message.upper(),
                              'Failed to update site ACL(security) EXCEPTION {} configuration.'.format(rule_id))
 
+    def test_e_add_cert(self):
+        print('Add site: www.mooreassistance.net')
+        test_incap_cli = testing(['site', 'upcert', '--private_key=/Users/joe.moore/Documents/'
+                                                    'AWS Certs/mooreassistance_net_apache-selfsigned.key',
+                                 '/Users/joe.moore/Documents/AWS Certs/www_mooreassistance_net_apache-selfsigned.crt',
+                                  str(TestIncapCLI.site_id)])
+        self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to upload certificate to:'
+                                                                   ' www.mooreassistance.net.')
+
     def test_y_site_status(self):
         print('Get site status.')
         test_incap_cli = testing(['site', 'status', str(TestIncapCLI.site_id)])
         self.assertNotEqual(test_incap_cli, IncapError, 'Failed to get site status on site ID: {}'.format(TestIncapCLI.site_id))
 
-    def test_z_site_delete(self):
-        print('Delete site.')
-        test_incap_cli = testing(['site', 'delete', str(TestIncapCLI.site_id)])
-        self.assertNotEqual(test_incap_cli, IncapError, 'Failed to delete site on site ID: {}'.format(TestIncapCLI.site_id))
+    # def test_f_delete_cert(self):
+    #     print('Add site: www.mooreassistance.net')
+    #     test_incap_cli = testing(['site', 'delcert', str(TestIncapCLI.site_id)])
+    #     self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to add site: www.mooreassistance.net.')
+    #
+    #
+    # def test_z_site_delete(self):
+    #     print('Delete site.')
+    #     test_incap_cli = testing(['site', 'delete', str(TestIncapCLI.site_id)])
+    #     self.assertNotEqual(test_incap_cli, IncapError, 'Failed to delete site on site ID: {}'.format(TestIncapCLI.site_id))
 
 
 if __name__ == '__main__':

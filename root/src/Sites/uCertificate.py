@@ -39,10 +39,12 @@ def upload(params):
         if "certificate" in params:
             cert_file = open(params['certificate'], 'rb')
             encoded_cert = base64.b64encode(cert_file.read())
+            cert_file.close()
             params['certificate'] = encoded_cert
             if params["private_key"] is not None:
                 key_file = open(params['private_key'], 'rb')
                 encoded_key = base64.b64encode(key_file.read())
+                key_file.close()
                 params['private_key'] = encoded_key
             return execute(resturl, params)
         else:

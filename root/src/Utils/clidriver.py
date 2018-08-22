@@ -19,7 +19,7 @@ from Sites.rIncapRule import r_incaprule
 from Sites.uIncapRule import u_incaprule
 from Sites.dIncapRule import d_incaprule
 from Config.configuration import configure
-from Sites.cSite_restore import c_site_restore
+from Utils.cSite_restore import c_site_restore
 from Accounts.rAccounts import r_accounts
 from Accounts.rAccount import r_account
 from Accounts.rSubAccounts import r_subaccount
@@ -171,10 +171,18 @@ site_list_parser.add_argument('--account_id',
 site_list_parser.add_argument('--page_size',
                               help='The number of objects to return in the response. Default is 50.')
 site_list_parser.add_argument('--page_num', help='The page to return starting from 0, Default is 0.')
-site_list_parser.add_argument('--export', default=False, help='Set to true to export files locally. '
-                                                              '(Current folder where script is run)')
-site_list_parser.add_argument('--path', default=None, help='If export is select, you can specify the '
-                                                           'FULL path; default is current dir.')
+site_list_parser.add_argument('--export', default=False, help='Set to true to export files locally.')
+site_list_parser.add_argument('--path', default=None, help='If export is selected, you can specify the '
+                                                           'FULL path; default is current dir OR'
+                                                           ' the path configured in the config.ini.')
+site_list_parser.add_argument('--filename', default="{site_id}_{domain}_{date}",
+                              help='If export is selected, you can specify the file name.'
+                                   'Default name is {site_id}_{domain}_{date}.\r'
+                                   'Optional files name:\r'
+                                   '{site_id}_{domain}\r'
+                                   '{site_id}\r'
+                                   '{domain}\r'
+                                   '{site_id}_{domain}_CUSTOM -- Ex: {site_id}_{domain}_Rev3_0B')
 site_list_parser.add_argument('--log', default='INFO')
 site_list_parser.set_defaults(func=r_sites)
 

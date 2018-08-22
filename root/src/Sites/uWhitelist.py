@@ -1,7 +1,6 @@
 from Utils.executeRest import execute
 from Sites.site import Site
 from Utils.incapError import IncapError
-from Sites.exception import IncapException
 import logging
 
 
