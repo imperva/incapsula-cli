@@ -48,11 +48,9 @@ def export_site(sites, path, filename, param):
     for site in sites['sites']:
         try:
             if 'incap_rules' in site:
-                print(len(site['incap_rules']))
                 del site['incap_rules']
             param['site_id'] = site['site_id']
             incap_rules = Sites.rIncapRule.read(param)
-            print(len(incap_rules))
             if incap_rules['res'] == '0':
                 incap_rules.pop('res', None)
                 site['policies'] = incap_rules
