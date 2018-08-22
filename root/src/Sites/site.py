@@ -34,9 +34,11 @@ class Site:
         self.authentication_methods = self.login_protect.get('authentication_methods') or []
         self.policies = data.get('policies') or None
         if self.policies is not None:
-            self.incap_rules = self.policies['incap_rules']['All'] or []
-            self.adr_rules = self.policies['delivery_rules'] or {}
-        elif data.get('incap_rules') or None:
+            if self.policies.get('incap_rules'):
+                self.incap_rules = self.policies['incap_rules']['All']
+            if self.policies.get('delivery_rules'):
+                self.adr_rules = self.policies['delivery_rules'] or {}
+        elif data.get('incap_rules'):
             self.incap_rules = data.get('incap_rules')
             self.adr_rules = None
         self.clapps = None

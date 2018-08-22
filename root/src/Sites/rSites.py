@@ -48,22 +48,22 @@ def export_site(sites, path, filename, param):
     for site in sites['sites']:
         try:
             if 'incap_rules' in site:
-                param['site_id'] = site['site_id']
                 print(len(site['incap_rules']))
-                incap_rules = Sites.rIncapRule.read(param)
-                print(len(incap_rules))
-                if incap_rules['res'] == '0':
-                    incap_rules.pop('res', None)
-                    del site['incap_rules']
-                    site['policies'] = incap_rules
-                #file_name = path + '/' + site.get('domain') + '.json-{}'.format(file_time)
-                _filename = path + '/' + create_filename(filename, site)
-                print("Export file name: {}". format(_filename))
-                if not os.path.exists(path):
-                    os.makedirs(path)
-                with open(_filename, 'w') as outfile:
-                    json.dump(site, outfile)
-                    print("Exported results to {}...".format(_filename))
+                del site['incap_rules']
+            param['site_id'] = site['site_id']
+            incap_rules = Sites.rIncapRule.read(param)
+            print(len(incap_rules))
+            if incap_rules['res'] == '0':
+                incap_rules.pop('res', None)
+                site['policies'] = incap_rules
+            #file_name = path + '/' + site.get('domain') + '.json-{}'.format(file_time)
+            _filename = path + '/' + create_filename(filename, site) + '.json'
+            print("Export file name: {}". format(_filename))
+            if not os.path.exists(path):
+                os.makedirs(path)
+            with open(_filename, 'w') as outfile:
+                json.dump(site, outfile, indent=4)
+                print("Exported results to {}...".format(_filename))
         except OSError as e:
             logging.error(e.strerror)
 
