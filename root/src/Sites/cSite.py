@@ -25,7 +25,7 @@ def c_site(args):
 
     result = create(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
         return err
@@ -36,7 +36,7 @@ def c_site(args):
 
 
 def create(params):
-    resturl = '/api/prov/v1/sites/add'
+    resturl = 'sites/add'
     if params:
         if "domain" in params:
             return execute(resturl, params)

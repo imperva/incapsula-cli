@@ -16,7 +16,7 @@ def d_site(args):
     }
     result = delete(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
         return err
@@ -27,7 +27,7 @@ def d_site(args):
 
 
 def delete(params):
-    resturl = '/api/prov/v1/sites/delete'
+    resturl = 'sites/delete'
     if params:
         if "site_id" in params:
             return execute(resturl, params)

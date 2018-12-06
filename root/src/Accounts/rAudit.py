@@ -9,22 +9,23 @@ def r_audit(args):
     output = 'Get account audit events.'
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     print(output)
+    param = vars(args)
 
-    param = {
-        "api_id": args.api_id,
-        "api_key": args.api_key,
-        "account_id": args.account_id,
-        "time_range": args.time_range,
-        "start": args.start,
-        "end": args.end,
-        "type": args.type,
-        "page_size": args.page_size,
-        "page_num": args.page_num
-    }
+    # param = {
+    #     "api_id": args.api_id,
+    #     "api_key": args.api_key,
+    #     "account_id": args.account_id,
+    #     "time_range": args.time_range,
+    #     "start": args.start,
+    #     "end": args.end,
+    #     "type": args.type,
+    #     "page_size": args.page_size,
+    #     "page_num": args.page_num
+    # }
 
     result = read(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     elif 'audit_events' in result:
@@ -35,7 +36,7 @@ def r_audit(args):
 
 
 def read(params):
-    resturl = '/api/prov/v1/accounts/audit'
+    resturl = 'accounts/audit'
 
     if params:
         if "account_id" in params:

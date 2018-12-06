@@ -1,28 +1,27 @@
 import argparse
 from Accounts.cAccount import c_account
 from Accounts.rAudit import r_audit
-from Sites.cSite import c_site
+from Accounts.rAccounts import r_accounts
+from Accounts.rAccount import r_account
+from Accounts.rSubAccounts import r_subaccount
 from Sites.dCertificate import d_certificate
-from Sites.dSite import d_site
-from Sites.rSite import r_site
-from Sites.rSites import r_sites
+from Sites.uCertificate import u_certificate
+from Sites.site import Site
 from Sites.uACL import u_acl
 from Sites.uCacheMode import u_cachemode
 from Sites.uAdvanced import u_advanced
 from Sites.uCachingRules import u_cacherule
-from Sites.uCertificate import u_certificate
 from Sites.uConfigration import u_configuration
 from Sites.uWaf import u_security
 from Sites.uWhitelist import u_whitelist
-from Sites.cIncapRule import c_incaprule
-from Sites.rIncapRule import r_incaprule
-from Sites.uIncapRule import u_incaprule
-from Sites.dIncapRule import d_incaprule
-from Config.configuration import configure
+from Sites.incapRules import IncapRule
+from Sites.dataCenters import Server
+from Sites.dataCenters import DataCenter
+from Statistics.infra import Event
+from InfraProtect.testAlerts import Ddos, Connection
+from Utils.export import export
 from Utils.cSite_restore import c_site_restore
-from Accounts.rAccounts import r_accounts
-from Accounts.rAccount import r_account
-from Accounts.rSubAccounts import r_subaccount
+from Config.configuration import configure
 from _version import __version__
 
 
@@ -30,6 +29,7 @@ parser = argparse.ArgumentParser(prog='incap',
                                  usage='%(prog)s <resource> <command> [options]',
                                  description="CLI for site, account and security CRUD on Incapsula via API.")
 parser.add_argument('--version', action='version', version=__version__)
+parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
 subparsers = parser.add_subparsers()
 
 cli_config_parser = subparsers.add_parser('config', help='Use config to add the default API_ID,'
@@ -42,24 +42,12 @@ cli_config_parser.add_argument('account_id', help='Numeric identifier of the acc
                                                   'performed on the account identified by the '
                                                   'authentication parameters.')
 cli_config_parser.add_argument('--repo', default='', help='This is optional if you have a '
-                                                            'repository where backups and templates can be storied.')
-cli_config_parser.add_argument('--baseurl', default='https://my.incapsula.com',
+                                                          'repository where backups and templates can be storied.')
+cli_config_parser.add_argument('--baseurl', default='https://my.incapsula.com/api/prov/v1/',
                                help='Optionally set the URL for the API domain.')
 cli_config_parser.add_argument('--log', default='INFO')
 cli_config_parser.set_defaults(func=configure)
 
-# cli_archive_parser = subparsers.add_parser('archive', help='Use config to add the default API_ID,'
-#                                                            ' API_KEY and Account_ID.',
-#                                            usage='incap config [options] api_id api_key account_id')
-# cli_archive_parser.add_argument('api_id', help='API authentication identifier.')
-# cli_archive_parser.add_argument('api_key', help='API authentication identifier.')
-# cli_archive_parser.add_argument('account_id', help='Numeric identifier of the account to operate'
-#                                                   ' on. If not specified, operation will be '
-#                                                   'performed on the account identified by the '
-#                                                   'authentication parameters.')
-# cli_archive_parser.add_argument('--baseUrl', default='https://my.incapsula.com')
-# cli_archive_parser.add_argument('--log', default='INFO')
-# cli_archive_parser.set_defaults(func=create_repo)
 
 site_parser = subparsers.add_parser('site', help='Used to add, delete and configure Incapsula sites.',
                                     usage='incap site <command> [options]')
@@ -99,7 +87,66 @@ site_add_parser.add_argument('--logs_account_id', default='',
 site_add_parser.add_argument('domain', help='The domain name of the site. '
                                             'For example: www.example.com, hello.example.com, example.com')
 site_add_parser.add_argument('--log', default='INFO')
-site_add_parser.set_defaults(func=c_site)
+site_add_parser.set_defaults(func=Site.commit, do='add')
+
+site_list_parser = site_subparsers.add_parser('list', help='Use this operation to list all sites.',
+                                              usage='incap site list [options]')
+site_list_parser.add_argument('--api_id', help='API authentication identifier.')
+site_list_parser.add_argument('--api_key', help='API authentication identifier.')
+site_list_parser.add_argument('--account_id',
+                              help='Numeric identifier of the account to operate on. If not specified, '
+                                   'operation will be performed on the account identified '
+                                   'by the authentication parameters.')
+site_list_parser.add_argument('--page_size',
+                              help='The number of objects to return in the response. Default is 50.')
+site_list_parser.add_argument('--page_num', help='The page to return starting from 0, Default is 0.')
+site_list_parser.add_argument('--export', default=False, help='Set to true to export files locally.')
+site_list_parser.add_argument('--log', default='INFO')
+site_list_parser.set_defaults(func=Site.commit, do='list')
+
+site_status_parser = site_subparsers.add_parser('status', help='Use this operation to get the status of a site.',
+                                                usage='incap site status [options] site_id')
+site_status_parser.add_argument('--api_id', help='API authentication identifier.')
+site_status_parser.add_argument('--api_key', help='API authentication identifier.')
+site_status_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_status_parser.add_argument('--tests', default='', help='List of tests to run on site before returning its status. '
+                                                            'A comma separated list of one of: '
+                                                            'domain_validation, services, dns. '
+                                                            'See detailed description below.')
+site_status_parser.add_argument('--log', default='INFO')
+site_status_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
+
+site_status_parser.set_defaults(func=Site.commit, do='status')
+
+site_delete_parser = site_subparsers.add_parser('delete', help='Use this operation to delete a site.',
+                                                usage='incap site delete [options] site_id')
+site_delete_parser.add_argument('--api_id', help='API authentication identifier.')
+site_delete_parser.add_argument('--api_key', help='API authentication identifier.')
+site_delete_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_delete_parser.add_argument('--log', default='INFO')
+site_delete_parser.set_defaults(func=Site.commit, do='delete')
+
+site_export_parser = site_subparsers.add_parser('export', help='Use this operation to export a site or all sites.',
+                                                 usage='incap site export')
+site_export_parser.add_argument('--api_id', help='API authentication identifier.')
+site_export_parser.add_argument('--api_key', help='API authentication identifier.')
+site_export_parser.add_argument('--account_id',
+                                 help='Numeric identifier of the account to operate on. '
+                                      'If not specified, operation will be performed on the account '
+                                      'identified by the authentication parameters.')
+site_export_parser.add_argument('--site_id', help='The specific site you would like to export.')
+site_export_parser.add_argument('--path', help='The directory to export to.')
+site_export_parser.add_argument('--filename', default="{site_id}_{domain}_{date}",
+                                help='If export is selected, you can specify the file name.'
+                                   'Default name is {site_id}_{domain}_{date}.\r'
+                                   'Optional files name:\r'
+                                   '{site_id}_{domain}\r'
+                                   '{site_id}\r'
+                                   '{domain}\r'
+                                   '{site_id}_{domain}_CUSTOM -- Ex: {site_id}_{domain}_Rev3_0B')
+site_export_parser.add_argument('--log', default='INFO')
+site_export_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
+site_export_parser.set_defaults(func=export)
 
 site_restore_parser = site_subparsers.add_parser('restore', help='Use this operation to bulk add sites.',
                                                  usage='incap site restore [options] path')
@@ -114,77 +161,87 @@ site_restore_parser.add_argument('path', help='The file or directory with multip
 site_restore_parser.add_argument('--log', default='INFO')
 site_restore_parser.set_defaults(func=c_site_restore)
 
-site_delete_parser = site_subparsers.add_parser('delete', help='Use this operation to delete a site.',
-                                                usage='incap site delete [options] site_id')
-site_delete_parser.add_argument('--api_id', help='API authentication identifier.')
-site_delete_parser.add_argument('--api_key', help='API authentication identifier.')
-site_delete_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
-site_delete_parser.add_argument('--log', default='INFO')
-site_delete_parser.set_defaults(func=d_site)
+site_create_dc_parser = site_subparsers.add_parser('add-dc',
+                                                   help="Use this operation to add a data center to a site.",
+                                                   usage='incap site add-dc site_id name server_address')
+site_create_dc_parser.add_argument('--api_id', help='API authentication identifier.')
+site_create_dc_parser.add_argument('--api_key', help='API authentication identifier.')
+site_create_dc_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_create_dc_parser.add_argument('name', help="The new data center's name.")
+site_create_dc_parser.add_argument('server_address', help="The server's address. Possible values: IP, CNAME")
+site_create_dc_parser.add_argument('--is_enabled', help='Enables the data center.')
+site_create_dc_parser.add_argument('--is_standby', help='Enables the data center. '
+                                                        'This parameter is deprecated. '
+                                                        'Use the is_enabled parameter instead '
+                                                        'for the same functionality.')
+site_create_dc_parser.add_argument('--is_content', help='The data center will be available for specific resources '
+                                                        '(Forward Delivery Rules).')
+site_create_dc_parser.add_argument('--log', default='INFO')
+site_create_dc_parser.set_defaults(func=DataCenter.commit, do='add')
 
-site_status_parser = site_subparsers.add_parser('status', help='Use this operation to get the status of a site.',
-                                                usage='incap site status [options] site_id')
-site_status_parser.add_argument('--api_id', help='API authentication identifier.')
-site_status_parser.add_argument('--api_key', help='API authentication identifier.')
-site_status_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
-site_status_parser.add_argument('--tests', default='', help='List of tests to run on site before returning its status. '
-                                                            'A comma separated list of one of: '
-                                                            'domain_validation, services, dns. '
-                                                            'See detailed description below.')
-site_status_parser.add_argument('--log', default='INFO')
-site_status_parser.set_defaults(func=r_site)
+site_list_dc_parser = site_subparsers.add_parser('list-dc', help="Use this operation to list a site's "
+                                                                 "data centers including the data centers' servers.",
+                                                 usage='incap site list-dc site_id')
+site_list_dc_parser.add_argument('--api_id', help='API authentication identifier.')
+site_list_dc_parser.add_argument('--api_key', help='API authentication identifier.')
+site_list_dc_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_list_dc_parser.add_argument('--log', default='INFO')
+site_list_dc_parser.set_defaults(func=DataCenter.commit, do='list')
 
-site_ucertificate_parser = site_subparsers.add_parser('upcert', help='Use this operation to upload custom '
-                                                                    'certificate for your site. The following SSL '
-                                                                    'certificate file formats are supported:'
-                                                                    ' PFX, PEM, CER.',
-                                                     usage='incap site upcert [options] certificate site_id')
-site_ucertificate_parser.add_argument('--api_id', help='API authentication identifier.')
-site_ucertificate_parser.add_argument('--api_key', help='API authentication identifier.')
-site_ucertificate_parser.add_argument('certificate', help='The certificate file in base64 format (location)')
-site_ucertificate_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
-site_ucertificate_parser.add_argument('--private_key', help='The private key of the certificate in base64 format.'
-                                                           ' Optional in case of PFX certificate file format')
-site_ucertificate_parser.add_argument('--passphrase', help='The passphrase used to protect your SSL certificate')
-site_ucertificate_parser.add_argument('--log', default='INFO')
-site_ucertificate_parser.set_defaults(func=u_certificate)
+site_update_dc_parser = site_subparsers.add_parser('edit-dc', help="Use this operation to edit a site's data center.",
+                                                   usage='incap site edit-dc dc_id name')
+site_update_dc_parser.add_argument('--api_id', help='API authentication identifier.')
+site_update_dc_parser.add_argument('--api_key', help='API authentication identifier.')
+site_update_dc_parser.add_argument('dc_id', help="The data center's ID.")
+site_update_dc_parser.add_argument('name', help="The new data center's name.")
+site_update_dc_parser.add_argument('--is_enabled', help='Enables the data center.')
+site_update_dc_parser.add_argument('--is_standby', help='Enables the data center. '
+                                                        'This parameter is deprecated. '
+                                                        'Use the is_enabled parameter instead '
+                                                        'for the same functionality.')
+site_update_dc_parser.add_argument('--is_content', help='The data center will be available for specific resources '
+                                                        '(Forward Delivery Rules).')
+site_update_dc_parser.add_argument('--log', default='INFO')
+site_update_dc_parser.set_defaults(func=DataCenter.commit, do='edit')
 
-site_dcertificate_parser = site_subparsers.add_parser('delcert', help='Use this operation to upload custom '
-                                                                    'certificate for your site. The following SSL '
-                                                                    'certificate file formats are supported:'
-                                                                    ' PFX, PEM, CER.',
-                                                     usage='incap site upcert [options] certificate site_id')
-site_dcertificate_parser.add_argument('--api_id', help='API authentication identifier.')
-site_dcertificate_parser.add_argument('--api_key', help='API authentication identifier.')
-site_dcertificate_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
-site_dcertificate_parser.add_argument('--log', default='INFO')
-site_dcertificate_parser.set_defaults(func=d_certificate)
+site_delete_dc_parser = site_subparsers.add_parser('del-dc', help="Use this operation to delete a site's data center.",
+                                                   usage='incap site del-dc dc_id')
+site_delete_dc_parser.add_argument('--api_id', help='API authentication identifier.')
+site_delete_dc_parser.add_argument('--api_key', help='API authentication identifier.')
+site_delete_dc_parser.add_argument('dc_id', help="The data center's ID.")
+site_delete_dc_parser.add_argument('--log', default='INFO')
+site_delete_dc_parser.set_defaults(func=DataCenter.commit, do='delete')
 
-site_list_parser = site_subparsers.add_parser('list', help='Use this operation to delete a site.',
-                                              usage='incap site list [options]')
-site_list_parser.add_argument('--api_id', help='API authentication identifier.')
-site_list_parser.add_argument('--api_key', help='API authentication identifier.')
-site_list_parser.add_argument('--account_id',
-                              help='Numeric identifier of the account to operate on. If not specified, '
-                                   'operation will be performed on the account identified '
-                                   'by the authentication parameters.')
-site_list_parser.add_argument('--page_size',
-                              help='The number of objects to return in the response. Default is 50.')
-site_list_parser.add_argument('--page_num', help='The page to return starting from 0, Default is 0.')
-site_list_parser.add_argument('--export', default=False, help='Set to true to export files locally.')
-site_list_parser.add_argument('--path', default=None, help='If export is selected, you can specify the '
-                                                           'FULL path; default is current dir OR'
-                                                           ' the path configured in the config.ini.')
-site_list_parser.add_argument('--filename', default="{site_id}_{domain}_{date}",
-                              help='If export is selected, you can specify the file name.'
-                                   'Default name is {site_id}_{domain}_{date}.\r'
-                                   'Optional files name:\r'
-                                   '{site_id}_{domain}\r'
-                                   '{site_id}\r'
-                                   '{domain}\r'
-                                   '{site_id}_{domain}_CUSTOM -- Ex: {site_id}_{domain}_Rev3_0B')
-site_list_parser.add_argument('--log', default='INFO')
-site_list_parser.set_defaults(func=r_sites)
+site_add_server_parser = site_subparsers.add_parser('add-server',
+                                                       help="Use this operation to add a server to a data center.",
+                                                       usage='incap site add-server dc_id server_address')
+site_add_server_parser.add_argument('--api_id', help='API authentication identifier.')
+site_add_server_parser.add_argument('--api_key', help='API authentication identifier.')
+site_add_server_parser.add_argument('dc_id', help="The data center's ID.")
+site_add_server_parser.add_argument('server_address', help="Server IP address.")
+site_add_server_parser.add_argument('--is_standby', help='Set the server as Active (P0) or Standby (P1) (Boolean).')
+site_add_server_parser.add_argument('--log', default='INFO')
+site_add_server_parser.set_defaults(func=Server.servers, do='add')
+
+site_edit_server_parser = site_subparsers.add_parser('edit-server',
+                                                       help="Use this operation to edit a server in a data center.",
+                                                       usage='incap site edit-server server_id')
+site_edit_server_parser.add_argument('--api_id', help='API authentication identifier.')
+site_edit_server_parser.add_argument('--api_key', help='API authentication identifier.')
+site_edit_server_parser.add_argument('server_id', help="Server ID.")
+site_edit_server_parser.add_argument('--server_address', help="Server IP address.")
+site_edit_server_parser.add_argument('--is_enabled', help='Enable or disable the server (Boolean).')
+site_edit_server_parser.add_argument('--is_standby', help='Set the server as Active (P0) or Standby (P1) (Boolean).')
+site_edit_server_parser.add_argument('--log', default='INFO')
+site_edit_server_parser.set_defaults(func=Server.servers, do='edit')
+site_delete_server_parser = site_subparsers.add_parser('del-server',
+                                                       help="Use this operation to edit a server in a data center.",
+                                                       usage='incap site edit-server server_id')
+site_delete_server_parser.add_argument('--api_id', help='API authentication identifier.')
+site_delete_server_parser.add_argument('--api_key', help='API authentication identifier.')
+site_delete_server_parser.add_argument('server_id', help="Server ID.")
+site_delete_server_parser.add_argument('--log', default='INFO')
+site_delete_server_parser.set_defaults(func=Server.servers, do='delete')
 
 site_configure_parser = site_subparsers.add_parser('configure',
                                                    help='Use this operation to change one of the basic '
@@ -196,7 +253,8 @@ site_configure_parser.add_argument('param', help='According to the param value, 
 site_configure_parser.add_argument('value', help='Name of configuration parameter to set.')
 site_configure_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
 site_configure_parser.add_argument('--log', default='INFO')
-site_configure_parser.set_defaults(func=u_configuration)
+site_configure_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
+site_configure_parser.set_defaults(func=u_configuration, do='configure')
 
 site_security_parser = site_subparsers.add_parser('security',
                                                   help='Use this operation to change the security '
@@ -233,6 +291,7 @@ site_security_parser.add_argument('--ddos_traffic_threshold', default='',
                                        'The valid values are 10, 20, 50, 100, 200, '
                                        '500, 750, 1000, 2000, 3000, 4000, 5000. i.e. --ddos_traffic_threshold=<10')
 site_security_parser.add_argument('--log', default='INFO')
+site_security_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
 site_security_parser.set_defaults(func=u_security)
 
 site_acl_parser = site_subparsers.add_parser('acl', help='Use this operation to change ACL configuration of a site.\n'
@@ -261,6 +320,7 @@ site_acl_parser.add_argument('--continents', default='', help='A comma separated
 site_acl_parser.add_argument('--ips', default='', help='A comma separated list of IPs or IP ranges, '
                                                        'e.g: 192.168.1.1, 192.168.1.1- 192.168.1.100 or 192.168.1.1/24')
 site_acl_parser.add_argument('--log', default='INFO')
+site_acl_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
 site_acl_parser.set_defaults(func=u_acl)
 
 site_add_incaprule_parser = site_subparsers.add_parser('add_incaprule',
@@ -307,7 +367,25 @@ site_add_incaprule_parser.add_argument('--lb_algorithm', default='',
                                             'LB_LEAST_OPEN_CONNECTIONS - Server with least open connections '
                                             'LB_SOURCE_IP_HASH - Server by IP hash RANDOM - Random server')
 site_add_incaprule_parser.add_argument('--log', default='INFO')
-site_add_incaprule_parser.set_defaults(func=c_incaprule)
+site_add_incaprule_parser.set_defaults(func=IncapRule.commit, do='add')
+
+site_list_incaprule_parser = site_subparsers.add_parser('list_incaprule',
+                                                        help='Use this operation to list rules '
+                                                             '(Delivery Rules and IncapRules) for a given site.',
+                                                        usage='incap site list_incaprule [options] site_id')
+site_list_incaprule_parser.add_argument('--api_id', help='API authentication identifier.')
+site_list_incaprule_parser.add_argument('--api_key', help='API authentication identifier.')
+site_list_incaprule_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_list_incaprule_parser.add_argument('--include_ad_rules', default='',
+                                        help='Whether or not delivery rules should be included. Defaults to "Yes".')
+site_list_incaprule_parser.add_argument('--include_incap_rules', default='',
+                                        help='Whether or not security rules be included. Defaults to "Yes".')
+site_list_incaprule_parser.add_argument('--page_size', default='',
+                                        help='The number of objects to return in the response. Default is 50.')
+site_list_incaprule_parser.add_argument('--page_num', default='',
+                                        help='The page to return starting from 0. Default is 0.')
+site_list_incaprule_parser.add_argument('--log', default='INFO')
+site_list_incaprule_parser.set_defaults(func=IncapRule.commit, do='list')
 
 site_edit_incaprule_parser = site_subparsers.add_parser('edit_incaprule',
                                                         help='Use this operation to edit an existing '
@@ -354,7 +432,7 @@ site_edit_incaprule_parser.add_argument('--lb_algorithm', default='',
                                         ' LB_SOURCE_IP_HASH - Server by IP hash'
                                         ' RANDOM - Random server')
 site_edit_incaprule_parser.add_argument('--log', default='INFO')
-site_edit_incaprule_parser.set_defaults(func=u_incaprule)
+site_edit_incaprule_parser.set_defaults(func=IncapRule.commit, do='edit')
 
 site_delete_incaprule_parser = site_subparsers.add_parser('del_incaprule', help='Use this operation to delete a '
                                                                                 'rule (Delivery Rules or IncapRules).',
@@ -363,25 +441,7 @@ site_delete_incaprule_parser.add_argument('--api_id', help='API authentication i
 site_delete_incaprule_parser.add_argument('--api_key', help='API authentication identifier.')
 site_delete_incaprule_parser.add_argument('rule_id', help='Numeric identifier of the site to operate on.')
 site_delete_incaprule_parser.add_argument('--log', default='INFO')
-site_delete_incaprule_parser.set_defaults(func=d_incaprule)
-
-site_list_incaprule_parser = site_subparsers.add_parser('list_incaprule',
-                                                        help='Use this operation to list rules '
-                                                             '(Delivery Rules and IncapRules) for a given site.',
-                                                        usage='incap site list_incaprule [options] site_id')
-site_list_incaprule_parser.add_argument('--api_id', help='API authentication identifier.')
-site_list_incaprule_parser.add_argument('--api_key', help='API authentication identifier.')
-site_list_incaprule_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
-site_list_incaprule_parser.add_argument('--include_ad_rules', default='',
-                                        help='Whether or not delivery rules should be included. Defaults to "Yes".')
-site_list_incaprule_parser.add_argument('--include_incap_rules', default='',
-                                        help='Whether or not security rules be included. Defaults to "Yes".')
-site_list_incaprule_parser.add_argument('--page_size', default='',
-                                        help='The number of objects to return in the response. Default is 50.')
-site_list_incaprule_parser.add_argument('--page_num', default='',
-                                        help='The page to return starting from 0. Default is 0.')
-site_list_incaprule_parser.add_argument('--log', default='INFO')
-site_list_incaprule_parser.set_defaults(func=r_incaprule)
+site_delete_incaprule_parser.set_defaults(func=IncapRule.commit, do='delete')
 
 site_whitelist_parser = site_subparsers.add_parser('whitelist', help='Use this operation to set whitelists '
                                                                      'to security rules or ACLs. '
@@ -492,6 +552,32 @@ site_advanced_cache_parser.add_argument('site_id', help='Numeric identifier of t
 site_advanced_cache_parser.add_argument('--log', default='INFO')
 site_advanced_cache_parser.set_defaults(func=u_advanced)
 
+site_ucertificate_parser = site_subparsers.add_parser('upcert', help='Use this operation to upload custom '
+                                                                    'certificate for your site. The following SSL '
+                                                                    'certificate file formats are supported:'
+                                                                    ' PFX, PEM, CER.',
+                                                     usage='incap site upcert [options] certificate site_id')
+site_ucertificate_parser.add_argument('--api_id', help='API authentication identifier.')
+site_ucertificate_parser.add_argument('--api_key', help='API authentication identifier.')
+site_ucertificate_parser.add_argument('certificate', help='The certificate file in base64 format (location)')
+site_ucertificate_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_ucertificate_parser.add_argument('--private_key', help='The private key of the certificate in base64 format.'
+                                                           ' Optional in case of PFX certificate file format')
+site_ucertificate_parser.add_argument('--passphrase', help='The passphrase used to protect your SSL certificate')
+site_ucertificate_parser.add_argument('--log', default='INFO')
+site_ucertificate_parser.set_defaults(func=u_certificate)
+
+site_dcertificate_parser = site_subparsers.add_parser('delcert', help='Use this operation to upload custom '
+                                                                    'certificate for your site. The following SSL '
+                                                                    'certificate file formats are supported:'
+                                                                    ' PFX, PEM, CER.',
+                                                     usage='incap site upcert [options] certificate site_id')
+site_dcertificate_parser.add_argument('--api_id', help='API authentication identifier.')
+site_dcertificate_parser.add_argument('--api_key', help='API authentication identifier.')
+site_dcertificate_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_dcertificate_parser.add_argument('--log', default='INFO')
+site_dcertificate_parser.set_defaults(func=d_certificate)
+
 account_parser = subparsers.add_parser('account',
                                        help='Used to add, delete and configure Incapsula accounts.',
                                        usage='incap account <command> [options]')
@@ -601,6 +687,105 @@ account_subList_parser.add_argument('--page_size', default='50',
 account_subList_parser.add_argument('--page_num', default='0', help='The page to return starting from 0. Default: 0.')
 account_subList_parser.add_argument('--log', default='INFO')
 account_subList_parser.set_defaults(func=r_subaccount)
+
+
+infra_parser = subparsers.add_parser('infra',
+                                       help='The Test Alerts API enables you to send dummy notifications. \n'
+                                            'Many of the parameters are optional. If you do not use them, \n'
+                                            'sample data is created automatically based on your existing \n'
+                                            'configuration and used to generate the test alerts. \n'
+                                            'There is no impact on your actual configuration.',
+                                       usage='incap infra <command> [options]')
+infra_subparsers = infra_parser.add_subparsers(description='valid subcommands',
+                                                   help='additional help')
+
+infra_start_ddos_parser = infra_subparsers.add_parser('start', help="Use this operation to list a site's "
+                                                                 "data centers including the data centers' servers.",
+                                                 usage='incap site list-dc site_id')
+infra_start_ddos_parser.add_argument('--api_id', help='API authentication identifier.')
+infra_start_ddos_parser.add_argument('--api_key', help='API authentication identifier.')
+infra_start_ddos_parser.add_argument('--log', default='INFO')
+infra_start_ddos_parser.set_defaults(func=Ddos.commit, do='start')
+
+infra_stop_ddos_parser = infra_subparsers.add_parser('stop', help="Use this operation to list a site's "
+                                                                 "data centers including the data centers' servers.",
+                                                 usage='incap site list-dc site_id')
+infra_stop_ddos_parser.add_argument('--api_id', help='API authentication identifier.')
+infra_stop_ddos_parser.add_argument('--api_key', help='API authentication identifier.')
+infra_stop_ddos_parser.add_argument('--log', default='INFO')
+infra_stop_ddos_parser.set_defaults(func=Ddos.commit, do='stop')
+
+infra_stop_ddos_parser = infra_subparsers.add_parser('up', help="Use this operation to list a site's "
+                                                                 "data centers including the data centers' servers.",
+                                                 usage='incap site list-dc site_id')
+infra_stop_ddos_parser.add_argument('--api_id', help='API authentication identifier.')
+infra_stop_ddos_parser.add_argument('--api_key', help='API authentication identifier.')
+infra_stop_ddos_parser.add_argument('--log', default='INFO')
+infra_stop_ddos_parser.set_defaults(func=Connection.commit, do='up')
+
+infra_stop_ddos_parser = infra_subparsers.add_parser('down', help="Use this operation to list a site's "
+                                                                 "data centers including the data centers' servers.",
+                                                 usage='incap site list-dc site_id')
+infra_stop_ddos_parser.add_argument('--api_id', help='API authentication identifier.')
+infra_stop_ddos_parser.add_argument('--api_key', help='API authentication identifier.')
+infra_stop_ddos_parser.add_argument('--log', default='INFO')
+infra_stop_ddos_parser.set_defaults(func=Connection.commit, do='down')
+
+infra_events_parser = infra_subparsers.add_parser('events', help="Use this operation to list a site's "
+                                                                 "data centers including the data centers' servers.",
+                                                 usage='incap site list-dc site_id')
+infra_events_parser.add_argument('--api_id', help='API authentication identifier.')
+infra_events_parser.add_argument('--api_key', help='API authentication identifier.')
+infra_events_parser.add_argument('--account_id', help='Numeric identifier of the site to operate on.')
+infra_events_parser.add_argument('--event_type', default='', help='A comma separated list of specific event types. \n'
+                                                              'Any of: GRE_TUNNEL_UP, GRE_TUNNEL_DOWN, \n'
+                                                              'ORIGIN_CONNECTION_GRE_UP, ORIGIN_CONNECTION_GRE_DOWN, \n'
+                                                              'ORIGIN_CONNECTION_ECX_UP, ORIGIN_CONNECTION_ECX_DOWN, \n'
+                                                              'ORIGIN_CONNECTION_CROSS_CONNECT_UP, \n'
+                                                              'ORIGIN_CONNECTION_CROSS_CONNECT_DOWN, DDOS_START_IP_RANGE, \n'
+                                                              'DDOS_STOP_IP_RANGE, DDOS_QUIET_TIME_IP_RANGE, EXPORTER_NO_DATA, \n'
+                                                              'EXPORTER_BAD_DATA, EXPORTER_GOOD_DATA, MONITORING_CRITICAL_ATTACK, \n'
+                                                              'PROTECTED_IP_STATUS_UP, PROTECTED_IP_STATUS_DOWN, \n'
+                                                              'PER_IP_DDOS_START_IP_RANGE.')
+infra_events_parser.add_argument('--ip_prefix', default='', help='Specific Protected IP or IP range. For example, 1.1.1.0/24.')
+infra_events_parser.add_argument('--start', default='',
+                                  help='Start date in milliseconds since 1970; '
+                                       'All dates should be specified as number of milliseconds since midnight 1970 '
+                                       '(UNIX time * 1000).')
+infra_events_parser.add_argument('--end', default='', help='End date in milliseconds since 1970; '
+                                                            'All dates should be specified as number of milliseconds '
+                                                            'since midnight 1970 (UNIX time * 1000).')
+infra_events_parser.add_argument('--page_size', default='50',
+                                  help='The number of objects to return in the response. Default: 50.')
+infra_events_parser.add_argument('--page_num', default='0', help='The page to return starting from 0. Default: 0.')
+infra_events_parser.add_argument('--log', default='INFO')
+infra_events_parser.set_defaults(func=Event.commit, do='events')
+
+infra_stats_parser = infra_subparsers.add_parser('stats', help="Use this operation to list a site's "
+                                                                 "data centers including the data centers' servers.",
+                                                 usage='incap site list-dc site_id')
+infra_stats_parser.add_argument('--api_id', help='API authentication identifier.')
+infra_stats_parser.add_argument('--api_key', help='API authentication identifier.')
+infra_stats_parser.add_argument('--account_id', help='Numeric identifier of the site to operate on.')
+infra_stats_parser.add_argument('--traffic_type', default='', help='A comma separated list of specific traffic types. \n'
+                                                                          'Any of: UDP, TCP, DNS, DNS_RESPONSE, ICMP, SYN, FRAG, \n'
+                                                                          'LARGE_SYN, NTP, NETFLOW, SSDP, GENERAL. \n'
+                                                                          'Cannot be used together with the pop parameter.')
+infra_stats_parser.add_argument('--traffic', default='', help='Specific traffic. One of: Total, Passed, Blocked.')
+infra_stats_parser.add_argument('--ip_prefix', default='', help='Specific Protected IP or IP range. For example, 1.1.1.0/24.')
+infra_stats_parser.add_argument('--start', default='',
+                                  help='Start date in milliseconds since 1970; '
+                                       'All dates should be specified as number of milliseconds since midnight 1970 '
+                                       '(UNIX time * 1000).')
+infra_stats_parser.add_argument('--end', default='', help='End date in milliseconds since 1970; '
+                                                            'All dates should be specified as number of milliseconds '
+                                                            'since midnight 1970 (UNIX time * 1000).')
+infra_stats_parser.add_argument('--pop', default='',
+                                  help='A comma separated list of specific PoP names. \n'
+                                       'For example: iad, tko. Cannot be used together with the traffic_type parameter. \n'
+                                       'For the list of PoP codes and locations, see Incapsula Data Centers (PoPs). ')
+infra_stats_parser.add_argument('--log', default='INFO')
+infra_stats_parser.set_defaults(func=Event.commit, do='stats')
 
 
 def main(args=None):

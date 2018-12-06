@@ -9,16 +9,17 @@ def u_configuration(args):
     output = 'Update site {0} with configuration param={1} and value={2}.'. format(args.site_id, args.param, args.value)
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     print(output)
-    param = {
-        "api_id": args.api_id,
-        "api_key": args.api_key,
-        "site_id": args.site_id,
-        "param": args.param,
-        "value": args.value
-    }
+    # param = {
+    #     "api_id": args.api_id,
+    #     "api_key": args.api_key,
+    #     "site_id": args.site_id,
+    #     "param": args.param,
+    #     "value": args.value
+    # }
+    param = vars(args)
     result = update(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
         return err
@@ -30,7 +31,7 @@ def u_configuration(args):
 
 
 def update(params):
-    resturl = '/api/prov/v1/sites/configure'
+    resturl = 'sites/configure'
     if params:
         if "param" in params and "value" in params:
             return execute(resturl, params)

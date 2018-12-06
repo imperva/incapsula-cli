@@ -1,7 +1,8 @@
 from Sites.cIncapRule import create
-from Sites.dIncapRule import delete
-from Sites.uIncapRule import update
+from Utils.executeRest import execute
 import logging
+
+from Utils.incapError import IncapError
 
 
 class ADRuleRedirect:
@@ -113,3 +114,66 @@ class IncapRule:
         return '-------------------------------------------------------------------------------------------------\n' \
                "Rule ID: %s\n--name='%s' --filter='%s' --action=%s"\
                % (self.id, self.name, self.filter, self.action)
+
+    @staticmethod
+    def commit(args):
+        param = vars(args)
+        action = param['do']
+        print('{} IncapRule.'.format(str.capitalize(action)))
+        logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+        resturl = '{}/{}'.format(str.replace(__name__[0].lower() + __name__[1:], '.', '/'), action)
+
+        if action == 'list':
+            result = execute(resturl, param)
+            IncapRule._list(result)
+            return result
+        else:
+            result = execute(resturl, param)
+            IncapRule._execute(result, action)
+            return result
+
+    @staticmethod
+    def _execute(result, action):
+        if int(result.get('res')) != 0:
+            err = IncapError(result)
+            err.log()
+            return err
+        else:
+            print('{} successful on IncapRule {}'
+                  .format(action[0].upper() + action[1:], result.get('rule_id') or ''))
+
+    @staticmethod
+    def _list(result):
+        if int(result.get('res')) != 0:
+            err = IncapError(result)
+            err.log()
+        else:
+            if 'incap_rules' in result:
+                if 'All' in result['incap_rules']:
+                    for rule in result['incap_rules']['All']:
+                        incap_rule = IncapRule(rule)
+                        print(incap_rule.log())
+                else:
+                    logging.info('You have no IncapRules!!!')
+
+            if 'delivery_rules' in result:
+                if 'Redirect' in result['delivery_rules']:
+                    for rule in result['delivery_rules']['Redirect']:
+                        adr_rule = ADRuleRedirect(rule)
+                        print(adr_rule.log())
+                else:
+                    logging.info('You have no Redirect Rules!!!')
+
+                if 'Forward' in result['delivery_rules']:
+                    for rule in result['delivery_rules']['Forward']:
+                        adr_rule = ADRuleForward(rule)
+                        print(adr_rule.log())
+                else:
+                    logging.info('You have no Forward Rules!!!')
+
+                if 'Rewrite' in result['delivery_rules']:
+                    for rule in result['delivery_rules']['Rewrite']:
+                        adr_rule = ADRuleRewrite(rule)
+                        print(adr_rule.log())
+                else:
+                    logging.info('You have no Rewrite Rules!!!')

@@ -1,69 +1,28 @@
-import json
-import os
 import time
-import Sites.rIncapRule
 from Config.configuration import IncapConfigurations
 from Sites.site import Site
 from Utils.executeRest import execute
 from Utils.incapError import IncapError
+import Utils.export
 import logging
+from Utils.print_table import PrintTable
+from Utils.table_formatter import TableFormatter
 
 
 def r_sites(args):
     output = 'Getting site list.'
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     print(output)
-    param = {
-        "api_id": args.api_id,
-        "api_key": args.api_key,
-        "account_id": args.account_id,
-        "page_size": args.page_size,
-        "page_num": args.page_num,
-    }
+    param = vars(args)
 
     result = read(param)
-
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
         return err
     else:
-        for site in result['sites']:
-            print('FQDN: %s - Status: %s - Site ID: %s'
-                  % (site.get('domain'), site.get('status'), site.get('site_id')))
-        if args.export:
-            config = IncapConfigurations()
-            if args.path is None:
-                path = config.get_repo()
-            else:
-                path = args.path
-            filename = args.filename
-            export_site(result, path, filename, param)
-        return result.get('res_message')
-
-
-def export_site(sites, path, filename, param):
-    file_time = time.strftime("%Y%m%d-%H%M%S")
-    del param['account_id']
-    for site in sites['sites']:
-        try:
-            if 'incap_rules' in site:
-                del site['incap_rules']
-            param['site_id'] = site['site_id']
-            incap_rules = Sites.rIncapRule.read(param)
-            if incap_rules['res'] == '0':
-                incap_rules.pop('res', None)
-                site['policies'] = incap_rules
-            #file_name = path + '/' + site.get('domain') + '.json-{}'.format(file_time)
-            _filename = path + '/' + create_filename(filename, site) + '.json'
-            print("Export file name: {}". format(_filename))
-            if not os.path.exists(path):
-                os.makedirs(path)
-            with open(_filename, 'w') as outfile:
-                json.dump(site, outfile, indent=4)
-                print("Exported results to {}...".format(_filename))
-        except OSError as e:
-            logging.error(e.strerror)
+        format_site = TableFormatter(headers=['domain', 'status', 'site_id'], data=result['sites'])
+        PrintTable(label='Sites', data=format_site.headers).print_all()
 
 
 def create_filename(filename, site):
@@ -82,7 +41,7 @@ def create_filename(filename, site):
 
 
 def read(params):
-    resturl = '/api/prov/v1/sites/list'
+    resturl = 'sites/list'
     if params:
         if "account_id" in params:
             return execute(resturl, params)

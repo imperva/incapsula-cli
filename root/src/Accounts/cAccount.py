@@ -24,7 +24,7 @@ def c_account(args):
     }
     result = create(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     else:
@@ -33,7 +33,7 @@ def c_account(args):
 
 
 def create(params):
-    resturl = '/api/prov/v1/accounts/add'
+    resturl = 'accounts/add'
     if params:
         if "email" in params:
             return execute(resturl, params)

@@ -1,8 +1,8 @@
 from Utils.executeRest import execute
-from Sites.adr_incaprule import IncapRule
-from Sites.adr_incaprule import ADRuleRewrite
-from Sites.adr_incaprule import ADRuleRedirect
-from Sites.adr_incaprule import ADRuleForward
+from Sites.incapRules import IncapRule
+from Sites.incapRules import ADRuleRewrite
+from Sites.incapRules import ADRuleRedirect
+from Sites.incapRules import ADRuleForward
 from Utils.incapError import IncapError
 import logging
 import json
@@ -26,7 +26,7 @@ def r_incaprule(args):
     result = read(param)
     logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
-    if result.get('res') != "0":
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     else:
@@ -63,7 +63,7 @@ def r_incaprule(args):
 
 
 def read(params):
-    resturl = '/api/prov/v1/sites/incapRules/list'
+    resturl = 'sites/incapRules/list'
     if params:
         if "site_id" in params:
             return execute(resturl, params)

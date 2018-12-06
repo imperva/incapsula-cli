@@ -27,7 +27,7 @@ def d_incaprule(args):
 
 
 def delete(params):
-    resturl = '/api/prov/v1/sites/incapRules/delete'
+    resturl = 'sites/incapRules/delete'
     if params:
         if "rule_id" in params:
             result = execute(resturl, params)

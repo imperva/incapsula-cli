@@ -39,7 +39,7 @@ def c_incaprule(args):
 
 
 def create(params):
-    resturl = '/api/prov/v1/sites/incapRules/add'
+    resturl = 'sites/incapRules/add'
     if params:
         if "site_id" in params:
             result = execute(resturl, params)

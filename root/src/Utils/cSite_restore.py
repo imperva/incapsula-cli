@@ -1,6 +1,6 @@
 import json
 import os
-from Sites.adr_incaprule import IncapRule
+from Sites.incapRules import IncapRule
 from Sites.site import Site
 from Sites.cSite import create
 from Utils.incapError import IncapError
@@ -47,7 +47,7 @@ def recover_site(file, params):
     else:
         print('Creating {0} from {1} template'.format(params['domain'], old_site.domain))
         result = create(params)
-        if result.get('res') != 0:
+        if int(result.get('res')) != 0:
             logging.error('%s was not created, please review logs.' % params['domain'])
             err = IncapError(result)
             err.log()

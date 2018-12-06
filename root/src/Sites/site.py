@@ -1,7 +1,12 @@
 import time
 from Sites.cache import Cache
-from Integration.clapps import r_clapps
+from Integration.clapps import get_clapps
+from Utils.executeRest import execute
 import logging
+from Utils.incapError import IncapError
+from Utils.incapResponse import IncapResponse
+from Utils.print_table import PrintTable
+from Utils.table_formatter import TableFormatter
 
 
 class Site:
@@ -41,26 +46,55 @@ class Site:
         elif data.get('incap_rules'):
             self.incap_rules = data.get('incap_rules')
             self.adr_rules = None
-        self.clapps = None
+        self.data_centers = data.get('dataCenters') or None
         self.cache = Cache(self.performance_configuration)
 
-    def get_clapps(self, cl_id):
-        if self.clapps is None:
-            self.clapps = r_clapps()
-            client = self.clapps['clientAppTypes'][cl_id[0]] + ' with client name ' + self.clapps['clientApps'][cl_id[0]]
-            return client
+    @staticmethod
+    def commit(args, json=False):
+        param = vars(args)
+        action = param['do']
+        if action == 'list':
+            print('{} sites.'.format(str.capitalize(action)))
+            if args.export:
+                print('This action has been deprecated, please use incap site export')
+                exit(0)
         else:
-            client = self.clapps['clientAppTypes'][cl_id[0]] + ' with client name ' + self.clapps['clientApps'][cl_id[0]]
-            return client
+            print('{} site.'.format(str.capitalize(action)))
+        logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+        resturl = '{}/{}'.format(str.replace(__name__[0].lower() + __name__[1:], '.', '/').split('/')[0], param['do'])
+        result = execute(resturl, param)
 
-    def get_waf_rules(self):
-        return self.waf_rules
+        if json:
+            return result
 
-    def get_domain(self):
-        return self.domain
+        if int(result.get('res')) != 0:
+            err = IncapError(result)
+            err.log()
+            return err
+        else:
+            if action == 'delete':
+                print('Success {} {}!'.format(str.replace(__name__[0].lower() + __name__[1:], '.', '/')
+                                               .split('/')[1], param['do']))
+                resp = IncapResponse(result)
+                resp.log()
+                return resp
+            elif action == 'list':
+                format_site = TableFormatter(headers=['domain', 'status', 'site_id'], data=result['sites'])
+                PrintTable(label='Sites', data=format_site.headers).print_all()
+                resp = IncapResponse(result)
+                resp.log()
+                return resp
+            else:
+                site = Site(result)
+                site.log()
+                return site
 
-    def get_id(self):
-        return self.site_id
+    @staticmethod
+    def get_site_json(args):
+        param = vars(args)
+        print('Get site JSON.')
+        resturl = '{}/{}'.format(str.replace(__name__[0].lower() + __name__[1:], '.', '/').split('/')[0], param['do'])
+        return execute(resturl, param)
 
     def log(self):
         divide = '-------------------------------------------------------------------------------------------------'
@@ -215,7 +249,8 @@ class Site:
         #print('Response Message = %s' % self.response_message)
         #print('Debug Info = %s' % self.debug_info)
 
-    def site_exceptions(self, data):
+    @staticmethod
+    def site_exceptions(data):
         #print('{values}'.format(**data))
         for item in data['values']:
             #pprint('{id}'.format(**item))
@@ -235,4 +270,14 @@ class Site:
             elif item['id'] == 'api.rule_exception_type.client_app_id':
                 print('-------------------------------------------------------------------------------------------\n|\n'
                       '| Client Application Exception ID: {id}'.format(**data) + ' - '
-                                                                                 'Exception for client app type: %s\n|' % ''.join(self.get_clapps(item['client_apps'])))
+                                                                                 'Exception for client app type: %s\n|' % ''.join(get_clapps(item['client_apps'])))
+
+    def print_site(self):
+        site_header = [['FQDN', self.domain], ['Status', self.status], ['Site ID', str(self.site_id)]]
+
+        for v in site_header:
+            if len(v[0]) > len(v[1]):
+                v.append(len(v[0]))
+            else:
+                v.append(len(v[1]))
+        return site_header

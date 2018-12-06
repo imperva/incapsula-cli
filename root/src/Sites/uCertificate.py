@@ -6,22 +6,24 @@ from Utils.incapResponse import IncapResponse
 
 
 def u_certificate(args):
+    param = vars(args)
+    #action = param['do']
     output = 'Upload Certificate to: {0}'. format(args.site_id)
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     print(output)
 
-    param = {
-        "api_id": args.api_id,
-        "api_key": args.api_key,
-        "site_id": args.site_id,
-        "certificate": args.certificate,
-        "private_key": args.private_key,
-        "passphrase": args.passphrase
-    }
+    # param = {
+    #     "api_id": args.api_id,
+    #     "api_key": args.api_key,
+    #     "site_id": args.site_id,
+    #     "certificate": args.certificate,
+    #     "private_key": args.private_key,
+    #     "passphrase": args.passphrase
+    # }
 
     result = upload(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
         return err
@@ -33,7 +35,7 @@ def u_certificate(args):
 
 
 def upload(params):
-    resturl = '/api/prov/v1/sites/customCertificate/upload'
+    resturl = 'sites/customCertificate/upload'
     if params:
         logging.debug(params)
         if "certificate" in params:

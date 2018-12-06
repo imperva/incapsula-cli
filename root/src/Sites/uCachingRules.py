@@ -24,7 +24,7 @@ def u_cacherule(args):
     }
     result = update(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     else:
@@ -39,7 +39,7 @@ def u_cacherule(args):
 
 
 def update(params):
-    resturl = '/api/prov/v1/sites/performance/caching-rules'
+    resturl = 'sites/performance/caching-rules'
     if params:
         if "site_id" in params:
             return execute(resturl, params)

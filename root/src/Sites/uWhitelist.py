@@ -5,36 +5,38 @@ import logging
 
 
 def u_whitelist(args):
+    param = vars(args)
+    #action = param['do']
     output = 'Update whitelist rule ID={0}.'. format(args.rule_id)
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     print(output)
 
     rule_id = ''
     if "listed" in args.rule_id:
-        rule_id = 'api.acl.' + args.rule_id
+        param['rule_id'] = 'api.acl.' + args.rule_id
     else:
-        rule_id = 'api.threats.' + args.rule_id
+        param['rule_id'] = 'api.threats.' + args.rule_id
 
-    param = {
-        "api_id": args.api_id,
-        "api_key": args.api_key,
-        "site_id": args.site_id,
-        "rule_id": rule_id,
-        "urls": args.urls,
-        "countries": args.countries,
-        "continents": args.continents,
-        "ips": args.ips,
-        "whitelist_id": args.whitelist_id,
-        "delete_whitelist": args.delete_whitelist,
-        "client_app_types": args.client_app_types,
-        "client_apps": args.client_apps,
-        "parameters": args.parameters,
-        "user_agents": args.user_agents
-    }
+    # param = {
+    #     "api_id": args.api_id,
+    #     "api_key": args.api_key,
+    #     "site_id": args.site_id,
+    #     "rule_id": rule_id,
+    #     "urls": args.urls,
+    #     "countries": args.countries,
+    #     "continents": args.continents,
+    #     "ips": args.ips,
+    #     "whitelist_id": args.whitelist_id,
+    #     "delete_whitelist": args.delete_whitelist,
+    #     "client_app_types": args.client_app_types,
+    #     "client_apps": args.client_apps,
+    #     "parameters": args.parameters,
+    #     "user_agents": args.user_agents
+    # }
 
     result = update(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
         return err
@@ -56,7 +58,7 @@ def u_whitelist(args):
 
 
 def update(params):
-    resturl = '/api/prov/v1/sites/configure/whitelists'
+    resturl = 'sites/configure/whitelists'
     if params:
         if "site_id" in params and "rule_id" in params:
             result = execute(resturl, params)

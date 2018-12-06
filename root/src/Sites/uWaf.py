@@ -5,6 +5,8 @@ import logging
 
 
 def u_security(args):
+    param = vars(args)
+    #action = param['do']
     output = 'Update site {0} security configuration.'. format(args.site_id)
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     print(output)
@@ -27,32 +29,34 @@ def u_security(args):
     if args.security_rule_action:
         security_rule_action = 'api.threats.action.' + args.security_rule_action
 
-    param = {
-        "api_id": args.api_id,
-        "api_key": args.api_key,
-        "site_id": args.site_id,
-        "rule_id": rule_id,
-        "block_bad_bots": args.block_bad_bots,
-        "challenge_suspected_bots": args.challenge_suspected_bots,
-        "activation_mode": activation_mode,
-        "security_rule_action": security_rule_action,
-        "quarantined_urls": args.quarantined_urls,
-        "ddos_traffic_threshold": args.ddos_traffic_threshold
-    }
+    param['rule_id'] = rule_id
+    param['activation_mode'] = activation_mode
+    param['security_rule_action'] = security_rule_action
+    # param = {"api_id": args.api_id,
+    #     "api_key": args.api_key,
+    #     "site_id": args.site_id,
+    #     "rule_id": rule_id,
+    #     "block_bad_bots": args.block_bad_bots,
+    #     "challenge_suspected_bots": args.challenge_suspected_bots,
+    #     "activation_mode": activation_mode,
+    #     "security_rule_action": security_rule_action,
+    #     "quarantined_urls": args.quarantined_urls,
+    #     "ddos_traffic_threshold": args.ddos_traffic_threshold
+    # }
 
     result = update(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     else:
         site = Site(result)
-        print('Updated {} Security(WAF) Rule for {}.'.format(args.rule_id.replace('_', ' '), site.get_domain()))
+        print('Updated {} Security(WAF) Rule for {}.'.format(args.rule_id.replace('_', ' '), site.domain))
         return site
 
 
 def update(params):
-    resturl = '/api/prov/v1/sites/configure/security'
+    resturl = 'sites/configure/security'
     if params:
         if "site_id" in params and "rule_id" in params:
             result = execute(resturl, params)

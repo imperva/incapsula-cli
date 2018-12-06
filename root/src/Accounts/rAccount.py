@@ -7,16 +7,19 @@ import json
 
 def r_account(args):
     output = 'Get account status!'
-    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    param = vars(args)
+    #action = param['do']
+    #print('{} site data centers.'.format(str.capitalize(action)))
+    logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
     logging.info(output)
-    param = {
-        "api_id": args.api_id,
-        "api_key": args.api_key,
-        "account_id": args.account_id
-    }
+    # param = {
+    #     "api_id": args.api_id,
+    #     "api_key": args.api_key,
+    #     "account_id": args.account_id
+    # }
     result = read(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     else:
@@ -25,7 +28,7 @@ def r_account(args):
 
 
 def read(params):
-    resturl = '/api/prov/v1/account'
+    resturl = 'account'
     if params:
         return execute(resturl, params)
     else:

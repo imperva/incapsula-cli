@@ -17,7 +17,7 @@ def r_accounts(args):
     }
     result = read(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     else:
@@ -27,7 +27,7 @@ def r_accounts(args):
 
 
 def read(params):
-    resturl = '/api/prov/v1/accounts/list'
+    resturl = 'accounts/list'
     if params:
         return execute(resturl, params)
     else:

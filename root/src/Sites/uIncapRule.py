@@ -28,7 +28,7 @@ def u_incaprule(args):
     }
 
     result = update(param)
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
         return err
@@ -40,7 +40,7 @@ def u_incaprule(args):
 
 
 def update(params):
-    resturl = '/api/prov/v1/sites/incapRules/edit'
+    resturl = 'sites/incapRules/edit'
     if params:
         if "rule_id" in params:
             result = execute(resturl, params)

@@ -19,7 +19,7 @@ def r_subaccount(args):
     result = read(param)
     logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     else:
@@ -29,7 +29,7 @@ def r_subaccount(args):
 
 
 def read(params):
-    resturl = '/api/prov/v1/accounts/listSubAccounts'
+    resturl = 'accounts/listSubAccounts'
     if params:
             return execute(resturl, params)
     else:

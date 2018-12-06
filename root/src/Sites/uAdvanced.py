@@ -17,7 +17,7 @@ def u_advanced(args):
     }
     result = update(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     else:
@@ -29,7 +29,7 @@ def u_advanced(args):
 
 
 def update(params):
-    resturl = '/api/prov/v1/sites/performance/advanced'
+    resturl = 'sites/performance/advanced'
     if params:
         if "site_id" in params and "param" in params and "value" in params:
             return execute(resturl, params)

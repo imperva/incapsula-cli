@@ -18,7 +18,7 @@ def u_cachemode(args):
     }
     result = update(param)
 
-    if result.get('res') != 0:
+    if int(result.get('res')) != 0:
         err = IncapError(result)
         err.log()
     else:
@@ -33,7 +33,7 @@ def u_cachemode(args):
 
 
 def update(params):
-    resturl = '/api/prov/v1/sites/performance/cache-mode'
+    resturl = 'sites/performance/cache-mode'
     if params:
         if "site_id" in params and "cache_mode" in params:
             return execute(resturl, params)
