@@ -4,6 +4,7 @@ from Accounts.rAudit import r_audit
 from Accounts.rAccounts import r_accounts
 from Accounts.rAccount import r_account
 from Accounts.rSubAccounts import r_subaccount
+from Accounts.subscription import r_subscription
 from Sites.dCertificate import d_certificate
 from Sites.uCertificate import u_certificate
 from Sites.site import Site
@@ -688,6 +689,18 @@ account_subList_parser.add_argument('--page_num', default='0', help='The page to
 account_subList_parser.add_argument('--log', default='INFO')
 account_subList_parser.set_defaults(func=r_subaccount)
 
+account_reseller_audit = account_subparsers.add_parser('subscription',
+                                                      help='Use this operation to get subscription details for an account.',
+                                                      usage='incap account subscription [options]')
+account_reseller_audit.add_argument('--api_id', help='API authentication identifier.')
+account_reseller_audit.add_argument('--api_key', help='API authentication identifier.')
+account_reseller_audit.add_argument('account_id',
+                                   help='Numeric identifier of the account to operate on. If not specified, '
+                                        'operation will be performed on the account identified by '
+                                        'the authentication parameters.')
+account_reseller_audit.add_argument('--log', default='INFO')
+account_reseller_audit.add_argument('--reseller', default=False)
+account_reseller_audit.set_defaults(func=r_subscription)
 
 infra_parser = subparsers.add_parser('infra',
                                        help='The Test Alerts API enables you to send dummy notifications. \n'
