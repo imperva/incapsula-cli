@@ -173,6 +173,72 @@ class IncapRule:
 
                 if 'Rewrite' in result['delivery_rules']:
                     for rule in result['delivery_rules']['Rewrite']:
+                        data = ""
+                        del rule["id"]
+                        del rule["enabled"]
+                        del rule["priority"]
+                        del rule["allow_caching"]
+                        del rule["last_7_days_requests_count"]
+
+                        for k, v in rule.items():
+                            if k == "filter" and v == "":
+                                data += 'URL contains "^/"'
+                            elif k == "filter" and v is not "":
+                                data += "--{}='{}' ".format(k, v)
+                            else:
+                                data += '--{}="{}" '. format(k, v)
+
+                        adr_rule = ADRuleRewrite(rule)
+                        print(adr_rule.log())
+                else:
+                    logging.info('You have no Rewrite Rules!!!')
+
+    @staticmethod
+    def _copy(result, ):
+        if int(result.get('res')) != 0:
+            err = IncapError(result)
+            err.log()
+        else:
+            if 'incap_rules' in result:
+                if 'All' in result['incap_rules']:
+                    for rule in result['incap_rules']['All']:
+                        incap_rule = IncapRule(rule)
+                        print(incap_rule.log())
+                else:
+                    logging.info('You have no IncapRules!!!')
+
+            if 'delivery_rules' in result:
+                if 'Redirect' in result['delivery_rules']:
+                    for rule in result['delivery_rules']['Redirect']:
+                        adr_rule = ADRuleRedirect(rule)
+                        print(adr_rule.log())
+                else:
+                    logging.info('You have no Redirect Rules!!!')
+
+                if 'Forward' in result['delivery_rules']:
+                    for rule in result['delivery_rules']['Forward']:
+                        adr_rule = ADRuleForward(rule)
+                        print(adr_rule.log())
+                else:
+                    logging.info('You have no Forward Rules!!!')
+
+                if 'Rewrite' in result['delivery_rules']:
+                    for rule in result['delivery_rules']['Rewrite']:
+                        data = ""
+                        del rule["id"]
+                        del rule["enabled"]
+                        del rule["priority"]
+                        del rule["allow_caching"]
+                        del rule["last_7_days_requests_count"]
+
+                        for k, v in rule.items():
+                            if k == "filter" and v == "":
+                                data += 'URL contains "^/"'
+                            elif k == "filter" and v is not "":
+                                data += "--{}='{}' ".format(k, v)
+                            else:
+                                data += '--{}="{}" '. format(k, v)
+
                         adr_rule = ADRuleRewrite(rule)
                         print(adr_rule.log())
                 else:
