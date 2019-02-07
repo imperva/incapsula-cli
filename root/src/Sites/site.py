@@ -173,7 +173,10 @@ class Site:
                     print('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
 
                 elif aclRules['id'] == 'api.acl.blacklisted_countries':
-                    print('The following countries are blacklisted: %s' % ', '.join(aclRules['geo']['countries']))
+                    if "countries" in aclRules['geo']:
+                        print('The following countries are blacklisted: %s' % ', '.join(aclRules['geo']['countries']))
+                    if "continents" in aclRules['geo']:
+                        print('The following continents are blacklisted: %s' % ', '.join(aclRules['geo']['continents']))
                     if 'exceptions' in aclRules:
                         print('Blacklisted Countries Exceptions follow:')
 
@@ -256,17 +259,17 @@ class Site:
             #pprint('{id}'.format(**item))
             if item['id'] == 'api.rule_exception_type.client_ip':
                 print('-------------------------------------------------------------------------------------------\n|\n'
-                      '| IP Exception ID: {id}'.format(**data) + ' - Exception for client app type: %s\n|' % ', '.join(item['ips']))
+                      '| IP Exception ID: {id}'.format(**data) + ' - Exception for client ip: %s\n|' % ', '.join(item['ips']))
             elif item['id'] == 'api.rule_exception_type.user_agent':
                 print('-------------------------------------------------------------------------------------------\n|\n'
-                      '| User Agent Exception ID: {id}'.format(**data) + ' -  Exception for client app type: %s\n|' % ', '.join(item['user_agents']))
+                      '| User Agent Exception ID: {id}'.format(**data) + ' -  Exception for user agent: %s\n|' % ', '.join(item['user_agents']))
             elif item['id'] == 'api.rule_exception_type.url':
                 for url in item['urls']:
                     print('-------------------------------------------------------------------------------------------\n|\n'
-                          '| Url Exception ID: {id}'.format(**data) + ' - Exception for client app type: %s\n|' % ''.join(url['value']))
+                          '| Url Exception ID: {id}'.format(**data) + ' - Exception for url: %s\n|' % ''.join(url['value']))
             elif item['id'] == 'api.rule_exception_type.country':
                 print('-------------------------------------------------------------------------------------------\n|\n'
-                      '| Country Exception ID: {id}'.format(**data) + ' - Exception for client app type: %s\n|' % ', '.join(item['geo']['countries']))
+                      '| Country Exception ID: {id}'.format(**data) + ' - Exception for country(s): %s\n|' % ', '.join(item['geo']['countries']))
             elif item['id'] == 'api.rule_exception_type.client_app_id':
                 print('-------------------------------------------------------------------------------------------\n|\n'
                       '| Client Application Exception ID: {id}'.format(**data) + ' - '

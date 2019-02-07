@@ -3,8 +3,9 @@ import datetime
 
 BUSINESS = 90.00
 FREE = 0.75
-SITELOCK_LITE = 0.75
-SITELOCK_PRO = 3.50
+LITE = 0.75
+PRO = 3.50
+OVERAGE = 260.00
 
 
 class ResellerExport:
@@ -14,13 +15,12 @@ class ResellerExport:
         self.worksheet = self.workbook.add_worksheet('{} Sitelock Usage'.format(_date))
         self.worksheet1 = self.workbook.add_worksheet("Plan Cost")
         self.worksheet2 = self.workbook.add_worksheet("Summary")
-        self.worksheet.set_column('A:O', width=15)
+        self.worksheet.set_column('A:B', width=15)
+        self.worksheet.set_column('C:E', width=16)
+        self.worksheet.set_column('F:F', width=10)
+        self.worksheet.set_column('G:G', width=15)
         self.worksheet1.set_column('A:A', width=15)
         self.money = self.workbook.add_format({'num_format': '$#,##0.00'})
-        self.current_bits = 0
-        self.previous_bits = 0
-        self.earlier_bits = 0
-
 
     def add_header(self):
         headers = ["Name", "Plan", "Earlier billing cycle", "Previous billing cycle",
@@ -41,8 +41,8 @@ class ResellerExport:
         self.worksheet1.write(4, 0, "SiteLock-Pro")
         self.worksheet1.write(1, 1, BUSINESS, self.money)
         self.worksheet1.write(2, 1, FREE, self.money)
-        self.worksheet1.write(3, 1, SITELOCK_LITE, self.money)
-        self.worksheet1.write(4, 1, SITELOCK_PRO, self.money)
+        self.worksheet1.write(3, 1, LITE, self.money)
+        self.worksheet1.write(4, 1, PRO, self.money)
 
         headers = ["Plan", "Count of Plan", "Sum of Cost", "Sum of Monthly Overages"]
         col = 0
@@ -53,28 +53,25 @@ class ResellerExport:
     def add_account_data(self, data):
         row = 1
         for account in data:
-            accountName = account["planStatus"]["accountName"]
-            accountId = account["planStatus"]["accountId"]
+            accountName = account["account_name"]
+            accountId = account["account_id"]
+            plan_name = account["plan_name"]
             name = "{}({})".format(accountName, accountId)
             for bandwidthHistory in account["bandwidthHistory"]:
                 if bandwidthHistory["billingCycle"] == "Previous billing cycle":
-                    alwaysOnBandwidth = bandwidthHistory["alwaysOnBandwidth"]
+                    previous_bits = bandwidthHistory["alwaysOnBandwidth"]
+                if bandwidthHistory["billingCycle"] == "Current billing cycle":
+                    current_bits = bandwidthHistory["alwaysOnBandwidth"]
+                if bandwidthHistory["billingCycle"] == "Earlier billing cycle":
+                    earlier_bits = bandwidthHistory["alwaysOnBandwidth"]
             self.worksheet.write(row, 0, name)
-            self.worksheet.write(row, 5, alwaysOnBandwidth)
-            self.worksheet.write(row, 6, self.convert_bits(alwaysOnBandwidth))
+            self.worksheet.write(row, 1, plan_name)
+            self.worksheet.write(row, 2, self.convert_bits(earlier_bits))
+            self.worksheet.write(row, 3, self.convert_bits(previous_bits))
+            self.worksheet.write(row, 4, self.convert_bits(current_bits))
+            self.worksheet.write(row, 5, self.find_cost(plan_name), self.money)
+            self.worksheet.write(row, 6, self.get_overage(self.convert_bits(previous_bits), plan_name), self.money)
             row += 1
-
-    def add_account_info(self, data):
-        row = 1
-        for account in data:
-            print(account)
-            for sub_account in account["accounts"]:
-                plan_name = sub_account["plan_name"]
-                trial_end_date = sub_account.get("trial_end_date") or "None"
-                self.worksheet.write(row, 1, plan_name)
-                self.worksheet.write(row, 3, trial_end_date)
-                self.worksheet.write(row, 7, self.find_cost(plan_name), self.money)
-                row += 1
 
     def convert_bits(self, data):
         if "Tbps" in data:
@@ -105,8 +102,14 @@ class ResellerExport:
         elif "Free" in data:
             return FREE
         elif "SiteLock-Lite" in data:
-            return SITELOCK_LITE
+            return LITE
         elif "SiteLock-Pro" in data:
-            return SITELOCK_PRO
+            return PRO
         else:
             return "none"
+
+    def get_overage(self, bits, plan):
+        print(str(bits))
+        if 5000000 <= bits <= 20000000:
+            print("Found one:{}".format(str(bits)))
+            return OVERAGE

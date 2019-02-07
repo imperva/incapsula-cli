@@ -1,1 +1,1 @@
-__version__ = "Incap 1.0.5"
+__version__ = "Incap 2.0"

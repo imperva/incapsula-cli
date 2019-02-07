@@ -2,21 +2,14 @@ from Utils.executeRest import execute
 from Utils.incapError import IncapError
 import logging
 from Utils.reseller_usage import ResellerExport
-import json
 
 
 def r_subscription(args):
     output = 'Get account status!'
     param = vars(args)
-    #action = param['do']
-    #print('{} site data centers.'.format(str.capitalize(action)))
     logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
     logging.info(output)
-    # param = {
-    #     "api_id": args.api_id,
-    #     "api_key": args.api_key,
-    #     "account_id": args.account_id
-    # }
+
     excel = ResellerExport("data.xlsx")
     excel.add_header()
     accounts = []
@@ -24,7 +17,7 @@ def r_subscription(args):
     print(args.reseller)
     if bool(param["reseller"]):
         page = 0
-        param['page_size'] = 5
+        param['page_size'] = 100
         while True:
             param['page_num'] = page
             from Accounts.rAccounts import read
@@ -37,7 +30,7 @@ def r_subscription(args):
             elif results["accounts"]:
                 accounts.append(results)
                 page += 1
-                if page > 2:
+                if page > 10:
                     break
             else:
                 break
@@ -49,11 +42,10 @@ def r_subscription(args):
                 print(sub_account["account_id"])
                 param["account_id"] = sub_account["account_id"]
                 sub_account["bandwidthHistory"] = get(param).get("bandwidthHistory")
-                print(sub_account)
-                exit(0)
-                account_list.append(get(param))
+                account_list.append(sub_account)
+            # print(account_list)
+            # exit(0)
         excel.add_account_data(account_list)
-        excel.add_account_info(accounts)
         excel.workbook.close()
         return
     else:
