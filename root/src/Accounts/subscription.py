@@ -1,3 +1,5 @@
+import time
+
 from Utils.executeRest import execute
 from Utils.incapError import IncapError
 import logging
@@ -15,6 +17,7 @@ def r_subscription(args):
     accounts = []
     print(param)
     print(args.reseller)
+    startTime = time.time()
     if bool(param["reseller"]):
         page = 0
         param['page_size'] = 100
@@ -30,7 +33,7 @@ def r_subscription(args):
             elif results["accounts"]:
                 accounts.append(results)
                 page += 1
-                if page > 10:
+                if page > 100:
                     break
             else:
                 break
@@ -47,6 +50,8 @@ def r_subscription(args):
             # exit(0)
         excel.add_account_data(account_list)
         excel.workbook.close()
+        endTime = time.time()
+        print("X transactions took: {}s".format(endTime - startTime))
         return
     else:
         result = get(param)
