@@ -12,11 +12,11 @@ class ResellerExport:
     def __init__(self, filename):
         _date = datetime.date.today()
         self.workbook = xlsxwriter.Workbook(filename)
-        self.wsBusiness = self.workbook.add_worksheet('{} (Business) Usage'.format(_date))
-        self.wsPro = self.workbook.add_worksheet('{} (Pro) Usage'.format(_date))
-        self.wsLite = self.workbook.add_worksheet('{} (Lite) Usage'.format(_date))
-        self.wsFree = self.workbook.add_worksheet('{} (Free) Usage'.format(_date))
-        self.wsOverage = self.workbook.add_worksheet('{} Overage'.format(_date))
+        self.wsBusiness = self.workbook.add_worksheet('Business Usage'.format(_date))
+        self.wsPro = self.workbook.add_worksheet('Pro Usage'.format(_date))
+        self.wsLite = self.workbook.add_worksheet('Lite Usage'.format(_date))
+        self.wsFree = self.workbook.add_worksheet('Free Usage'.format(_date))
+        self.wsOverage = self.workbook.add_worksheet('Overage'.format(_date))
         self.wsPlanCost = self.workbook.add_worksheet("Plan Cost")
         self.wsSummary = self.workbook.add_worksheet("Summary")
         self.wsBusiness.set_column('A:B', width=15)
@@ -105,14 +105,14 @@ class ResellerExport:
                     current_bits = bandwidthHistory["alwaysOnBandwidth"] or 0
                 if bandwidthHistory["billingCycle"] == "Earlier billing cycle":
                     earlier_bits = bandwidthHistory["alwaysOnBandwidth"] or 0
-            if self.get_overage(self.convert_bits(previous_bits), plan_name):
+            if self.get_overage(self.convert_bits(previous_bits)):
                 self.wsOverage.write(rOverage, 0, name)
                 self.wsOverage.write(rOverage, 1, plan_name)
                 self.wsOverage.write(rOverage, 2, self.convert_bits(earlier_bits))
                 self.wsOverage.write(rOverage, 3, self.convert_bits(previous_bits))
                 self.wsOverage.write(rOverage, 4, self.convert_bits(current_bits))
-                self.wsOverage.write(rOverage, 5, self.find_cost(plan_name), self.money)
-                self.wsOverage.write(rOverage, 6, self.get_overage(self.convert_bits(previous_bits), plan_name), self.money)
+                self.wsOverage.write(rOverage, 5, self.find_cost(plan_name, self.convert_bits(previous_bits)), self.money)
+                self.wsOverage.write(rOverage, 6, self.get_overage(self.convert_bits(previous_bits)), self.money)
                 rOverage += 1
                 if "Business" in plan_name:
                     self.oBusiness += 1
@@ -129,8 +129,8 @@ class ResellerExport:
                     self.wsBusiness.write(rBusiness, 2, self.convert_bits(earlier_bits))
                     self.wsBusiness.write(rBusiness, 3, self.convert_bits(previous_bits))
                     self.wsBusiness.write(rBusiness, 4, self.convert_bits(current_bits))
-                    self.wsBusiness.write(rBusiness, 5, self.find_cost(plan_name), self.money)
-                    self.wsBusiness.write(rBusiness, 6, self.get_overage(self.convert_bits(previous_bits), plan_name), self.money)
+                    self.wsBusiness.write(rBusiness, 5, self.find_cost(plan_name, self.convert_bits(previous_bits)), self.money)
+                    self.wsBusiness.write(rBusiness, 6, self.get_overage(self.convert_bits(previous_bits)), self.money)
                     rBusiness += 1
 
                 if "SiteLock-Pro" in plan_name:
@@ -139,8 +139,8 @@ class ResellerExport:
                     self.wsPro.write(rPro, 2, self.convert_bits(earlier_bits))
                     self.wsPro.write(rPro, 3, self.convert_bits(previous_bits))
                     self.wsPro.write(rPro, 4, self.convert_bits(current_bits))
-                    self.wsPro.write(rPro, 5, self.find_cost(plan_name), self.money)
-                    self.wsPro.write(rPro, 6, self.get_overage(self.convert_bits(previous_bits), plan_name), self.money)
+                    self.wsPro.write(rPro, 5, self.find_cost(plan_name, self.convert_bits(previous_bits)), self.money)
+                    self.wsPro.write(rPro, 6, self.get_overage(self.convert_bits(previous_bits)), self.money)
                     rPro += 1
 
                 if "SiteLock-Lite" in plan_name:
@@ -149,8 +149,8 @@ class ResellerExport:
                     self.wsLite.write(rLite, 2, self.convert_bits(earlier_bits))
                     self.wsLite.write(rLite, 3, self.convert_bits(previous_bits))
                     self.wsLite.write(rLite, 4, self.convert_bits(current_bits))
-                    self.wsLite.write(rLite, 5, self.find_cost(plan_name), self.money)
-                    self.wsLite.write(rLite, 6, self.get_overage(self.convert_bits(previous_bits), plan_name), self.money)
+                    self.wsLite.write(rLite, 5, self.find_cost(plan_name, self.convert_bits(previous_bits)), self.money)
+                    self.wsLite.write(rLite, 6, self.get_overage(self.convert_bits(previous_bits)), self.money)
                     rLite += 1
 
                 if "Free" in plan_name:
@@ -159,8 +159,8 @@ class ResellerExport:
                     self.wsFree.write(rFree, 2, self.convert_bits(earlier_bits))
                     self.wsFree.write(rFree, 3, self.convert_bits(previous_bits))
                     self.wsFree.write(rFree, 4, self.convert_bits(current_bits))
-                    self.wsFree.write(rFree, 5, self.find_cost(plan_name), self.money)
-                    self.wsFree.write(rFree, 6, self.get_overage(self.convert_bits(previous_bits), plan_name), self.money)
+                    self.wsFree.write(rFree, 5, self.find_cost(plan_name, self.convert_bits(previous_bits)), self.money)
+                    self.wsFree.write(rFree, 6, self.get_overage(self.convert_bits(previous_bits)), self.money)
                     rFree += 1
 
         #Summerize
@@ -170,33 +170,50 @@ class ResellerExport:
         self.tFree = rFree - 1
 
         self.wsSummary.write(1, 0, "Business")
-        self.wsSummary.write(1, 1, self.tBusiness)
-        self.wsSummary.write(1, 2, self.tBusiness * BUSINESS, self.money)
-        self.wsSummary.write(1, 3, self.oBusiness * OVERAGE, self.money)
+        self.wsSummary.write_formula('B2', '=COUNTIF(\'Business Usage\'!B:B,"Business")')
+        #self.wsSummary.write(1, 1, self.tBusiness)#=COUNTIF('(Business) Usage'!B:B,"Business")
+        #self.wsSummary.write(1, 2, self.tBusiness * BUSINESS, self.money)#=SUM('Business Usage'!F:F)
+        self.wsSummary.write_formula('C2', '=SUM(\'Business Usage\'!F:F)', self.money)
+        #self.wsSummary.write(1, 3, self.oBusiness * OVERAGE, self.money)
+        self.wsSummary.write_formula('D2', '=COUNTIF(Overage!B:B,"Business") * {}'.format(OVERAGE), self.money)
 
         self.wsSummary.write(2, 0, "SiteLock-Pro")
-        self.wsSummary.write(2, 1, self.tPro)
-        self.wsSummary.write(2, 2, self.tPro * PRO, self.money)
-        self.wsSummary.write(2, 3, self.oPro * OVERAGE, self.money)
+        self.wsSummary.write_formula('B3', '=COUNTIF(\'Pro Usage\'!B:B,"SiteLock-Pro")')
+        #self.wsSummary.write(2, 1, self.tPro)
+        #self.wsSummary.write(2, 2, self.tPro * PRO, self.money)
+        self.wsSummary.write_formula('C3', '=SUM(\'Pro Usage\'!F:F)', self.money)
+        #self.wsSummary.write(2, 3, self.oPro * OVERAGE, self.money)
+        self.wsSummary.write_formula('D3', '=COUNTIF(Overage!B:B,"SiteLock-Pro") * {}'.format(OVERAGE), self.money)
+
 
         self.wsSummary.write(3, 0, "SiteLock-Lite")
-        self.wsSummary.write(3, 1, self.tLite)
-        self.wsSummary.write(3, 2, self.tLite * LITE, self.money)
-        self.wsSummary.write(3, 3, self.oLite * OVERAGE, self.money)
+        self.wsSummary.write_formula('B4', '=COUNTIF(\'Lite Usage\'!B:B,"SiteLock-Lite")')
+        #self.wsSummary.write(3, 1, self.tLite)
+        #self.wsSummary.write(3, 2, self.tLite * LITE, self.money)
+        self.wsSummary.write_formula('C4', '=SUM(\'Lite Usage\'!F:F)', self.money)
+        #self.wsSummary.write(3, 3, self.oLite * OVERAGE, self.money)
+        self.wsSummary.write_formula('D4', '=COUNTIF(Overage!B:B,"SiteLock-Lite") * {}'.format(OVERAGE), self.money)
 
         self.wsSummary.write(4, 0, "Free")
-        self.wsSummary.write(4, 1, self.tFree)
-        self.wsSummary.write(4, 2, self.tFree * FREE, self.money)
-        self.wsSummary.write(4, 3, self.oFree * OVERAGE, self.money)
+        self.wsSummary.write_formula('B5', '=COUNTIF(\'Free Usage\'!B:B,"Free")')
+        #self.wsSummary.write(4, 1, self.tFree)
+        #self.wsSummary.write(4, 2, self.tFree * FREE, self.money)
+        self.wsSummary.write_formula('C5', '=SUM(\'Free Usage\'!F:F)', self.money)
+        #self.wsSummary.write(4, 3, self.oFree * OVERAGE, self.money)
+        self.wsSummary.write_formula('D5', '=COUNTIF(Overage!B:B,"Free") * {}'.format(OVERAGE), self.money)
 
         self.wsSummary.write(5, 0, "Total")
-        self.wsSummary.write(5, 1, self.tBusiness + self.tPro + self.tLite + self.tFree)
-        self.wsSummary.write(5, 2, (self.tBusiness * BUSINESS) + (self.tPro * PRO) + (self.tLite * LITE) + (self.tFree * FREE), self.money)
-        self.wsSummary.write(5, 3, (self.oBusiness + self.oPro + self.oLite + self.oFree) * OVERAGE, self.money)
+        self.wsSummary.write_formula('B6', '=SUM(B2:B5)')
+        #self.wsSummary.write(5, 1, self.tBusiness + self.tPro + self.tLite + self.tFree)
+        #self.wsSummary.write(5, 2, (self.tBusiness * BUSINESS) + (self.tPro * PRO) + (self.tLite * LITE) + (self.tFree * FREE), self.money)
+        self.wsSummary.write_formula('C6', '=SUM(C2:C5)', self.money)
+        #self.wsSummary.write(5, 3, (self.oBusiness + self.oPro + self.oLite + self.oFree) * OVERAGE, self.money)
+        self.wsSummary.write_formula('D6', '=SUM(D2:D5)', self.money)
 
         self.wsSummary.write(6, 0, "Grand Total")
-        self.wsSummary.write(6, 3, ((self.oBusiness + self.oPro + self.oLite + self.oFree) * OVERAGE) +
-                             (self.tBusiness * BUSINESS) + (self.tPro * PRO) + (self.tLite * LITE) + (self.tFree * FREE), self.summary)
+        self.wsSummary.write_formula('D7', '=SUM(C6:D7)', self.money)
+        #self.wsSummary.write(6, 3, ((self.oBusiness + self.oPro + self.oLite + self.oFree) * OVERAGE) +
+                             #(self.tBusiness * BUSINESS) + (self.tPro * PRO) + (self.tLite * LITE) + (self.tFree * FREE), self.summary)
 
     def convert_bits(self, data):
         if "Tbps" in data:
@@ -221,20 +238,32 @@ class ResellerExport:
         else:
             return "none"
 
-    def find_cost(self, data):
+    def find_cost(self, data, bits):
         if "Business" in data:
             return BUSINESS
         elif "Free" in data:
-            return FREE
+            if self.get_cost(bits):
+                return BUSINESS
+            else:
+                return FREE
         elif "SiteLock-Lite" in data:
-            return LITE
+            if self.get_cost(bits):
+                return BUSINESS
+            else:
+                return LITE
         elif "SiteLock-Pro" in data:
-            return PRO
+            if self.get_cost(bits):
+                return BUSINESS
+            else:
+                return PRO
         else:
             return "none"
 
-    def get_overage(self, bits, plan):
-        print(str(bits))
+    def get_overage(self, bits):
         if 5000000 <= bits <= 20000000:
             print("Found one:{}".format(str(bits)))
             return OVERAGE
+
+    def get_cost(self, bits):
+        if bits >= 5000000:
+            return True

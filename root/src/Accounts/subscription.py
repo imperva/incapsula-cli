@@ -33,7 +33,7 @@ def r_subscription(args):
             elif results["accounts"]:
                 accounts.append(results)
                 page += 1
-                if page > 100:
+                if page > 10:
                     break
             else:
                 break

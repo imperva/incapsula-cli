@@ -236,7 +236,7 @@ site_edit_server_parser.add_argument('--is_standby', help='Set the server as Act
 site_edit_server_parser.add_argument('--log', default='INFO')
 site_edit_server_parser.set_defaults(func=Server.servers, do='edit')
 site_delete_server_parser = site_subparsers.add_parser('del-server',
-                                                       help="Use this operation to edit a server in a data center.",
+                                                       help="Use this operation to delete a server in a data center.",
                                                        usage='incap site edit-server server_id')
 site_delete_server_parser.add_argument('--api_id', help='API authentication identifier.')
 site_delete_server_parser.add_argument('--api_key', help='API authentication identifier.')

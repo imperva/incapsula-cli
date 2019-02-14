@@ -41,7 +41,6 @@ def execute(resturl, param):
 
         with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
             result = json.loads(response.read().decode('utf8'))
-            print("Type {}".format(type(result)))
             logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
             return result
 
