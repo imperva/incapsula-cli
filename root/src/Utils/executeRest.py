@@ -28,6 +28,7 @@ def execute(resturl, param):
         endpoint = resturl
     else:
         endpoint = IncapConfigurations.get_config(param['profile'], 'baseurl') + resturl
+
     try:
         logging.debug('Request Data: {}'.format(param))
         p = ''

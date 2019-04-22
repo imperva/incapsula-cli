@@ -7,6 +7,7 @@ from Accounts.rSubAccounts import r_subaccount
 from Accounts.subscription import r_subscription
 from Sites.dCertificate import d_certificate
 from Sites.uCertificate import u_certificate
+from Sites.csr import new_csr
 from Sites.site import Site
 from Sites.uACL import u_acl
 from Sites.uCacheMode import u_cachemode
@@ -202,6 +203,7 @@ site_update_dc_parser.add_argument('--is_standby', help='Enables the data center
                                                         'for the same functionality.')
 site_update_dc_parser.add_argument('--is_content', help='The data center will be available for specific resources '
                                                         '(Forward Delivery Rules).')
+site_update_dc_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
 site_update_dc_parser.add_argument('--log', default='INFO')
 site_update_dc_parser.set_defaults(func=DataCenter.commit, do='edit')
 
@@ -553,6 +555,28 @@ site_advanced_cache_parser.add_argument('site_id', help='Numeric identifier of t
 site_advanced_cache_parser.add_argument('--log', default='INFO')
 site_advanced_cache_parser.set_defaults(func=u_advanced)
 
+
+site_customcert_parser = site_subparsers.add_parser('csr', help='Use this operation to create a certificate '
+                                                                'signing request (CSR) for your site. '
+                                                                'For details on how to provide Incapsula with a '
+                                                                'custom certificate without a private key, '
+                                                                'see Upload a Certificate without a Private Key.',
+                                                     usage='incap site csr [options] site_id')
+site_customcert_parser.add_argument('--api_id', help='API authentication identifier.')
+site_customcert_parser.add_argument('--api_key', help='API authentication identifier.')
+site_customcert_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_customcert_parser.add_argument('--email', help='Email address. For example: joe@example.com')
+site_customcert_parser.add_argument('--organization', help='The legal name of your organization. '
+                                                           'This should not be abbreviated or include '
+                                                           'suffixes such as Inc., Corp., or LLC.')
+site_customcert_parser.add_argument('--organization_unit', help='The division of your organization handling the certificate. '
+                                                                'For example, "IT Department".')
+site_customcert_parser.add_argument('--country', help='The two-letter ISO code for the country where your organization is located.')
+site_customcert_parser.add_argument('--state', help='The state/region where your organization is located. This should not be abbreviated.')
+site_customcert_parser.add_argument('--city', help='The city where your organization is located.	')
+site_customcert_parser.add_argument('--log', default='INFO')
+site_customcert_parser.set_defaults(func=new_csr)
+
 site_ucertificate_parser = site_subparsers.add_parser('upcert', help='Use this operation to upload custom '
                                                                     'certificate for your site. The following SSL '
                                                                     'certificate file formats are supported:'
@@ -699,7 +723,6 @@ account_reseller_audit.add_argument('account_id',
                                         'operation will be performed on the account identified by '
                                         'the authentication parameters.')
 account_reseller_audit.add_argument('--log', default='INFO')
-account_reseller_audit.add_argument('--reseller', default=False)
 account_reseller_audit.set_defaults(func=r_subscription)
 
 infra_parser = subparsers.add_parser('infra',
