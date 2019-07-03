@@ -28,7 +28,7 @@ class DataCenter:
             return result
         else:
             result = execute(resturl, param)
-            DataCenter._result(execute(result, action))
+            DataCenter._result(execute(resturl, param), action)
             return result
 
     @staticmethod
