@@ -7,21 +7,10 @@ from Utils.incapError import IncapError
 
 def c_account(args):
     output = 'With API_ID{0}, API Key={1} lets add {2}!'. format(args.api_id, args.api_key, args.account_name)
-    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+    param = vars(args)
+    logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
     logging.info(output)
 
-    param = {
-        "api_id": args.api_id,
-        "api_key": args.api_key,
-        "email": args.email,
-        "parent_id": args.parent_id,
-        "ref_id": args.ref_id,
-        "user_name": args.user_name,
-        "plan_id": args.plan_id,
-        "log_level": args.log_level,
-        "logs_account_id": args.logs_account_id,
-        "account_name": args.account_name
-    }
     result = create(param)
 
     if int(result.get('res')) != 0:
