@@ -2,7 +2,7 @@ from Utils.table_formatter import TableFormatter
 
 
 class PrintTable:
-    def __init__(self, label, data: list):
+    def __init__(self, label, data: TableFormatter):
         self.data = data
         self.label = label
 
@@ -16,24 +16,22 @@ class PrintTable:
 
     def print_headers(self):
         header = '|'
-        for headers in self.data[0]:
-            if type(headers[1]) is not list:
-                header += "{0:^{1}}|".format(headers[0].capitalize(), str(headers[2]))
+        for headers in self.data.req_headers:
+            header += "{0:^{1}}|".format(headers.capitalize(), 18)
         print('~' * len(header) + '\n' + header + '\n' + '~' * len(header))
 
     def print_values(self):
         p = None
         value = '|'
-        for data in self.data:
-            #print('Data: {}'.format(data))
-            for values in data:
-                #print('Value: {}'.format(values))
-                if type(values[1]) is list:
-                    headers = list(values[1][0].keys())
-                    format_site = TableFormatter(headers=headers, data=values[1])
-                    p = PrintTable(label=values[0].capitalize(), data=format_site.headers)
+        for data in self.data.data:
+            for header in self.data.req_headers:
+                if header in data:
+                    if type(data[header]) == list:
+                        value += "{0:^{1}}|".format(data[header][0], 18)
+                    else:
+                        value += "{0:^{1}}|".format(data.get(header), 18)
                 else:
-                    value += "{0:^{1}}|".format(values[1], str(values[2]))
+                    value += "{0:^{1}}|".format("null", 18)
             print('-' * len(value) + '\n' + value + '\n' + '-' * len(value))
             value = '|'
             if p: p.print_all()

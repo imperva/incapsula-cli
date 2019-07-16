@@ -1,6 +1,5 @@
 import logging
 from operator import itemgetter
-
 from Utils.executeRest import execute
 from Utils.print_ifp_stats import PrintTable
 from Utils.table_formatter import TableFormatter
@@ -29,12 +28,15 @@ class Event:
 
     @staticmethod
     def print_events(events: list):
-        newlist = sorted(events, key=itemgetter('eventTime'))
-        format_site = TableFormatter(headers=['accountId', 'eventTime', 'eventType', 'itemType', 'eventTarget'], data=newlist)
-        PrintTable(label='Events', data=format_site.headers).print_all()
+        if len(events) > 0:
+            newlist = sorted(events, key=itemgetter('eventTime'))
+            format_site = TableFormatter(headers=['accountId', 'eventTime', 'eventType', 'itemType', 'eventTarget'], data=newlist)
+            PrintTable(label='Events', data=format_site.headers).print_all()
+        else:
+            logging.info("There are no events at this time.")
 
     @staticmethod
     def print_stats(events: list):
         newlist = sorted(events, key=itemgetter('startTime'))
-        format_site = TableFormatter(headers=['metric', 'ipPrefix', 'ipPrefixType', 'traffic', 'startTime', 'data'], data=newlist)
-        PrintTable(label='Events', data=format_site.headers).print_all()
+        format_site = TableFormatter(headers=['metric', 'ipPrefix', 'pop', 'trafficType', 'ipPrefixType', 'traffic', 'startTime', 'data'], data=newlist)
+        PrintTable(label='Stats', data=format_site).print_all()

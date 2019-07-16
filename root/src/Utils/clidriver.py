@@ -89,6 +89,12 @@ site_add_parser.add_argument('--logs_account_id', default='',
                                   'be performed on the account identified by the authentication parameters')
 site_add_parser.add_argument('domain', help='The domain name of the site. '
                                             'For example: www.example.com, hello.example.com, example.com')
+site_add_parser.add_argument('--naked_domain_san', default='true', help='Use “true” to add the naked domain '
+                                                                       'SAN to a www site’s SSL certificate. '
+                                                                       'Default value: true')
+site_add_parser.add_argument('--wildcard_san', default='true', help='Use “true” to add the wildcard SAN '
+                                                                   'or “false” to add the full domain SAN to the site’s'
+                                                                   ' SSL certificate. Default value: true')
 site_add_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
 
 site_add_parser.add_argument('--log', default='INFO')
@@ -834,7 +840,7 @@ infra_events_parser.set_defaults(func=Event.commit, do='events')
 
 infra_stats_parser = infra_subparsers.add_parser('stats', help="Use this operation to list a site's "
                                                                  "data centers including the data centers' servers.",
-                                                 usage='incap site list-dc site_id')
+                                                 usage='incap infra stats')
 infra_stats_parser.add_argument('--api_id', help='API authentication identifier.')
 infra_stats_parser.add_argument('--api_key', help='API authentication identifier.')
 infra_stats_parser.add_argument('--account_id', help='Numeric identifier of the site to operate on.')
