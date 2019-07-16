@@ -160,7 +160,7 @@ site_dcertificate_parser.add_argument('site_id', help='Numeric identifier of the
 site_dcertificate_parser.add_argument('--log', default='INFO')
 site_dcertificate_parser.set_defaults(func=d_certificate)
 
-site_list_parser = site_subparsers.add_parser('list', help='Use this operation to delete a site.',
+site_list_parser = site_subparsers.add_parser('list', help='Use this operation to list all site in the account.',
                                               usage='incap site list [options]')
 site_list_parser.add_argument('--api_id', help='API authentication identifier.')
 site_list_parser.add_argument('--api_key', help='API authentication identifier.')
