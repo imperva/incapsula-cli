@@ -29,7 +29,7 @@ class ADRuleRedirect:
 
 class ADRuleRewrite:
     def __init__(self, data):
-        self.to = data['to']
+        self.to = data.get('to') or ""
         self.id = data['id']
         self.enabled = data['enabled']
         self.priority = data['priority']
@@ -37,10 +37,10 @@ class ADRuleRewrite:
         self.last_7_days_requests_count = data['last_7_days_requests_count']
         self.name = data['name']
         self.action = data['action']
-        self._from = data['from']
+        self._from = data.get('from') or ""
         self.filter = data['filter']
         self.allow_caching = str(data.get('allow_caching'))
-        self.rewrite_name = data['rewrite_name']
+        self.rewrite_name = data.get('rewrite_name') or ""
 
     def log(self):
         return '-------------------------------------------------------------------------------------------------\n' \
@@ -174,11 +174,11 @@ class IncapRule:
                 if 'Rewrite' in result['delivery_rules']:
                     for rule in result['delivery_rules']['Rewrite']:
                         data = ""
-                        del rule["id"]
-                        del rule["enabled"]
-                        del rule["priority"]
-                        del rule["allow_caching"]
-                        del rule["last_7_days_requests_count"]
+                        # del rule["id"]
+                        # del rule["enabled"]
+                        # del rule["priority"]
+                        # del rule["allow_caching"]
+                        # del rule["last_7_days_requests_count"]
 
                         for k, v in rule.items():
                             if k == "filter" and v == "":
@@ -187,7 +187,7 @@ class IncapRule:
                                 data += "--{}='{}' ".format(k, v)
                             else:
                                 data += '--{}="{}" '. format(k, v)
-
+                        print("RULE: {}".format(rule))
                         adr_rule = ADRuleRewrite(rule)
                         print(adr_rule.log())
                 else:

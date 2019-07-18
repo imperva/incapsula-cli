@@ -22,12 +22,6 @@ def export(args):
         param = vars(args)
         param['page_size'] = 100
         param['site_id'] = ''
-        # param = {
-        #     "api_id": args.api_id,
-        #     "api_key": args.api_key,
-        #     "account_id": args.account_id,
-        #     "page_size": 100
-        # }
 
         while True:
             param['page_num'] = page
@@ -44,26 +38,18 @@ def export(args):
                 print("Exporting pages from {} to {}".format(start_page, end_page))
                 for site in result['sites']:
                     if args.path is None:
-                        path = IncapConfigurations.get_config(param['profile'], 'repo')
+                        path = os.getenv("IMPV_REPO", IncapConfigurations.get_config(param["profile"], 'repo'))
                         if not path:
                             logging.warning('No path was provided.')
                             exit(0)
                     else:
                         path = args.path
                     filename = args.filename
-                    export_site(site, path, filename, param)
+                    export_site(site, path, filename, args)
                 page += 1
             else:
                 break
     else:
-        #param = vars(args)
-        # param = {
-        #     "api_id": args.api_id,
-        #     "api_key": args.api_key,
-        #     "account_id": args.account_id,
-        #     "site_id": args.site_id
-        # }
-        #from Sites.rSite import read
         args.do = 'status'
         result = Site.commit(args, True)# read(param)
 
@@ -73,7 +59,7 @@ def export(args):
             return err
         else:
             if args.path is None:
-                path = IncapConfigurations.get_config(args.profile, 'repo')
+                path = os.getenv("IMPV_REPO", IncapConfigurations.get_config(args.profile, 'repo'))
                 if not path:
                     logging.warning('No path was provided.')
                     exit(0)

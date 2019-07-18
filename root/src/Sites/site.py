@@ -73,8 +73,7 @@ class Site:
             return err
         else:
             if action == 'delete':
-                print('Success {} {}!'.format(str.replace(__name__[0].lower() + __name__[1:], '.', '/')
-                                               .split('/')[1], param['do']))
+                print('Successfully deleted site ID: {}!'.format(param['site_id']))
                 resp = IncapResponse(result)
                 resp.log()
                 return resp

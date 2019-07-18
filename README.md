@@ -44,6 +44,19 @@ https://www.python.org/downloads/
     incap config --profile=special_name --repo=/Users/<username>/your_repo_location --baseurl=https://my.incapsula.com 26012 ejf903rie-3983030ie23r2r39j0 2398
 View the config with - *cat ~/.incap/config*
 
+## Using environment variables
+    Set environment for the following:
+    IMPV_API_ID
+    IMPV_API_KEY
+    IMPV_ACCOUNT_ID
+    IMPV_BASEURL
+    IMPV_REPO (optional for export)
+    
+#### *With three options to apply creds/configs there is a hierarchy that applies and as follows:*
+    cmd line args
+    Environment variables
+    config.ini
+    
 ## Add a site
     incap site add www.saic.com
 
@@ -83,16 +96,18 @@ View the config with - *cat ~/.incap/config*
 ## Set advanced cache async validation to true
     incap site advanced-cache async_validation true SITE_ID
 
-## Backup full config (does not include ADR rules yet)
-    incap site list --export=true –-path=/Users/<name>/backups --filename={site_id}_{domain}_{date}
-    incap site list --export=true –-path=/Users/<name>/backups --filename={site_id}_{date}
-    incap site list --export=true –-path=/Users/<name>/backups --filename={domain}_{date}
-    incap site list --export=true –-path=/Users/<name>/backups --filename={site_id}
-    incap site list --export=true –-path=/Users/<name>/backups --filename={domain}_{date}
-    incap site list --export=true –-path=/Users/<name>/backups --filename={site_id}_{domain}_REV3_1B
+## Backup full config, includes incapRules and ADRules
+    incap site export –-path=/Users/<name>/backups --filename={site_id}_{domain}_{date}
+    incap site export –-path=/Users/<name>/backups --filename={site_id}_{date}
+    incap site export –-path=/Users/<name>/backups --filename={domain}_{date}
+    incap site export –-path=/Users/<name>/backups --filename={site_id}
+    incap site export –-path=/Users/<name>/backups --filename={site_id}_{domain}_REV3_1B
+
+ ###### *Back up a single site with the --site_id param.*
+    incap site export –-site_id=123456
 
 
-*Path in the backup is option and will use the repo path in the config file.*
+*Path in the backup is option and will use the repo path in the config file or environment variable.*
 
 ## Restore site config
     incap site restore --domain=www.example.com /Users/<name>/backups/www.template.com.json

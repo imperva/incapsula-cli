@@ -8,8 +8,8 @@ class TestIncapCLI(unittest.TestCase):
         self.site_id = None
 
     def test_a_site_add(self):
-        print('Add site: www.mooreassistance.net')
-        test_incap_cli = testing(['site', 'add', "www.mooreassistance.net", '--force_ssl=true'])
+        print('Add site: www.leidos.com')
+        test_incap_cli = testing(['site', 'add', "www.leidos.com", '--force_ssl=true'])
         self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to add site: www.mooreassistance.net.')
         TestIncapCLI.site_id = test_incap_cli.site_id
 

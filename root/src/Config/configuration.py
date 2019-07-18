@@ -28,7 +28,7 @@ class IncapConfigurations:
         except configparser.Error as err:
             logging.error('{}'.format(err.message))
             logging.error('Please run "incap config" to configure user info')
-            exit(1)
+            return None
 
 
 def configure(args):

@@ -9,25 +9,32 @@ import logging
 import ssl
 
 
-def execute(resturl, param):
-    # with open(os.path.expanduser('~') + '/BitBucket/IncapAPI/root/src/temp files/CEResponse.json', 'r') as json_file:
-    #     json_txt = json_file.read()
-    #     json_body = json.loads(json_txt)
-    #     print(json_body['log'])
-    #     exit(0)
+def execute(resturl, param, endpoint=""):
+    try:
+        del param["func"]
+        del param["do"]
+        del param["log"]
+    except:
+        pass
+
     ctx = ssl._create_unverified_context()
     ctx.check_hostname = False
 
     if param.get('api_id') is None:
-        param["api_id"] = IncapConfigurations.get_config(param['profile'], 'id')
+        param["api_id"] = os.getenv("IMPV_API_ID", IncapConfigurations.get_config(param['profile'], 'id'))
         if param.get('api_key') is None:
-            param["api_key"] = IncapConfigurations.get_config(param['profile'], 'key')
+            param["api_key"] = os.getenv("IMPV_API_KEY", IncapConfigurations.get_config(param['profile'], 'key'))
             if param.get('account_id') is None:
-                param["account_id"] = IncapConfigurations.get_config(param['profile'], 'account')
-    if "https://" in resturl:
-        endpoint = resturl
-    else:
-        endpoint = IncapConfigurations.get_config(param['profile'], 'baseurl') + resturl
+                param["account_id"] = os.getenv("IMPV_ACCOUNT_ID", IncapConfigurations.get_config(param['profile'], 'account'))
+
+    if str(urllib.parse.urlparse(resturl).netloc.__eq__("")):
+        baseurl = os.getenv("IMPV_BASEURL", IncapConfigurations.get_config(param['profile'], 'baseurl')) or "https://my.imperva.com"
+        if not str(urllib.parse.urlparse(baseurl).path).__contains__("/api/prov/v1/"):
+            endpoint = baseurl + "/api/prov/v1/" + resturl
+        else:
+            endpoint = baseurl + resturl
+        if not str(urllib.parse.urlparse(endpoint).scheme.__eq__("https")):
+            logging.error("Error: URL does not contain the proper scheme 'https'.")
 
     try:
         logging.debug('Request Data: {}'.format(param))
@@ -43,6 +50,7 @@ def execute(resturl, param):
         with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
             result = json.loads(response.read().decode('utf8'))
             logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
+            logging.debug("HTTP Response Code: {}".format(response.getcode()))
             return result
 
     except (HTTPError, URLError) as error:

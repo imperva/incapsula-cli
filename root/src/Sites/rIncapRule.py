@@ -41,6 +41,7 @@ def r_incaprule(args):
         if 'delivery_rules' in result:
             if 'Redirect' in result['delivery_rules']:
                 for rule in result['delivery_rules']['Redirect']:
+                    print("RULE: {}".format(rule))
                     adr_rule = ADRuleRedirect(rule)
                     print(adr_rule.log())
             else:
@@ -55,6 +56,7 @@ def r_incaprule(args):
 
             if 'Rewrite' in result['delivery_rules']:
                 for rule in result['delivery_rules']['Rewrite']:
+                    print("RULE: {}".format(rule))
                     adr_rule = ADRuleRewrite(rule)
                     print(adr_rule.log())
             else:
