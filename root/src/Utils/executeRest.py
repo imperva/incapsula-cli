@@ -35,7 +35,8 @@ def execute(resturl, param, endpoint=""):
             endpoint = baseurl + resturl
         if not str(urllib.parse.urlparse(endpoint).scheme.__eq__("https")):
             logging.error("Error: URL does not contain the proper scheme 'https'.")
-
+        if str(urllib.parse.urlparse(resturl).path).__contains__("/api/integration/v1/clapps"):
+            endpoint = baseurl.replace("/api/prov/v1/", "/api/integration/v1/clapps")
     try:
         logging.debug('Request Data: {}'.format(param))
         p = ''

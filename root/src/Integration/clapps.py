@@ -30,8 +30,8 @@ def get_clapps(cl_id):
 
 def get_update_file(filename, param, cl_id):
     try:
+        result = read(param)
         with open(filename, 'w') as outfile:
-            result = read(param)
             if int(result.get('res')) != 0:
                 err = IncapError(result)
                 err.log()
@@ -43,6 +43,7 @@ def get_update_file(filename, param, cl_id):
 
 
 def read(param):
+    param["profile"] = "api"
     resturl = '/api/integration/v1/clapps'
     return execute(resturl, param)
 
