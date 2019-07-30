@@ -7,15 +7,10 @@ import json
 
 def r_subaccount(args):
     output = 'Get sub accounts!'
-    logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
-    print(output)
-    param = {
-        "api_id": args.api_id,
-        "api_key": args.api_key,
-        "account_id": args.account_id,
-        "page_size": args.page_size,
-        "page_num": args.page_num
-    }
+    param = vars(args)
+    logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+    logging.info(output)
+
     result = read(param)
     logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
 

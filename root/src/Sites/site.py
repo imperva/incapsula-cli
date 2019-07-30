@@ -160,35 +160,36 @@ class Site:
         if 'acls' in self.security:
             print('ACL settings are as follows:')
             for aclRules in self.security['acls']['rules']:
-                if aclRules['id'] == 'api.acl.blacklisted_ips':
-                    print('The following IPs are blacklisted: %s' % ', '.join(aclRules['ips']))
-                    if 'exceptions' in aclRules:
-                        print('Blacklisted IPs Exceptions follow:')
+                if aclRules:
+                    if aclRules['id'] == 'api.acl.blacklisted_ips':
+                        print('The following IPs are blacklisted: %s' % ', '.join(aclRules['ips']))
+                        if 'exceptions' in aclRules:
+                            print('Blacklisted IPs Exceptions follow:')
 
-                        for exception in aclRules['exceptions']:
-                            self.site_exceptions(exception)
+                            for exception in aclRules['exceptions']:
+                                self.site_exceptions(exception)
 
-                elif aclRules['id'] == 'api.acl.whitelisted_ips':
-                    print('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
+                    elif aclRules['id'] == 'api.acl.whitelisted_ips':
+                        print('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
 
-                elif aclRules['id'] == 'api.acl.blacklisted_countries':
-                    if "countries" in aclRules['geo']:
-                        print('The following countries are blacklisted: %s' % ', '.join(aclRules['geo']['countries']))
-                    if "continents" in aclRules['geo']:
-                        print('The following continents are blacklisted: %s' % ', '.join(aclRules['geo']['continents']))
-                    if 'exceptions' in aclRules:
-                        print('Blacklisted Countries Exceptions follow:')
+                    elif aclRules['id'] == 'api.acl.blacklisted_countries':
+                        if "countries" in aclRules['geo']:
+                            print('The following countries are blacklisted: %s' % ', '.join(aclRules['geo']['countries']))
+                        if "continents" in aclRules['geo']:
+                            print('The following continents are blacklisted: %s' % ', '.join(aclRules['geo']['continents']))
+                        if 'exceptions' in aclRules:
+                            print('Blacklisted Countries Exceptions follow:')
 
-                        for exception in aclRules['exceptions']:
-                            self.site_exceptions(exception)
+                            for exception in aclRules['exceptions']:
+                                self.site_exceptions(exception)
 
-                elif aclRules['id'] == 'api.acl.blacklisted_urls':
+                    elif aclRules['id'] == 'api.acl.blacklisted_urls':
 
-                    for url in aclRules['urls']:
-                        print('URL is blacklisted: url= %s pattern= %s.'
-                                     % (''.join(url['value']), ''.join(url['pattern'])))
-                else:
-                    print("Nothing is being blacklisted or whitelisted.")
+                        for url in aclRules['urls']:
+                            print('URL is blacklisted: url= %s pattern= %s.'
+                                         % (''.join(url['value']), ''.join(url['pattern'])))
+                    else:
+                        print("Nothing is being blacklisted or whitelisted.")
         else:
             print(divide)
             print("No ACLs")
@@ -198,28 +199,28 @@ class Site:
         print(divide)
 
         for secRule in self.security["waf"]["rules"]:
+            if secRule:
+                if secRule['name'] == 'Bot Access Control':
+                    print('{name} setting are: Block Bad Bots={block_bad_bots} '
+                                 'and Challenge Suspected Bots={challenge_suspected_bots}.'.format(**secRule))
 
-            if secRule['name'] == 'Bot Access Control':
-                print('{name} setting are: Block Bad Bots={block_bad_bots} '
-                             'and Challenge Suspected Bots={challenge_suspected_bots}.'.format(**secRule))
+                    if 'exceptions' in secRule:
+                        print('Bot Exceptions follow:')
 
-                if 'exceptions' in secRule:
-                    print('Bot Exceptions follow:')
+                        for exception in secRule['exceptions']:
+                            self.site_exceptions(exception)
 
-                    for exception in secRule['exceptions']:
-                        self.site_exceptions(exception)
+                elif secRule['name'] == 'DDoS':
+                    print('{name} setting are: DDoS Activation Mode={activation_mode_text} '
+                                 'and DDoS Traffic Threshold={ddos_traffic_threshold}.'.format(**secRule))
 
-            elif secRule['name'] == 'DDoS':
-                print('{name} setting are: DDoS Activation Mode={activation_mode_text} '
-                             'and DDoS Traffic Threshold={ddos_traffic_threshold}.'.format(**secRule))
+                    if 'exceptions' in secRule:
+                        print('DDoS Exceptions follow:')
 
-                if 'exceptions' in secRule:
-                    print('DDoS Exceptions follow:')
-
-                    for exception in secRule['exceptions']:
-                        self.site_exceptions(exception)
-            else:
-                print('{name} is set to {action_text}.'.format(**secRule))
+                        for exception in secRule['exceptions']:
+                            self.site_exceptions(exception)
+                else:
+                    print('{name} is set to {action_text}.'.format(**secRule))
 
         print('\nSSL info following:')
         print('SSL detected: {0}, detected status: {1}.'
