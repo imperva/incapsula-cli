@@ -27,16 +27,32 @@ def execute(resturl, param, endpoint=""):
             if param.get('account_id') is None:
                 param["account_id"] = os.getenv("IMPV_ACCOUNT_ID", IncapConfigurations.get_config(param['profile'], 'account'))
 
+    print("RestURL Netloc: {}".format(str(urllib.parse.urlparse(resturl).netloc)))
     if str(urllib.parse.urlparse(resturl).netloc.__eq__("")):
         baseurl = os.getenv("IMPV_BASEURL", IncapConfigurations.get_config(param['profile'], 'baseurl')) or "https://my.imperva.com"
+        print("BaseURL: {}".format(str(urllib.parse.urlparse(baseurl))))
+        print("RestURL: {}".format(str(urllib.parse.urlparse(resturl))))
+        print(str(urllib.parse.urlparse(baseurl).path).__contains__("/api/prov/v1/"))
         if not str(urllib.parse.urlparse(baseurl).path).__contains__("/api/prov/v1/"):
-            endpoint = baseurl + "/api/prov/v1/" + resturl
+            print("BaseURL: {}".format(str(urllib.parse.urlparse(baseurl))))
+            print("RestURL: {}".format(str(urllib.parse.urlparse(resturl))))
+            if str(urllib.parse.urlparse(resturl).path).__contains__("/api/integration/v1/clapps"):
+                endpoint = baseurl + resturl
+            else:
+                endpoint = baseurl + "/api/prov/v1/" + resturl
+
         else:
-            endpoint = baseurl + resturl
+            if str(urllib.parse.urlparse(resturl).path).__contains__("/api/integration/v1/clapps"):
+                endpoint = baseurl.replace("/api/prov/v1/", "/api/integration/v1/clapps")
+            else:
+                endpoint = baseurl + resturl
+    else:
+        endpoint = resturl
+
         if not str(urllib.parse.urlparse(endpoint).scheme.__eq__("https")):
             logging.error("Error: URL does not contain the proper scheme 'https'.")
-        if str(urllib.parse.urlparse(resturl).path).__contains__("/api/integration/v1/clapps"):
-            endpoint = baseurl.replace("/api/prov/v1/", "/api/integration/v1/clapps")
+
+    print("Netloc: {}".format(str(urllib.parse.urlparse(endpoint))))
     try:
         logging.debug('Request Data: {}'.format(param))
         p = ''
