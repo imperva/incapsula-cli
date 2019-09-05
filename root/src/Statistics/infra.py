@@ -31,7 +31,7 @@ class Event:
         if len(events) > 0:
             newlist = sorted(events, key=itemgetter('eventTime'))
             format_site = TableFormatter(headers=['accountId', 'eventTime', 'eventType', 'itemType', 'eventTarget'], data=newlist)
-            PrintTable(label='Events', data=format_site.headers).print_all()
+            PrintTable(label='Events', data=format_site).print_all()
         else:
             logging.info("There are no events at this time.")
 

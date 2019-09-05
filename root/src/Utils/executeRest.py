@@ -27,7 +27,7 @@ def execute(resturl, param, endpoint=""):
             if param.get('account_id') is None:
                 param["account_id"] = os.getenv("IMPV_ACCOUNT_ID", IncapConfigurations.get_config(param['profile'], 'account'))
 
-    if str(urllib.parse.urlparse(resturl).netloc.__eq__("")):
+    if str(urllib.parse.urlparse(resturl).netloc) == "":
         baseurl = os.getenv("IMPV_BASEURL", IncapConfigurations.get_config(param['profile'], 'baseurl')) or "https://my.imperva.com"
         if not str(urllib.parse.urlparse(baseurl).path).__contains__("/api/prov/v1/"):
             if str(urllib.parse.urlparse(resturl).path).__contains__("/api/integration/v1/clapps"):
@@ -43,7 +43,7 @@ def execute(resturl, param, endpoint=""):
     else:
         endpoint = resturl
 
-        if not str(urllib.parse.urlparse(endpoint).scheme.__eq__("https")):
+        if not str(urllib.parse.urlparse(endpoint).scheme) == "https":
             logging.error("Error: URL does not contain the proper scheme 'https'.")
 
     try:
