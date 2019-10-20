@@ -1,6 +1,7 @@
 from Utils.executeRest import execute
 from Utils.incapError import IncapError
 import logging
+import json
 
 
 def r_subscription(args):
@@ -15,7 +16,7 @@ def r_subscription(args):
         err = IncapError(result)
         err.log()
     else:
-        print(result)
+        logging.info('Subscription Response: {}'.format(json.dumps(result, indent=4)))
 
 
 def read(params):
