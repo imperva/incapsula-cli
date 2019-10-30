@@ -139,7 +139,10 @@ class Site:
                     print('The following IPs are whitelisted: %s' % ', '.join(aclRules['ips']))
 
                 elif aclRules['id'] == 'api.acl.blacklisted_countries':
-                    print('The following countries are blacklisted: %s' % ', '.join(aclRules['geo']['countries']))
+                    if "countries" in aclRules["geo"]:
+                        print('The following countries are blacklisted: %s' % ', '.join(aclRules['geo']['countries']))
+                    if "continents" in aclRules["geo"]:
+                        print('The following continents are blacklisted: %s' % ', '.join(aclRules['geo']['continents']))
                     if 'exceptions' in aclRules:
                         print('Blacklisted Countries Exceptions follow:')
 
