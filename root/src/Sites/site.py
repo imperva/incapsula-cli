@@ -223,8 +223,16 @@ class Site:
                     print('{name} is set to {action_text}.'.format(**secRule))
 
         print('\nSSL info following:')
-        print('SSL detected: {0}, detected status: {1}.'
-                     .format(self.ssl['origin_server']['detected'], self.ssl['origin_server']['detectionStatus']))
+        print("Custom certificate used: {}".format(self.ssl['custom_certificate']['active']))
+        if self.ssl['custom_certificate']['active']:
+            expirationDate = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(self.ssl['custom_certificate']['expirationDate'] / 1000.0))
+            print("Expiration Date: {}".format(expirationDate))
+            print("Revocation Error: {}".format(self.ssl['custom_certificate']['revocationError']))
+            print("Validity Error: {}".format(self.ssl['custom_certificate']['validityError']))
+            print("Chain Error: {}".format(self.ssl['custom_certificate']['chainError']))
+            print("Hostname Mismatch Error: {}".format(self.ssl['custom_certificate']['hostnameMismatchError']))
+        print('\nSSL on origin server detected: {0}, detected status: {1}.'
+              .format(self.ssl['origin_server']['detected'], self.ssl['origin_server']['detectionStatus']))
 
         if self.ssl['origin_server']['detected'] == 'True':
 
