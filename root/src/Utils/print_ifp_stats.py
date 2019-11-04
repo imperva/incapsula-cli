@@ -1,3 +1,5 @@
+import time
+
 from Utils.table_formatter import TableFormatter
 
 
@@ -28,6 +30,8 @@ class PrintTable:
                 if header in data:
                     if type(data[header]) == list:
                         value += "{0:^{1}}|".format(data[header][0], 18)
+                    elif header == "startTime":
+                        value += "{0:^{1}}|".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(data.get(header)) / 1000.0)), 18)
                     else:
                         value += "{0:^{1}}|".format(data.get(header), 18)
                 else:

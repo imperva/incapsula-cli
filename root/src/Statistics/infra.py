@@ -1,4 +1,5 @@
 import logging
+import time
 from operator import itemgetter
 from Utils.executeRest import execute
 from Utils.print_ifp_stats import PrintTable
