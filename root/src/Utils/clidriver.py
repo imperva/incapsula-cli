@@ -777,6 +777,9 @@ infra_start_ddos_parser = infra_subparsers.add_parser('start', help="Use this op
 infra_start_ddos_parser.add_argument('--api_id', help='API authentication identifier.')
 infra_start_ddos_parser.add_argument('--api_key', help='API authentication identifier.')
 infra_start_ddos_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
+infra_start_ddos_parser.add_argument('--ip_prefix', Help='The IP prefix to send a notification for. For example, 1.1.1.1.')
+infra_start_ddos_parser.add_argument('--bps', help='Number of bits per second.')
+infra_start_ddos_parser.add_argument('--pps', default='Number of packets per second.')
 infra_start_ddos_parser.add_argument('--log', default='INFO')
 infra_start_ddos_parser.set_defaults(func=Ddos.commit, do='start')
 
@@ -786,6 +789,9 @@ infra_stop_ddos_parser = infra_subparsers.add_parser('stop', help="Use this oper
 infra_stop_ddos_parser.add_argument('--api_id', help='API authentication identifier.')
 infra_stop_ddos_parser.add_argument('--api_key', help='API authentication identifier.')
 infra_stop_ddos_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
+infra_stop_ddos_parser.add_argument('--ip_prefix', Help='The IP prefix to send a notification for. For example, 1.1.1.1.')
+infra_stop_ddos_parser.add_argument('--bps', help='Number of bits per second.')
+infra_stop_ddos_parser.add_argument('--pps', default='Number of packets per second.')
 infra_stop_ddos_parser.add_argument('--log', default='INFO')
 infra_stop_ddos_parser.set_defaults(func=Ddos.commit, do='stop')
 
@@ -795,6 +801,12 @@ infra_up_ddos_parser = infra_subparsers.add_parser('up', help="Use this operatio
 infra_up_ddos_parser.add_argument('--api_id', help='API authentication identifier.')
 infra_up_ddos_parser.add_argument('--api_key', help='API authentication identifier.')
 infra_up_ddos_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
+infra_up_ddos_parser.add_argument('--connection_name', default='The connection to send '
+                                                               'a notification for. Enter the '
+                                                               'connection name as it appears '
+                                                               'in the Cloud Security Console’s '
+                                                               'Protection Settings page. For example, '
+                                                               'Test_GRE_Tunnel.')
 infra_up_ddos_parser.add_argument('--log', default='INFO')
 infra_up_ddos_parser.set_defaults(func=Connection.commit, do='up')
 
@@ -804,6 +816,12 @@ infra_down_ddos_parser = infra_subparsers.add_parser('down', help="Use this oper
 infra_down_ddos_parser.add_argument('--api_id', help='API authentication identifier.')
 infra_down_ddos_parser.add_argument('--api_key', help='API authentication identifier.')
 infra_down_ddos_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
+infra_down_ddos_parser.add_argument('--connection_name', default='The connection to send '
+                                                               'a notification for. Enter the '
+                                                               'connection name as it appears '
+                                                               'in the Cloud Security Console’s '
+                                                               'Protection Settings page. For example, '
+                                                               'Test_GRE_Tunnel.')
 infra_down_ddos_parser.add_argument('--log', default='INFO')
 infra_down_ddos_parser.set_defaults(func=Connection.commit, do='down')
 
