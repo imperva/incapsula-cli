@@ -10,7 +10,7 @@ from Sites.uCertificate import u_certificate
 from Sites.csr import new_csr
 from Sites.site import Site
 from Sites.uACL import u_acl
-from Sites.uCacheMode import u_cachemode
+from Sites.cacheMode import cacheMode
 from Sites.uAdvanced import u_advanced
 from Sites.uCachingRules import u_cacherule
 from Sites.uConfigration import u_configuration
@@ -513,8 +513,19 @@ site_whitelist_parser.add_argument('--profile', default='api', help='Allows for 
 site_whitelist_parser.add_argument('--log', default='INFO')
 site_whitelist_parser.set_defaults(func=u_whitelist)
 
-site_cache_mode_parser = site_subparsers.add_parser('cache-mode', help='Use this operation to edit basic site '
-                                                                       'caching settings.',
+
+site_get_cache_mode_parser = site_subparsers.add_parser('get-cache-mode', help='Use this operation to get the '
+                                                                               'site cache mode settings.',
+                                                    usage='incap site get-cache-mode [options] site_id')
+site_get_cache_mode_parser.add_argument('--api_id', help='API authentication identifier.')
+site_get_cache_mode_parser.add_argument('--api_key', help='API authentication identifier.')
+site_get_cache_mode_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
+site_get_cache_mode_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
+site_get_cache_mode_parser.add_argument('--log', default='INFO')
+site_get_cache_mode_parser.set_defaults(func=cacheMode.commit, do='cache-mode/get')
+
+site_cache_mode_parser = site_subparsers.add_parser('edit-cache-mode', help='Use this operation to modify the '
+                                                                            'site cache mode settings.',
                                                     usage='incap site cache [options] cache-mode site_id')
 site_cache_mode_parser.add_argument('--api_id', help='API authentication identifier.')
 site_cache_mode_parser.add_argument('--api_key', help='API authentication identifier.')
@@ -529,7 +540,7 @@ site_cache_mode_parser.add_argument('--aggressive_cache_duration', default='',
                                     " '_' and one of: hr | min | sec | days | weeks: default: 1_hr.")
 site_cache_mode_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
 site_cache_mode_parser.add_argument('--log', default='INFO')
-site_cache_mode_parser.set_defaults(func=u_cachemode)
+site_cache_mode_parser.set_defaults(func=cacheMode.commit, do='cache-mode')
 
 site_cache_rule_parser = site_subparsers.add_parser('cache-rule', help='Use this operation to edit basic '
                                                                        'site caching settings.',
