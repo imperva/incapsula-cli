@@ -177,12 +177,12 @@ site_restore_parser.set_defaults(func=c_site_restore)
 
 site_create_dc_parser = site_subparsers.add_parser('add-dc',
                                                    help="Use this operation to add a data center to a site.",
-                                                   usage='incap site add-dc site_id name server_address')
+                                                   usage='incap site add-dc name server_address site_id')
 site_create_dc_parser.add_argument('--api_id', help='API authentication identifier.')
 site_create_dc_parser.add_argument('--api_key', help='API authentication identifier.')
-site_create_dc_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
 site_create_dc_parser.add_argument('name', help="The new data center's name.")
 site_create_dc_parser.add_argument('server_address', help="The server's address. Possible values: IP, CNAME")
+site_create_dc_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
 site_create_dc_parser.add_argument('--is_enabled', help='Enables the data center.')
 site_create_dc_parser.add_argument('--is_standby', help='Enables the data center. '
                                                         'This parameter is deprecated. '
@@ -232,11 +232,11 @@ site_delete_dc_parser.set_defaults(func=DataCenter.commit, do='delete')
 
 site_add_server_parser = site_subparsers.add_parser('add-server',
                                                        help="Use this operation to add a server to a data center.",
-                                                       usage='incap site add-server dc_id server_address')
+                                                       usage='incap site add-server server_address dc_id')
 site_add_server_parser.add_argument('--api_id', help='API authentication identifier.')
 site_add_server_parser.add_argument('--api_key', help='API authentication identifier.')
-site_add_server_parser.add_argument('dc_id', help="The data center's ID.")
 site_add_server_parser.add_argument('server_address', help="Server IP address.")
+site_add_server_parser.add_argument('dc_id', help="The data center's ID.")
 site_add_server_parser.add_argument('--is_standby', help='Set the server as Active (P0) or Standby (P1) (Boolean).')
 site_add_server_parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
 site_add_server_parser.add_argument('--log', default='INFO')
@@ -257,7 +257,7 @@ site_edit_server_parser.set_defaults(func=Server.servers, do='edit')
 
 site_delete_server_parser = site_subparsers.add_parser('del-server',
                                                        help="Use this operation to delete a server in a data center.",
-                                                       usage='incap site edit-server server_id')
+                                                       usage='incap site del-server server_id')
 site_delete_server_parser.add_argument('--api_id', help='API authentication identifier.')
 site_delete_server_parser.add_argument('--api_key', help='API authentication identifier.')
 site_delete_server_parser.add_argument('server_id', help="Server ID.")

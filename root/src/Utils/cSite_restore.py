@@ -22,7 +22,7 @@ def c_site_restore(args):
     config = IncapConfigurations()
 
     if args.path == '':
-        dir_file = config.get_repo()
+        dir_file = os.getenv("IMPV_REPO", IncapConfigurations.get_config(args.profile, 'repo'))
     else:
         dir_file = args.path
 

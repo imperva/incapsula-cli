@@ -234,6 +234,8 @@ class Site:
         print('\nSSL on origin server detected: {0}, detected status: {1}.'
               .format(self.ssl['origin_server']['detected'], self.ssl['origin_server']['detectionStatus']))
 
+        if "validation_data" in self.ssl["generated_certificate"]:
+            print("GS_TXT: {}".format(self.ssl["generated_certificate"]["validation_data"][0]["set_data_to"][0]))
         if self.ssl['origin_server']['detected'] == 'True':
 
             if 'validation_method' in self.ssl['generated_certificate']:

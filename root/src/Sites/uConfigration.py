@@ -9,13 +9,7 @@ def u_configuration(args):
     output = 'Update site {0} with configuration param={1} and value={2}.'. format(args.site_id, args.param, args.value)
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
     print(output)
-    # param = {
-    #     "api_id": args.api_id,
-    #     "api_key": args.api_key,
-    #     "site_id": args.site_id,
-    #     "param": args.param,
-    #     "value": args.value
-    # }
+
     param = vars(args)
     result = update(param)
 
@@ -26,7 +20,6 @@ def u_configuration(args):
     else:
         resp = IncapResponse(result)
         print('Updated Site ID: {} {} configuration to {}'.format(args.site_id, args.param.replace('_', ' '), args.value))
-        resp.log()
         return resp
 
 

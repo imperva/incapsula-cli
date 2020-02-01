@@ -46,28 +46,38 @@ def execute(resturl, param, endpoint=""):
         if not str(urllib.parse.urlparse(endpoint).scheme) == "https":
             logging.error("Error: URL does not contain the proper scheme 'https'.")
 
-    try:
-        logging.debug('Request Data: {}'.format(param))
-        p = ''
-        for k, v in param.items():
-            p += '{}={}&'.format(k, v)
-        logging.debug("curl -d '{}' {}".format(p, endpoint))
+    fails = 0
+    while fails < 4:
+        try:
+            logging.debug('Request Data: {}'.format(param))
+            p = ''
+            for k, v in param.items():
+                p += '{}={}&'.format(k, v)
+            logging.debug("curl -d '{}' {}".format(p, endpoint))
 
-        data = urllib.parse.urlencode(param).encode()
-        headers = {'content-type': "application/x-www-form-urlencoded"}
-        req = urllib.request.Request(endpoint, data, headers, method='POST')
+            data = urllib.parse.urlencode(param).encode()
+            headers = {'content-type': "application/x-www-form-urlencoded"}
+            req = urllib.request.Request(endpoint, data, headers, method='POST')
 
-        with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
-            result = json.loads(response.read().decode('utf8'))
-            logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
-            logging.debug("HTTP Response Code: {}".format(response.getcode()))
-            return result
+            with urllib.request.urlopen(req, timeout=15, context=ctx) as response:
+                result = json.loads(response.read().decode('utf8'))
+                logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
+                logging.debug("HTTP Response Code: {}".format(response.getcode()))
+                return result
 
-    except (HTTPError, URLError) as error:
-        logging.error('Data was not received from %s\nError: %s' % (endpoint, error))
-        exit(1)
+        except (HTTPError, URLError) as error:
+            fails += 1
+            if type(error) == HTTPError:
+                logging.error('HTTP Error: %s.' % error.code)
+                # exit(1)
+            elif type(error) == URLError:
+                logging.error('Data was not received from %s\nError: %s' % (endpoint, error.reason))
+                # exit(1)
 
-    except timeout:
-        logging.error('Socket timed out - URL %s' % endpoint)
-        exit(1)
+        except timeout:
+            fails += 1
+            logging.error('Socket timed out - URL %s' % endpoint)
+            # exit(1)
+    logging.error("Tried %i times and failed to get the data." % fails)
+    exit(1)
 
