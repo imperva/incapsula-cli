@@ -6,4 +6,4 @@ admin_api
 .vscode
 py3.6.5_1
 temp files
-.gitignore
+root/src/Utils/updateDNS.py
