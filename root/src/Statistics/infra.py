@@ -24,7 +24,7 @@ class Event:
         if action == "events":
             Event.print_events(execute(resturl, param)["events"])
         elif action == "stats":
-            Event.print_stats(execute(resturl, param)["stats"][0]["payload"])
+            Event.print_stats(execute(resturl, param)["stats"])
 
     @staticmethod
     def print_events(events: list):
@@ -37,6 +37,11 @@ class Event:
 
     @staticmethod
     def print_stats(events: list):
-        newlist = sorted(events, key=itemgetter('startTime'))
-        format_site = TableFormatter(headers=['metric', 'ipPrefix', 'pop', 'trafficType', 'ipPrefixType', 'traffic', 'startTime', 'data'], data=newlist)
-        PrintTable(label='Stats', data=format_site).print_all()
+        if events and events[0]['payload']:
+            print("Something")
+            #newlist = sorted(events, key=itemgetter('ipPrefix'))
+            format_site = TableFormatter(headers=['metric', 'ipPrefix', 'pop', 'trafficType', 'ipPrefixType', 'traffic', 'startTime', 'interval', 'data'], data=events[0]['payload'])
+            PrintTable(label='Stats', data=format_site).print_all()
+        else:
+            print("Nothing")
+            exit(0)
