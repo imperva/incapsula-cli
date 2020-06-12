@@ -9,3 +9,6 @@ temp files
 cwafcli/src/Utils/updateDNS.py
 /cwafcli/STAR_dev_impervademo_com.crt
 /cwafcli/STAR_dev_impervademo_com.key
+/build/
+/cwaf_cli.egg-info/
+/dist/
