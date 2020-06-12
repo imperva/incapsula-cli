@@ -6,4 +6,6 @@ admin_api
 .vscode
 py3.6.5_1
 temp files
-root/src/Utils/updateDNS.py
+cwafcli/src/Utils/updateDNS.py
+/cwafcli/STAR_dev_impervademo_com.crt
+/cwafcli/STAR_dev_impervademo_com.key
