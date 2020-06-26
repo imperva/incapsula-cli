@@ -19,7 +19,7 @@ class Event:
         action = param['do']
         print('{} site data centers.'.format(str.capitalize(action)))
         logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
-        resturl = 'https://my.incapsula.com/api/v1/{}/{}'.format(str.split(__name__[1:], '.')[1], action)
+        resturl = 'https://my.incapsula.com/api/v1/infra/{}'.format(action)
 
         if action == "events":
             Event.print_events(execute(resturl, param)["events"])
