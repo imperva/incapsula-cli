@@ -4,14 +4,16 @@ from .Utils.clidriver import testing
 
 
 class TestIncapCLI(unittest.TestCase):
-    def setUp(self):
-        self.site_id = None
+    unittest.TestCase.site_id = None
+    # def setUp(self):
+    #     unittest.TestCase.site_id = None
 
     def test_a_site_add(self):
         print('Add site: nobodyknows.dev.impervademo.com')
         test_incap_cli = testing(['site', 'add', "nobodyknows.dev.impervademo.com", '--force_ssl=true'])
+        print(test_incap_cli.site_id)
+        unittest.TestCase.site_id = test_incap_cli.site_id
         self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to add site: nobodyknows.dev.impervademo.com.')
-        TestIncapCLI.site_id = test_incap_cli.site_id
 
     def test_b_site_list(self):
         print('List sites.')
@@ -23,15 +25,15 @@ class TestIncapCLI(unittest.TestCase):
         rule_ids = ['sql_injection', 'cross_site_scripting', 'illegal_resource_access', 'remote_file_inclusion']
         for rule_id in rule_ids:
             test_incap_cli = testing(['site', 'security', rule_id, '--security_rule_action=block_request',
-                                      str(TestIncapCLI.site_id)])
+                                      str(unittest.TestCase.site_id)])
             self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to update site WAF configuration.')
         test_incap_cli = testing(['site', 'security', 'bot_access_control', '--block_bad_bots=false',
-                                  '--challenge_suspected_bots=true', str(TestIncapCLI.site_id)])
+                                  '--challenge_suspected_bots=true', str(unittest.TestCase.site_id)])
         self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to update site WAF configuration.')
-        test_incap_cli = testing(['site', 'security', 'backdoor', '--security_rule_action=alert', str(TestIncapCLI.site_id)])
+        test_incap_cli = testing(['site', 'security', 'backdoor', '--security_rule_action=alert', str(unittest.TestCase.site_id)])
         self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to update site WAF configuration.')
         test_incap_cli = testing(['site', 'security', 'ddos', '--activation_mode=on', '--ddos_traffic_threshold=100',
-                                  str(TestIncapCLI.site_id)])
+                                  str(unittest.TestCase.site_id)])
         self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to update site WAF configuration.')
 
     def test_d_site_waf_exceptions(self):
@@ -43,7 +45,7 @@ class TestIncapCLI(unittest.TestCase):
             test_incap_cli = testing(['site', 'whitelist', "--urls=/home,/example",  "--countries=JM,CA",
                                       "--continents=AF", "--ips=192.168.1.1,172.21.12.0/24",
                                       "--client_app_types=Browser", "--client_apps=68", "--user_agents=curl",
-                                      rule_id, str(TestIncapCLI.site_id)])
+                                      rule_id, str(unittest.TestCase.site_id)])
             self.assertNotEqual(test_incap_cli, IncapError,
                                 'Failed to update site WAF EXCEPTION {} configuration.'.format(rule_id))
 
@@ -51,24 +53,31 @@ class TestIncapCLI(unittest.TestCase):
         print('Add cert: nobodyknows.dev.impervademo.com')
         test_incap_cli = testing(['site', 'upcert', '--private_key=/Users/jmoore/Repo/incapsula-cli/cwafcli/STAR_dev_impervademo_com.key',
                                  '/Users/jmoore/Repo/incapsula-cli/cwafcli/STAR_dev_impervademo_com.crt',
-                                  str(TestIncapCLI.site_id)])
+                                  str(unittest.TestCase.site_id)])
         self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to upload certificate to:'
                                                                    ' nobodyknows.dev.impervademo.com.')
 
     def test_f_site_status(self):
         print('Get site status.')
-        test_incap_cli = testing(['site', 'status', str(TestIncapCLI.site_id)])
-        self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to get site status on site ID: {}'.format(TestIncapCLI.site_id))
+        test_incap_cli = testing(['site', 'status', str(unittest.TestCase.site_id)])
+        self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to get site status on site ID: {}'.format(unittest.TestCase.site_id))
+
+    def test_g_add_incaprule(self):
+        print("Tesing add incapRule.")
+        test_incap_cli = testing(['site', 'add_incaprule', '--name=Testing block crawlers', '--action=RULE_ACTION_ALERT', '--filter=ClientType == Crawler', '{}'.format(str(unittest.TestCase.site_id))])
+        print(test_incap_cli)
+        self.assertEqual("OK", test_incap_cli["status"].upper()), 'Failed to add the incapRule on site ID: {}'.format(unittest.TestCase.site_id)
 
     def test_y_delete_cert(self):
         print('Add site: nobodyknows.dev.impervademo.com')
-        test_incap_cli = testing(['site', 'delcert', str(TestIncapCLI.site_id)])
+        test_incap_cli = testing(['site', 'delcert', str(unittest.TestCase.site_id)])
+        print(test_incap_cli)
         self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to delete cert: nobodyknows.dev.impervademo.com.')
 
     def test_z_site_delete(self):
         print('Delete site.')
-        test_incap_cli = testing(['site', 'delete', str(TestIncapCLI.site_id)])
-        self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to delete site on site ID: {}'.format(TestIncapCLI.site_id))
+        test_incap_cli = testing(['site', 'delete', str(unittest.TestCase.site_id)])
+        self.assertEqual("OK", test_incap_cli.res_message.upper(), 'Failed to delete site on site ID: {}'.format(unittest.TestCase.site_id))
 
 
 if __name__ == '__main__':

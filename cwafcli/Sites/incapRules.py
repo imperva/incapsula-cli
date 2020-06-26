@@ -130,6 +130,7 @@ class IncapRule:
         else:
             result = execute(resturl, param)
             IncapRule._execute(result, action)
+            print("IncapRule Result: {}".format(result))
             return result
 
     @staticmethod

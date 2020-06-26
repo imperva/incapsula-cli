@@ -1,23 +1,22 @@
 import json
 import os
 import urllib
-from urllib import request, parse
-from urllib.error import HTTPError, URLError
-from socket import timeout
+from urllib import parse
 from ..Config.configuration import IncapConfigurations
 import logging
-import ssl
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+endpoint = None
 
 
-def execute(resturl, param, endpoint=""):
+def execute(resturl, param):
     try:
         del param["func"]
 
     except:
         pass
-
-    ctx = ssl._create_unverified_context()
-    ctx.check_hostname = False
 
     if param.get('api_id') is None:
         param["api_id"] = os.getenv("IMPV_API_ID", IncapConfigurations.get_config(param['profile'], 'id'))
@@ -45,37 +44,36 @@ def execute(resturl, param, endpoint=""):
         if not str(urllib.parse.urlparse(endpoint).scheme) == "https":
             logging.error("Error: URL does not contain the proper scheme 'https'.")
 
-    fails = 0
-    while fails < 4:
-        try:
-            logging.debug('Request Data: {}'.format(param))
-            p = ''
-            for k, v in param.items():
-                p += '{}={}&'.format(k, v)
-            logging.debug("curl -d '{}' {}".format(p, endpoint))
+    try:
+        logging.debug('Request Data: \n{}'.format(param))
+        p = ''
+        for k, v in param.items():
+            p += '{}={}&'.format(k, v)
+        logging.debug("curl -d '{}' {}".format(p, endpoint))
 
-            data = urllib.parse.urlencode(param).encode()
-            headers = {'content-type': "application/x-www-form-urlencoded"}
-            req = urllib.request.Request(endpoint, data, headers, method='POST')
+        retry_strategy = Retry(
+            total=3,
+            status_forcelist=[429],
+            method_whitelist=["POST"],
+            backoff_factor=2
+        )
 
-            with urllib.request.urlopen(req, timeout=20, context=ctx) as response:
-                result = json.loads(response.read().decode('utf8'))
-                logging.debug('JSON Response: {}'.format(json.dumps(result, indent=4)))
-                logging.debug("HTTP Response Code: {}".format(response.getcode()))
-                return result
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        session = requests.Session()
+        session.mount("https://", adapter)
 
-        except (HTTPError, URLError) as error:
-            fails += 1
-            if type(error) == HTTPError:
-                logging.error('HTTP Error: %s.' % error.code)
-                # exit(1)
-            elif type(error) == URLError:
-                logging.error('Data was not received from %s\nError: %s' % (endpoint, error.reason))
-                # exit(1)
+        with session.post(url=endpoint, data=param, timeout=(5, 15)) as response:
+            logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
+            return response.json()
 
-        except timeout:
-            fails += 1
-            logging.error('Socket timed out - URL %s' % endpoint)
-            # exit(1)
-    logging.error("Tried %i times and failed to get the data." % fails)
+    except requests.HTTPError as e:
+        logging.error(e)
+    except requests.ConnectionError as e:
+        logging.error(e)
+    except requests.Timeout as e:
+        logging.error(e)
+    except requests.RequestException as e:
+        logging.error(e)
+    except requests.exceptions as e:
+        logging.error(e)
     exit(1)
