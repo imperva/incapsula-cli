@@ -1,13 +1,15 @@
-#Please use the PYPI branch as this will be used going forward..
-
-# incapsula-cli
+# New PyPI package to make the cli a distributable module through pip3.
+With this release a user will now be able to install and use the cli with pip command:
+## Installation
+    pip3 install cwaf-cli
+# cwaf-cli
 This application provides a simple to use CLI that reflects industry standards (such as the AWS cli), and enables customers to easily integrate into configurations management, orchestration or automation frameworks to support the DevOps model
 
-## Running the Incap CLI
+## Running the CLI
 
-This CLI is a Python 3 application and has been tested with Python 3.5 -> 3.7
+This CLI is a Python 3 application and has been tested with Python 3.6 -> 3.8
 ## Requirements:
-    python 3.5.0 or higher
+    python 3.6 or higher
 
 ## Confirm your version of python if installed:
     Open a terminal
@@ -43,6 +45,9 @@ https://www.python.org/downloads/
     incap site list_incaprule 123456
     
 ## Adding your configuration info locally for easy use
+#####Basic:
+    incap api_id api_key account_id
+#####Advanced:
     incap config --profile=special_name --repo=/Users/<username>/your_repo_location --baseurl=https://my.incapsula.com 26012 ejf903rie-3983030ie23r2r39j0 2398
 View the config with - *cat ~/.incap/config*
 
@@ -52,7 +57,7 @@ View the config with - *cat ~/.incap/config*
     IMPV_API_KEY
     IMPV_ACCOUNT_ID
     IMPV_BASEURL
-    IMPV_REPO (optional for export)
+    IMPV_REPO (optional for exporting cwaf site configurations as JSON locally)
     
 #### *With three options to apply creds/configs there is a hierarchy that applies and as follows:*
     cmd line args
@@ -96,7 +101,7 @@ View the config with - *cat ~/.incap/config*
     incap site get-cache-mode 123456
 
 ## Edit cache mode
-    incap site get-cache-mode --aggressive_cache_duration=5_hr --dynamic_cache_duration=5_days static_and_dynamic 123456
+    incap site edit-cache-mode --aggressive_cache_duration=5_hr --dynamic_cache_duration=5_days static_and_dynamic 123456
 
 ## Set advanced cache async validation to true
     incap site advanced-cache {param} {value} 123456
