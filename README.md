@@ -8,9 +8,9 @@ This application provides a simple to use CLI that reflects industry standards (
 
 ## Running the CLI
 
-This CLI is a Python 3 application and has been tested with Python 3.5 -> 3.7
+This CLI is a Python 3 application and has been tested with Python 3.6 -> 3.8
 ## Requirements:
-    python 3.5.0 or higher
+    python 3.6 or higher
 
 ## Confirm your version of python if installed:
     Open a terminal
