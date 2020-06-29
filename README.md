@@ -1,8 +1,7 @@
-# New PyPI repo to make the cli a distributable module through pip3.
+# New PyPI package to make the cli a distributable module through pip3.
 With this release a user will now be able to install and use the cli with pip command:
 ## Installation
     pip3 install cwaf-cli
-
 # cwaf-cli
 This application provides a simple to use CLI that reflects industry standards (such as the AWS cli), and enables customers to easily integrate into configurations management, orchestration or automation frameworks to support the DevOps model
 
