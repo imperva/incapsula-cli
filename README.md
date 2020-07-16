@@ -45,9 +45,9 @@ https://www.python.org/downloads/
     incap site list_incaprule 123456
     
 ## Adding your configuration info locally for easy use
-#####Basic:
+##### Basic:
     incap api_id api_key account_id
-#####Advanced:
+##### Advanced:
     incap config --profile=special_name --repo=/Users/<username>/your_repo_location --baseurl=https://my.incapsula.com 26012 ejf903rie-3983030ie23r2r39j0 2398
 View the config with - *cat ~/.incap/config*
 
