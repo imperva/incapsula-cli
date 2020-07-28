@@ -1,9 +1,7 @@
 import time
-from ..Config.configuration import IncapConfigurations
 from ..Sites.site import Site
 from ..Utils.executeRest import execute
 from ..Utils.incapError import IncapError
-import Utils.export
 import logging
 from ..Utils.print_table import PrintTable
 from ..Utils.table_formatter import TableFormatter
@@ -28,7 +26,13 @@ def r_sites(args):
 def create_filename(filename, site):
     site = Site(site)
     if filename == "{site_id}_{domain}":
+        return "{}_{}".format(site.site_id, site.domain)
+    elif filename == "{domain}_{site_id}":
         return "{}_{}".format(site.domain, site.site_id)
+    elif filename == "{domain}_{date}":
+        return "{}_{}".format(site.domain, time.strftime("%Y%m%d-%H%M%S"))
+    elif filename == "{site_id}_{date}":
+        return "{}_{}".format(site.site_id, time.strftime("%Y%m%d-%H%M%S"))
     elif filename == "{domain}":
         return "{}".format(site.domain)
     elif filename == "{site_id}":

@@ -31,7 +31,10 @@ class PrintTable:
                     format_site = TableFormatter(headers=headers, data=values[1])
                     p = PrintTable(label=values[0].capitalize(), data=format_site.headers)
                 else:
-                    value += "{0:^{1}}|".format(values[1], str(values[2]))
+                    try:
+                        value += "{0:^{1}}|".format(values[1], str(values[2]))
+                    except:
+                        pass
             print('-' * len(value) + '\n' + value + '\n' + '-' * len(value))
             value = '|'
             if p: p.print_all()

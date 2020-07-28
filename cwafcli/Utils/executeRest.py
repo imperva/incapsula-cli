@@ -62,7 +62,7 @@ def execute(resturl, param):
         session = requests.Session()
         session.mount("https://", adapter)
 
-        with session.post(url=endpoint, data=param, timeout=(5, 15)) as response:
+        with session.post(url=endpoint, data=param, timeout=(5, 15), headers={'content-type': 'application/x-www-form-urlencoded'}) as response:
             logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
             return response.json()
 

@@ -16,6 +16,7 @@ class Site:
         self.site_id = data.get('site_id') or int
         self.account_id = data.get('account_id') or ''
         self.active = data.get('active') or ''
+        self.log_level = data.get('log_level') or None
         self.extended_ddos = data.get('extended_ddos') or int
         self.res = data['res']
         self.response_message = data.get('res_message') or ''
@@ -78,7 +79,7 @@ class Site:
                 resp.log()
                 return resp
             elif action == 'list':
-                format_site = TableFormatter(headers=['domain', 'status', 'site_id'], data=result['sites'])
+                format_site = TableFormatter(headers=['domain', 'status', 'site_id', "log_level"], data=result['sites'])
                 PrintTable(label='Sites', data=format_site.headers).print_all()
                 resp = IncapResponse(result)
                 resp.log()
@@ -286,7 +287,7 @@ class Site:
                                                                                  'Exception for client app type: %s\n|' % ''.join(get_clapps(item['client_apps'])))
 
     def print_site(self):
-        site_header = [['FQDN', self.domain], ['Status', self.status], ['Site ID', str(self.site_id)]]
+        site_header = [['FQDN', self.domain], ['Status', self.status], ['Site ID', str(self.site_id)], ["LogLevel", self.log_level]]
 
         for v in site_header:
             if len(v[0]) > len(v[1]):

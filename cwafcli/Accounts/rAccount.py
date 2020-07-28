@@ -2,7 +2,6 @@ from ..Utils.executeRest import execute
 from ..Accounts.account import Account
 from ..Utils.incapError import IncapError
 import logging
-import json
 
 
 def r_account(args):

@@ -48,7 +48,7 @@ https://www.python.org/downloads/
 #####Basic:
     incap api_id api_key account_id
 #####Advanced:
-    incap config --profile=special_name --repo=/Users/<username>/your_repo_location --baseurl=https://my.incapsula.com 26012 ejf903rie-3983030ie23r2r39j0 2398
+    incap config --profile=special_name --repo=/Users/<username>/your_repo_location --baseurl=https://my.imperva.com 26012 ejf903rie-3983030ie23r2r39j0 2398
 View the config with - *cat ~/.incap/config*
 
 ## Using environment variables
@@ -108,10 +108,12 @@ View the config with - *cat ~/.incap/config*
     incap site advanced-cache async_validation true 123456
 
 ## Backup full config, includes incapRules and ADRules
-    incap site export –-path=/Users/<name>/backups --filename={site_id}_{domain}_{date}
+    incap site export –-path=/Users/<name>/backups --filename={site_id}_{domain}
+    incap site export –-path=/Users/<name>/backups --filename={domain}_{site_id}
     incap site export –-path=/Users/<name>/backups --filename={site_id}_{date}
     incap site export –-path=/Users/<name>/backups --filename={domain}_{date}
     incap site export –-path=/Users/<name>/backups --filename={site_id}
+    incap site export –-path=/Users/<name>/backups --filename={domain}
     incap site export –-path=/Users/<name>/backups --filename={site_id}_{domain}_REV3_1B
 
  ###### *Back up a single site with --site_id param.*
