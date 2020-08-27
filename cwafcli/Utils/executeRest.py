@@ -11,12 +11,15 @@ from requests.packages.urllib3.util.retry import Retry
 endpoint = None
 
 
-def execute(resturl, param):
+def execute(resturl, param, method=None, body=None):
+
     try:
         del param["func"]
-
     except:
         pass
+
+    if body:
+        body = {k: v for k, v in body.items() if v}
 
     if param.get('api_id') is None:
         param["api_id"] = os.getenv("IMPV_API_ID", IncapConfigurations.get_config(param['profile'], 'id'))
@@ -28,7 +31,10 @@ def execute(resturl, param):
     if str(urllib.parse.urlparse(resturl).netloc) == "":
         baseurl = os.getenv("IMPV_BASEURL", IncapConfigurations.get_config(param['profile'], 'baseurl')) or "https://my.imperva.com"
         if not str(urllib.parse.urlparse(baseurl).path).__contains__("/api/prov/v1/"):
+            logging.debug("baseurl: {}".format(baseurl))
             if str(urllib.parse.urlparse(resturl).path).__contains__("/api/integration/v1/clapps"):
+                endpoint = baseurl + resturl
+            elif str(urllib.parse.urlparse(baseurl).path).__contains__("/api/prov/v2"):
                 endpoint = baseurl + resturl
             else:
                 endpoint = baseurl + "/api/prov/v1/" + resturl
@@ -54,7 +60,7 @@ def execute(resturl, param):
         retry_strategy = Retry(
             total=3,
             status_forcelist=[429],
-            method_whitelist=["POST"],
+            method_whitelist=["POST", "PUT", "GET", "DELETE"],
             backoff_factor=2
         )
 
@@ -62,9 +68,33 @@ def execute(resturl, param):
         session = requests.Session()
         session.mount("https://", adapter)
 
-        with session.post(url=endpoint, data=param, timeout=(5, 15), headers={'content-type': 'application/x-www-form-urlencoded'}) as response:
-            logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
-            return response.json()
+        auth = {"api_id": param["api_id"],
+                "api_key": param["api_key"]}
+
+        if method is None:
+            with session.post(url=endpoint, params=param, timeout=(5, 15),
+                              headers={'content-type': 'application/x-www-form-urlencoded'}) as response:
+                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
+                return response.json()
+        elif method == "GET":
+            with session.get(url=endpoint, params=auth, timeout=(5, 15)) as response:
+                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
+                return response.json()
+        elif method == "POST":
+            with session.post(url=endpoint, params=auth, json=body, timeout=(5, 15),
+                              headers={'content-type': 'application/json'}) as response:
+                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
+                return response.json()
+        elif method == "PUT":
+            with session.put(url=endpoint, params=auth, data=body, timeout=(5, 15),
+                              headers={'content-type': 'application/json'}) as response:
+                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
+                return response.json()
+        elif method == "DELETE":
+            with session.delete(url=endpoint, params=auth, timeout=(5, 15),
+                              headers={'content-type': 'application/json'}) as response:
+                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
+                return response.json()
 
     except requests.HTTPError as e:
         logging.error(e)
@@ -74,6 +104,6 @@ def execute(resturl, param):
         logging.error(e)
     except requests.RequestException as e:
         logging.error(e)
-    except requests.exceptions as e:
-        logging.error(e)
+    # except requests.exceptions as e:
+    #     logging.error(e)
     exit(1)

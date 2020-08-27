@@ -49,7 +49,9 @@ def export(args):
                 break
     else:
         args.do = 'status'
-        result = Site.commit(args, True)# read(param)
+        args.format = "json"
+        print(args)
+        result = Site.commit(args)# read(param)
         if int(result.get('res')) != 0:
             err = IncapError(result)
             err.log()

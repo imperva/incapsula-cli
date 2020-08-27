@@ -20,15 +20,21 @@ class IncapConfigurations:
     def get_config(key, value):
         config = configparser.ConfigParser()
         filename = os.path.expanduser('~') + '/.incap/config.ini'
-        try:
-            config.read(filename)
-            config.sections()
-            if config:
-                return config[key].get(value)
-        except configparser.Error as err:
-            logging.error('{}'.format(err))
-            logging.error('Please run "incap config" to configure user info')
-            return None
+        config.read(filename)
+        config.sections()
+        if config:
+            try:
+                if key in config:
+                    return config[key].get(value)
+                else:
+                    logging.warning('No configuration params found for section={} and key={}.\n'
+                                    'Please configure with "incap config -h" or pass in configuration info.'.format(key, value))
+                    exit(1)
+            except configparser.Error as err:
+                logging.error('{}'.format(err))
+                logging.error('Please run "incap config" to configure user info')
+                return None
+
 
 
 def configure(args):

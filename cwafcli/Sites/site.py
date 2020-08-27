@@ -1,8 +1,9 @@
 import time
+import json
+import logging
 from ..Sites.cache import Cache
 from ..Integration.clapps import get_clapps
 from ..Utils.executeRest import execute
-import logging
 from ..Utils.incapError import IncapError
 from ..Utils.incapResponse import IncapResponse
 from ..Utils.print_table import PrintTable
@@ -51,9 +52,16 @@ class Site:
         self.cache = Cache(self.performance_configuration)
 
     @staticmethod
-    def commit(args, json=False):
+    def commit(args):
         param = vars(args)
         action = param['do']
+        response = param['format']
+
+        logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
+        resturl = '{}/{}'.format(str.replace(__name__, '.', '/').split('/')[1], param['do']).lower()
+
+        if response == "json":
+            return print(json.dumps(execute(resturl, param)))
         if action == 'list':
             print('{} sites.'.format(str.capitalize(action)))
             if args.export:
@@ -61,12 +69,8 @@ class Site:
                 exit(0)
         else:
             print('{} site.'.format(str.capitalize(action)))
-        logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
-        resturl = '{}/{}'.format(str.replace(__name__, '.', '/').split('/')[1], param['do']).lower()
-        result = execute(resturl, param)
 
-        if json:
-            return result
+        result = execute(resturl, param)
 
         if int(result.get('res')) != 0:
             err = IncapError(result)
@@ -110,6 +114,7 @@ class Site:
         print('Extended DDoS = %s' % self.extended_ddos)
         print('Seal Location = %s' % self.sealLocation['name'])
         print('Acceleration Level: %s' % self.acceleration_level)
+        print("Log Level = {}".format(self.log_level))
 
         print(divide)
         print('Current DNS information is set to the following:')
@@ -195,6 +200,7 @@ class Site:
             print(divide)
             print("No ACLs")
         print(divide)
+
 
         print('Security settings are as follows:')
         print(divide)
