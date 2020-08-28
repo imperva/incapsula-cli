@@ -12,7 +12,7 @@ endpoint = None
 
 
 def execute(resturl, param, method=None, body=None):
-
+    response = None
     try:
         del param["func"]
     except:
@@ -26,10 +26,12 @@ def execute(resturl, param, method=None, body=None):
         if param.get('api_key') is None:
             param["api_key"] = os.getenv("IMPV_API_KEY", IncapConfigurations.get_config(param['profile'], 'key'))
             if param.get('account_id') is None:
-                param["account_id"] = os.getenv("IMPV_ACCOUNT_ID", IncapConfigurations.get_config(param['profile'], 'account'))
+                param["account_id"] = os.getenv("IMPV_ACCOUNT_ID",
+                                                IncapConfigurations.get_config(param['profile'], 'account'))
 
     if str(urllib.parse.urlparse(resturl).netloc) == "":
-        baseurl = os.getenv("IMPV_BASEURL", IncapConfigurations.get_config(param['profile'], 'baseurl')) or "https://my.imperva.com"
+        baseurl = os.getenv("IMPV_BASEURL",
+                            IncapConfigurations.get_config(param['profile'], 'baseurl')) or "https://my.imperva.com"
         if not str(urllib.parse.urlparse(baseurl).path).__contains__("/api/prov/v1/"):
             logging.debug("baseurl: {}".format(baseurl))
             if str(urllib.parse.urlparse(resturl).path).__contains__("/api/integration/v1/clapps"):
@@ -50,60 +52,44 @@ def execute(resturl, param, method=None, body=None):
         if not str(urllib.parse.urlparse(endpoint).scheme) == "https":
             logging.error("Error: URL does not contain the proper scheme 'https'.")
 
+    retry_strategy = Retry(
+        total=3,
+        status_forcelist=[429],
+        method_whitelist=["POST", "PUT", "GET", "DELETE"],
+        backoff_factor=2
+    )
+
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session = requests.Session()
+    session.mount("https://", adapter)
+
+    auth = {"api_id": param["api_id"],
+            "api_key": param["api_key"]}
+
+    logging.debug('curl -d "{}" {}?api_id={api_id}&api_key={api_key}'.format(body, endpoint, **auth))
+
     try:
-        logging.debug('Request Data: \n{}'.format(param))
-        p = ''
-        for k, v in param.items():
-            p += '{}={}&'.format(k, v)
-        logging.debug("curl -d '{}' {}".format(p, endpoint))
-
-        retry_strategy = Retry(
-            total=3,
-            status_forcelist=[429],
-            method_whitelist=["POST", "PUT", "GET", "DELETE"],
-            backoff_factor=2
-        )
-
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        session = requests.Session()
-        session.mount("https://", adapter)
-
-        auth = {"api_id": param["api_id"],
-                "api_key": param["api_key"]}
-
         if method is None:
-            with session.post(url=endpoint, params=param, timeout=(5, 15),
-                              headers={'content-type': 'application/x-www-form-urlencoded'}) as response:
-                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
-                return response.json()
+            response = session.post(url=endpoint, params=param, timeout=(5, 15),
+                                    headers={'content-type': 'application/x-www-form-urlencoded'})
         elif method == "GET":
-            with session.get(url=endpoint, params=auth, timeout=(5, 15)) as response:
-                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
-                return response.json()
+            response = session.get(url=endpoint, params=auth, timeout=(5, 15))
         elif method == "POST":
-            with session.post(url=endpoint, params=auth, json=body, timeout=(5, 15),
-                              headers={'content-type': 'application/json'}) as response:
-                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
-                return response.json()
+            response = session.post(url=endpoint, params=auth, json=body, timeout=(5, 15),
+                                    headers={'content-type': 'application/json'})
         elif method == "PUT":
-            with session.put(url=endpoint, params=auth, data=body, timeout=(5, 15),
-                              headers={'content-type': 'application/json'}) as response:
-                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
-                return response.json()
+            response = session.put(url=endpoint, params=auth, data=body, timeout=(5, 15),
+                                   headers={'content-type': 'application/json'})
         elif method == "DELETE":
-            with session.delete(url=endpoint, params=auth, timeout=(5, 15),
-                              headers={'content-type': 'application/json'}) as response:
-                logging.debug('JSON Response: {}'.format(json.dumps(response.json(), indent=4)))
-                return response.json()
-
+            response = session.delete(url=endpoint, params=auth, timeout=(5, 15),
+                                      headers={'content-type': 'application/json'})
+        response.raise_for_status()
+        return response.json()
     except requests.HTTPError as e:
-        logging.error(e)
+        return e
     except requests.ConnectionError as e:
-        logging.error(e)
+        return e
     except requests.Timeout as e:
-        logging.error(e)
+        return e
     except requests.RequestException as e:
-        logging.error(e)
-    # except requests.exceptions as e:
-    #     logging.error(e)
-    exit(1)
+        return e
