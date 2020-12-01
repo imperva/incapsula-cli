@@ -2,7 +2,7 @@ import json
 import os
 import urllib
 from urllib import parse
-from ..Config.configuration import IncapConfigurations
+
 import logging
 import requests
 from requests.adapters import HTTPAdapter
@@ -18,10 +18,13 @@ def execute(resturl, param, method=None, body=None):
     except:
         pass
 
-    if body:
+    if type(body) == dict:
         body = {k: v for k, v in body.items() if v}
+    elif type(body) == str:
+        body = json.loads(body)
 
     if param.get('api_id') is None:
+        from ..Config.configuration import IncapConfigurations
         param["api_id"] = os.getenv("IMPV_API_ID", IncapConfigurations.get_config(param['profile'], 'id'))
         if param.get('api_key') is None:
             param["api_key"] = os.getenv("IMPV_API_KEY", IncapConfigurations.get_config(param['profile'], 'key'))
@@ -73,23 +76,31 @@ def execute(resturl, param, method=None, body=None):
             response = session.post(url=endpoint, params=param, timeout=(5, 15),
                                     headers={'content-type': 'application/x-www-form-urlencoded'})
         elif method == "GET":
-            response = session.get(url=endpoint, params=auth, timeout=(5, 15))
+            response = session.get(url=endpoint, params=auth, timeout=(5, 15),
+                                   headers={'accept': 'application/json'})
         elif method == "POST":
             response = session.post(url=endpoint, params=auth, json=body, timeout=(5, 15),
-                                    headers={'content-type': 'application/json'})
+                                    headers={'content-type': 'application/json', 'accept': 'application/json'})
         elif method == "PUT":
-            response = session.put(url=endpoint, params=auth, data=body, timeout=(5, 15),
-                                   headers={'content-type': 'application/json'})
+            response = session.put(url=endpoint, params=auth, json=body, timeout=(5, 15),
+                                   headers={'content-type': 'application/json', 'accept': 'application/json'})
         elif method == "DELETE":
             response = session.delete(url=endpoint, params=auth, timeout=(5, 15),
-                                      headers={'content-type': 'application/json'})
-        response.raise_for_status()
+                                      headers={'content-type': 'application/json', 'accept': 'application/json'})
+
+        if response.status_code != 200:
+            logging.error(response.text)
+            response.raise_for_status()
+        elif "res" in response.json() and int(response.json()["res"]) != 0:
+            exit(logging.error("{res_message} - {debug_info}".format(**response.json())))
+        elif not response.json():
+            exit(response.text)
         return response.json()
     except requests.HTTPError as e:
-        return e
+        exit(e)
     except requests.ConnectionError as e:
-        return e
+        exit(e)
     except requests.Timeout as e:
-        return e
+        exit(e)
     except requests.RequestException as e:
-        return e
+        exit(e)

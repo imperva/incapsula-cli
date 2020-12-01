@@ -1,3 +1,6 @@
+from ..Utils.executeRest import execute
+
+
 class Cache:
     def __init__(self, data):
         self.acceleration_level = data.get('acceleration_level') or None
@@ -92,3 +95,99 @@ class Cache:
             "clear_never_cache_rules": self.clear_never_cache_rules,
             "clear_cache_headers_rules": self.clear_cache_headers_rules
         }
+
+
+class CacheSettings:
+    @staticmethod
+    def read(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache".format(**param),
+                       param, "GET", param)
+
+    @staticmethod
+    def override(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache".format(**param),
+                       param, "PUT", param["json"])
+
+    @staticmethod
+    def delete(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache".format(**param),
+                       param, "DELETE", param)
+
+    @staticmethod
+    def duplicate(args):
+        source = CacheSettings.read(args)
+        source["site_id"] = args.dup_site_id
+        source["profile"] = args.profile
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache".format(**source),
+                       source, "PUT", source)
+
+
+class CacheRule:
+    @staticmethod
+    def create(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache/rules".format(**param),
+                       param, "POST", param)
+
+    @staticmethod
+    def read(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache/rules/{rule_id}".format(**param),
+                       param, "GET", param)
+
+    @staticmethod
+    def list(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache/rules".format(**param),
+                       param, "GET")
+
+    @staticmethod
+    def update(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache/rules/{rule_id}".format(**param),
+                       param, "PUT", param)
+
+    @staticmethod
+    def delete(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache/rules/{rule_id}".format(**param),
+                       param, "DELETE", param)
+
+    @staticmethod
+    def duplicate(args):
+        source = CacheRule.read(args)
+        source["site_id"] = args.dup_site_id
+        source["profile"] = args.profile
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/cache/rules".format(**source),
+                       source, "POST", source)
+
+
+class DeliverySettings:
+    @staticmethod
+    def read(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/delivery".format(**param),
+                       param, "GET", param)
+
+    @staticmethod
+    def override(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/delivery".format(**param),
+                       param, "PUT", param["json"])
+
+    @staticmethod
+    def delete(args):
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/delivery".format(**param),
+                       param, "DELETE", param)
+
+    @staticmethod
+    def duplicate(args):
+        source = DeliverySettings.read(args)
+        source["site_id"] = args.dup_site_id
+        source["profile"] = args.profile
+        return execute("https://my.imperva.com/api/prov/v2/sites/{site_id}/settings/delivery".format(**source),
+                       source, "PUT", source)

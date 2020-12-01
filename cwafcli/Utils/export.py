@@ -1,7 +1,7 @@
 import json
 import os
 import time
-from ..Config.configuration import IncapConfigurations
+
 from ..Sites.dataCenters import DataCenter
 from ..Sites.incapRules import IncapRule
 from ..Sites.site import Site
@@ -10,9 +10,7 @@ import logging
 
 
 def export(args):
-    output = 'Export site(s).'
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
-    print(output)
 
     if args.site_id is None:
         page = 0
@@ -33,9 +31,10 @@ def export(args):
             elif result['sites']:
                 start_page = (end_page + 1)
                 end_page += len(result['sites'])
-                print("Exporting pages from {} to {}".format(start_page, end_page))
+                logging.debug("Exporting pages from {} to {}".format(start_page, end_page))
                 for site in result['sites']:
                     if args.path is None:
+                        from ..Config.configuration import IncapConfigurations
                         path = os.getenv("IMPV_REPO", IncapConfigurations.get_config(param["profile"], 'repo'))
                         if not path:
                             logging.warning('No path was provided.')
@@ -48,16 +47,14 @@ def export(args):
             else:
                 break
     else:
-        args.do = 'status'
-        args.format = "json"
-        print(args)
-        result = Site.commit(args)# read(param)
+        result = Site.read(args)
         if int(result.get('res')) != 0:
             err = IncapError(result)
             err.log()
             return err
         else:
             if args.path is None:
+                from ..Config.configuration import IncapConfigurations
                 path = os.getenv("IMPV_REPO", IncapConfigurations.get_config(args.profile, 'repo'))
                 if not path:
                     logging.warning('No path was provided.')
@@ -73,22 +70,22 @@ def export_site(site, path, filename, args):
         if 'incap_rules' in site:
             del site['incap_rules']
         args.site_id = site['site_id']
-        args.do = 'list'
-        incap_rules = IncapRule.commit(args) #Sites.rIncapRule.read(param)
-        if incap_rules['res'] == '0':
-            incap_rules.pop('res', None)
-            site['policies'] = incap_rules
-        data_centers = DataCenter.commit(args) #DataCenter.get_data_centers(param) #Sites.rDataCenters.read(param)
+        # args.do = 'list'
+        # incap_rules = IncapRule.commit(args)
+        # if incap_rules['res'] == '0':
+        #     incap_rules.pop('res', None)
+        #     site['policies'] = incap_rules
+        data_centers = DataCenter.commit(args)
         if data_centers['res'] == '0':
             data_centers.pop('res', None)
             site['dataCenters'] = data_centers
         _filename = path + '/' + create_filename(filename, site) + '.json'
-        print("Export file name: {}". format(_filename))
+        logging.debug("Export file name: {}". format(_filename))
         if not os.path.exists(path):
             os.makedirs(path)
         with open(_filename, 'w') as outfile:
             json.dump(site, outfile, indent=4)
-            print("Exported results to {}...".format(_filename))
+            logging.debug("Exported results to {}...".format(_filename))
     except OSError as e:
         logging.error(e.strerror)
 

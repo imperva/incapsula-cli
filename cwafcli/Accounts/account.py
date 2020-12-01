@@ -40,6 +40,40 @@ class Account:
                                                                                    account["sub_account_id"],
                                                                                    account["support_level"]))
 
+    @staticmethod
+    def create(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/accounts/add".format(**param),
+                       param, body=param)
+
+    @staticmethod
+    def read(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/account".format(**param),
+                       param, body=param)
+
+    @staticmethod
+    def update(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/accounts/configure".format(**param),
+                       param, body=param)
+
+    @staticmethod
+    def list(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/accounts/list".format(**param),
+                       param, body=param)
+
+    @staticmethod
+    def delete(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/accounts/delete".format(**param),
+                       param, body=param)
 
 class SubAccount:
     def __init__(self, data):
@@ -51,3 +85,4 @@ class SubAccount:
         return '-------------------------------------------------------------------------------------------------\n' \
                'Sub Account Name: %s\nSub Account ID: %s\nSupport Level: %s' \
                % (self.sub_account_name, self.sub_account_id, self.support_level)
+

@@ -15,6 +15,34 @@ class DataCenter:
         self.contentOnly = data['contentOnly']
 
     @staticmethod
+    def create(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/sites/dataCenters/add".format(**param),
+                       param, body=param)
+
+    @staticmethod
+    def update(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/sites/performance/caching-rules/edit".format(**param),
+                       param, body=param)
+
+    @staticmethod
+    def list(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/sites/dataCenters/list".format(**param),
+                       param, body=param)
+
+    @staticmethod
+    def delete(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/sites/dataCenters/delete".format(**param),
+                       param, body=param)
+
+    @staticmethod
     def commit(args):
         param = vars(args)
         action = param['do']
@@ -67,6 +95,27 @@ class Server:
         self.enabled = data['enabled']
         self.address = data['address']
         self.isStandby = data['isStandby']
+
+    @staticmethod
+    def create(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/sites/dataCenters/servers/add".format(**param),
+                       param, body=param)
+
+    @staticmethod
+    def update(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/sites/dataCenters/servers/edit".format(**param),
+                       param, body=param)
+
+    @staticmethod
+    def delete(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        return execute("https://my.imperva.com/api/prov/v1/sites/dataCenters/servers/delete".format(**param),
+                       param, body=param)
 
     @staticmethod
     def servers(args):
