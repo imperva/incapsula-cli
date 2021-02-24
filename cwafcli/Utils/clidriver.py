@@ -19,6 +19,7 @@ parser.add_argument('--api_key', help='API authentication identifier.')
 parser.add_argument('--version', action='version', version=cwafcli.__version__)
 parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
 parser.add_argument('--log', default='INFO')
+parser.add_argument('--output', default='friendly')
 subparsers = parser.add_subparsers()
 
 cli_config_parser = config_parse(subparsers)
@@ -36,40 +37,39 @@ def main(args=None):
     import requests
     args = parser.parse_args(args=args)
     logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
-    some = args.func(args)
 
-    if type(some) is requests.exceptions.HTTPError:
-        logging.error(some)
-    elif type(some) is str:
-        logging.info(some)
-    elif type(some) is list:
-        for sub in some:
-            if type(sub) is dict:
-                for ke, va in sub.items():
-                    print("{} = {}".format(ke.upper(), va))
-    else:
-        logging.debug(json.dumps(some))
-        for k, v in some.items():
-            if type(some[k]) is str:
-                print("{} = {}".format(k.upper(), some[k]))
-            elif type(some[k]) is int:
-                print("{} = {}".format(k.upper(), some[k]))
-            elif type(some[k]) is dict:
-                for ke, va in some[k].items():
-                    print("{} = {}".format(ke.upper(), va))
-            elif type(some[k]) is list:
-                for sub in some[k]:
-                    if type(sub) is dict:
-                        for ke, va in sub.items():
-                            print("{} = {}".format(ke.upper(), va))
-                    else:
-                        print("{} = {} ".format(k.upper(), sub))
-    # if args.log == "DEBUG":
-    #     import json
-    #     res_json = json.dumps(some)
-    #     print(res_json)
-    # else:
-    #     print(some)
+    response = args.func(args)
+
+    if type(response) is requests.exceptions.HTTPError:
+        logging.error(response)
+    elif response:
+        if args.output == "json":
+            print(json.dumps(response, sort_keys=True, indent=4))
+        if args.output == "friendly":
+            if "domain" in response:
+                from ..Sites import Site
+                Site(response).log(response)
+            for k, v in sorted(response.items()):
+                if type(response[k]) is str:
+                    print("{} = {}".format(k.upper(), response[k]))
+                elif type(response[k]) is int:
+                    print("{} = {}".format(k.upper(), response[k]))
+                elif type(response[k]) is dict:
+                    for ke, va in response[k].items():
+                        print("{} = {}".format(ke.upper(), va))
+                elif type(response[k]) is list:
+                    for sub in response[k]:
+                        if type(sub) is dict:
+                            for ke, va in sub.items():
+                                if type(va) == list:
+                                    for sub in va:
+                                        val = ''.join(sub)
+                                        print(" {} = {}".format(k.upper(), val))
+                                else:
+                                    print("{} = {}".format(ke.upper(), va))
+                        else:
+                            val = ''.join(sub)
+                            print("{} = {}".format(k.upper(), val))
 
 
 def testing(args=None):

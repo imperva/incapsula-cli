@@ -17,7 +17,6 @@ class Event:
     def commit(args):
         param = vars(args)
         action = param['do']
-        print('{} site data centers.'.format(str.capitalize(action)))
         logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
         resturl = 'https://my.incapsula.com/api/v1/infra/{}'.format(action)
 

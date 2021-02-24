@@ -81,7 +81,6 @@ def site_parse(subparsers):
     site_delete_parser.add_argument('site_id', help='Numeric identifier of the site to operate on.')
     site_delete_parser.set_defaults(func=Site.delete)
 
-
     site_custom_cert_parser = site_subparsers.add_parser('csr', help='Use this operation to create a certificate '
                                                                      'signing request (CSR) for your site. '
                                                                      'For details on how to provide Incapsula with a '
@@ -97,7 +96,8 @@ def site_parse(subparsers):
                                          help='The division of your organization handling the certificate. '
                                               'For example, "IT Department".')
     site_custom_cert_parser.add_argument('--country',
-                                         help='The two-letter ISO code for the country where your organization is located.')
+                                         help='The two-letter ISO code for the country where your organization is '
+                                              'located.')
     site_custom_cert_parser.add_argument('--state',
                                          help='The state/region where your organization is located. This should not be '
                                               'abbreviated.')

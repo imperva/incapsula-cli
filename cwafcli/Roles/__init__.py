@@ -8,12 +8,12 @@ def role_parse(subparsers):
         help='additional help')
     role_get_parser = role_subparsers.add_parser('get', help='Get Role Details By Account ID, User Email, or Role Name',
         usage='incap [options] role get [options] role_id')
-    role_get_parser.add_argument('roleId', help='The role ID of the required role.')
+    role_get_parser.add_argument('role_id', help='The role ID of the required role.')
     role_get_parser.set_defaults(func=Role.read)
 
     role_list_parser = role_subparsers.add_parser('list', help='Retrieve all policies in account',
         usage='incap [options] role list [options]')
-    role_list_parser.add_argument('accountId', help='The role ID of the required role.')
+    role_list_parser.add_argument('account_id', help='The role ID of the required role.')
     role_list_parser.add_argument('--email', dest="userEmail", default='', help='The email of the required user.')
     role_list_parser.add_argument('--role', dest="roleName", default='', help='The name of the required role.')
     role_list_parser.set_defaults(func=Role.list)
@@ -37,15 +37,15 @@ def role_parse(subparsers):
     assignment_get_parser = role_subparsers.add_parser('get-assignment',
         help='Get role assignments By User Email And Account ID',
         usage='incap [options] role get-assignment email account_id')
-    assignment_get_parser.add_argument('json', help='The details required for the new assignments.')
-    assignment_get_parser.set_defaults(func=Assignment.create)
+    assignment_get_parser.add_argument('userEmail', help='The email of the required user')
+    assignment_get_parser.add_argument('account_id', help='Unique ID of the required account.')
+    assignment_get_parser.set_defaults(func=Assignment.read)
 
     assignment_create_parser = role_subparsers.add_parser('create-assignment',
         help='Assign Users To Roles or Delete Existing Assignment',
         usage='incap [options] role get-assignment email account_id')
-    assignment_create_parser.add_argument('userEmail', help='The email of the required user')
-    assignment_create_parser.add_argument('accountId', help='Unique ID of the required account.')
-    assignment_create_parser.set_defaults(func=Assignment.read)
+    assignment_create_parser.add_argument('json', help='The details required for the new assignments.')
+    assignment_create_parser.set_defaults(func=Assignment.create)
 
     user_create_parser = role_subparsers.add_parser('create-user', help='Create new user.',
         usage='incap [options] role create json')
@@ -56,11 +56,17 @@ def role_parse(subparsers):
         help='Get role assignments By User Email And Account ID',
         usage='incap [options] role get-user email account_id')
     user_get_parser.add_argument('userEmail', help='The email of the required user.')
-    user_get_parser.add_argument('accountId', help='Unique ID of the required account.')
+    user_get_parser.add_argument('account_id', help='Unique ID of the required account.')
     user_get_parser.set_defaults(func=User.read)
 
     user_delete_parser = role_subparsers.add_parser('delete-user', help='Delete User Details By User Email.',
         usage='incap [options] role delete-user email account_id')
     user_delete_parser.add_argument('userEmail', help='The email of the required user.')
-    user_delete_parser.add_argument('accountId', help='Unique ID of the required account.')
+    user_delete_parser.add_argument('account_id', help='Unique ID of the required account.')
     user_delete_parser.set_defaults(func=User.delete)
+
+    ability_get_parser = role_subparsers.add_parser('get-abilities', help='Get ole management APIs for abilities '
+                                                                          'management',
+        usage='incap role get-abilities account_id')
+    ability_get_parser.add_argument('account_id', help='Unique ID of the required account.')
+    ability_get_parser.set_defaults(func=Abilities.read)

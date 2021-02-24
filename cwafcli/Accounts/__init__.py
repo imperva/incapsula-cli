@@ -2,7 +2,7 @@ from cwafcli.Accounts.account import Account
 from cwafcli.Accounts.cAccount import c_account
 from cwafcli.Accounts.rAccounts import r_accounts
 from cwafcli.Accounts.rAudit import r_audit
-from cwafcli.Accounts.rSubAccounts import r_subaccount
+from cwafcli.Accounts.rSubAccounts import SubAccount
 from cwafcli.Accounts.subscription import r_subscription
 from cwafcli.Statistics.stats import Stats
 
@@ -100,7 +100,7 @@ def account_parse(subparsers):
     account_subList_parser.add_argument('--page_size', default='50',
                                         help='The number of objects to return in the response. Default: 50.')
     account_subList_parser.add_argument('--page_num', default='0', help='The page to return starting from ..0. Default: 0.')
-    account_subList_parser.set_defaults(func=r_subaccount)
+    account_subList_parser.set_defaults(func=SubAccount.list)
 
     account_reseller_audit = account_subparsers.add_parser('subscription',
                                                            help='Use this operation to get subscription details for an '

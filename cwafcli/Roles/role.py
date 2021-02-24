@@ -7,7 +7,8 @@ class Abilities:
     @staticmethod
     def read(args):
         param = vars(args)
-        return execute("https://api.imperva.com/user-management/v1/abilities/accounts/{account_id}", param, "GET")
+        return execute("https://api.imperva.com/user-management/v1/abilities/accounts/{account_id}".format(**param),
+            param, "GET")
 
 
 class Role:
@@ -15,18 +16,18 @@ class Role:
     def create(args):
         param = vars(args)
         return execute("https://api.imperva.com/user-management/v1/roles".format(**param),
-                       param, "POST", param["json"])
+            param, "POST", param["json"])
 
     @staticmethod
     def read(args):
         param = vars(args)
-        return execute("https://api.imperva.com/user-management/v1/roles/{roleId}".format(**param),
-                       param, "GET", param)
+        return execute("https://api.imperva.com/user-management/v1/roles/{role_id}".format(**param),
+            param, "GET", param)
 
     @staticmethod
     def list(args):
         param = vars(args)
-        query = "accountId={accountId}".format(**param)
+        query = "accountId={account_id}".format(**param)
         if param["userEmail"]:
             query += "&userEmail={userEmail}".format(**param)
         if param["roleName"]:
@@ -43,14 +44,14 @@ class Role:
             del json_str["lastModified"]
         except:
             pass
-        return execute("https://api.imperva.com/user-management/v1/roles/{roleId}".format(**param),
-                       param, "POST", json_str)
+        return execute("https://api.imperva.com/user-management/v1/roles/{role_id}".format(**param),
+            param, "POST", json_str)
 
     @staticmethod
     def delete(args):
         param = vars(args)
         return execute("https://api.imperva.com/user-management/v1/roles/{role_id}".format(**param),
-                       param, "DELETE", param)
+            param, "DELETE", param)
 
     @staticmethod
     def duplicate(args):
@@ -58,21 +59,23 @@ class Role:
         source["roles_id"] = args.dup_site_id
         source["profile"] = args.profile
         return execute("https://api.imperva.com/user-management/v1/roles".format(**source),
-                       source, "POST", source)
+            source, "POST", source)
 
 
 class Assignment:
     @staticmethod
     def create(args):
         param = vars(args)
-        return execute("https://api.imperva.com/user-management/v1/assignments".format(**param),
-                       param, "POST", param)
+        return execute("https://api.imperva.com/user-management/v1/assignments",
+            param, "POST", param["json"])
 
     @staticmethod
     def read(args):
         param = vars(args)
-        return execute("https://api.imperva.com/user-management/v1/assignments?userEmail={userEmail}&accountId={accountId}".format(**param),
-                       param, "GET")
+        return execute(
+            "https://api.imperva.com/user-management/v1/assignments?userEmail={userEmail}&accountId={account_id}".format(
+                **param),
+            param, "GET")
 
     @staticmethod
     def duplicate(args):
@@ -80,27 +83,31 @@ class Assignment:
         source["site_id"] = args.dup_site_id
         source["profile"] = args.profile
         return execute("https://api.imperva.com/user-management/v1/policies".format(**source),
-                       source, "POST", source)
+            source, "POST", source)
 
 
 class User:
     @staticmethod
     def create(args):
         param = vars(args)
-        return execute("https://api.imperva.com/user-management/v1/users".format(**param),
-                       param, "POST", param)
+        return execute("https://api.imperva.com/user-management/v1/users",
+            param, "POST", param["json"])
 
     @staticmethod
     def read(args):
         param = vars(args)
-        return execute("https://api.imperva.com/user-management/v1/users?userEmail={userEmail}&accountId={account_id}".format(**param),
-                       param, "GET")
+        return execute(
+            "https://api.imperva.com/user-management/v1/users?userEmail={userEmail}&account_id={account_id}".format(
+                **param),
+            param, "GET")
 
     @staticmethod
     def delete(args):
         param = vars(args)
-        return execute("https://api.imperva.com/user-management/v1/users?userEmail={userEmail}&accountId={account_id}".format(**param),
-                       param, "DELETE", param)
+        return execute(
+            "https://api.imperva.com/user-management/v1/users?userEmail={userEmail}&accountId={account_id}".format(
+                **param),
+            param, "DELETE", param)
 
     @staticmethod
     def duplicate(args):
@@ -108,4 +115,4 @@ class User:
         source["site_id"] = args.dup_site_id
         source["profile"] = args.profile
         return execute("https://api.imperva.com/user-management/v1/users".format(**source),
-                       source, "POST", source)
+            source, "POST", source)
