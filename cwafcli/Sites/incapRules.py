@@ -216,7 +216,7 @@ class IncapRule:
                         for k, v in rule.items():
                             if k == "filter" and v == "":
                                 data += 'URL contains "^/"'
-                            elif k == "filter" and v is not "":
+                            elif k == "filter" and v != "":
                                 data += "--{}='{}' ".format(k, v)
                             else:
                                 data += '--{}="{}" '. format(k, v)
@@ -231,7 +231,7 @@ class IncapRule:
                         for k, v in rule.items():
                             if k == "filter" and v == "":
                                 data += 'URL contains "^/"'
-                            elif k == "filter" and v is not "":
+                            elif k == "filter" and v != "":
                                 data += "--{}='{}' ".format(k, v)
                             else:
                                 data += '--{}="{}" '. format(k, v)
@@ -282,7 +282,7 @@ class IncapRule:
                         for k, v in rule.items():
                             if k == "filter" and v == "":
                                 data += 'URL contains "^/"'
-                            elif k == "filter" and v is not "":
+                            elif k == "filter" and v != "":
                                 data += "--{}='{}' ".format(k, v)
                             else:
                                 data += '--{}="{}" '. format(k, v)
