@@ -144,8 +144,10 @@ def site_parse(subparsers):
 
     site_update_dc_parser = site_subparsers.add_parser('edit-dc', help="Use this operation to edit a site's data center.",
                                                        usage='incap [options] site edit-dc [options] dc_id name')
+    site_update_dc_parser.add_argument('site_id', help="The site ID.")
     site_update_dc_parser.add_argument('dc_id', help="The data center's ID.")
-    site_update_dc_parser.add_argument('name', help="The new data center's name.")
+    # site_update_dc_parser.add_argument('name', help="The new data center's name.")
+    site_update_dc_parser.add_argument('--weight', help='Load-balancing weight of the DC.')
     site_update_dc_parser.add_argument('--is_enabled', help='Enables the data center.')
     site_update_dc_parser.add_argument('--is_standby', help='Enables the data center. '
                                                             'This parameter is deprecated. '
@@ -153,7 +155,7 @@ def site_parse(subparsers):
                                                             'for the same functionality.')
     site_update_dc_parser.add_argument('--is_content', help='The data center will be available for specific resources '
                                                             '(Forward Delivery Rules).')
-    site_update_dc_parser.set_defaults(func=DataCenter.update)
+    site_update_dc_parser.set_defaults(func=DataCenter.update_v2)
 
     site_delete_dc_parser = site_subparsers.add_parser('del-dc', help="Use this operation to delete a site's data center.",
                                                        usage='incap [options] site del-dc dc_id')

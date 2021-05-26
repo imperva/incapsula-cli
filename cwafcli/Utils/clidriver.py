@@ -1,6 +1,5 @@
 import argparse
 import json
-
 import cwafcli
 from ..Config import config_parse
 from ..Sites import site_parse
@@ -18,8 +17,8 @@ parser.add_argument('--api_id', help='API authentication identifier.')
 parser.add_argument('--api_key', help='API authentication identifier.')
 parser.add_argument('--version', action='version', version=cwafcli.__version__)
 parser.add_argument('--profile', default='api', help='Allows for multiple API profiles to be used.')
-parser.add_argument('--log', default='INFO')
-parser.add_argument('--output', default='friendly')
+parser.add_argument('--log', default='INFO', help='Set the log level to DEBUG, WARN, ERROR, CRITICAL; default is INFO.')
+parser.add_argument('--output', default='friendly', help='Select json else default is friendly output messages.')
 subparsers = parser.add_subparsers()
 
 cli_config_parser = config_parse(subparsers)

@@ -88,11 +88,12 @@ def execute(resturl, param, method=None, body=None):
             response = session.delete(url=endpoint, params=auth, timeout=(5, 15),
                                       headers={'content-type': 'application/json', 'accept': 'application/json'})
 
+        # print(json.dumps(response.json(), sort_keys=True, indent=4))
         if response.status_code != 200:
             logging.error(response.text)
             response.raise_for_status()
         elif "res" in response.json() and int(response.json()["res"]) != 0:
-            exit(logging.error("{res_message} - {debug_info}".format(**response.json())))
+            exit(logging.error("Error Code:({res}) - Message:({res_message}) - INFO:({debug_info})".format(**response.json())))
         elif not response.json():
             exit(response.text)
         return response.json()
