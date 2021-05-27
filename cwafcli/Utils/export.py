@@ -70,11 +70,11 @@ def export_site(site, path, filename, args):
         if 'incap_rules' in site:
             del site['incap_rules']
         args.site_id = site['site_id']
-        # args.do = 'list'
-        # incap_rules = IncapRule.commit(args)
-        # if incap_rules['res'] == '0':
-        #     incap_rules.pop('res', None)
-        #     site['policies'] = incap_rules
+        args.do = 'list'
+        incap_rules = IncapRule.commit(args)
+        if incap_rules['res'] == '0':
+            incap_rules.pop('res', None)
+            site['policies'] = incap_rules
         data_centers = DataCenter.commit(args)
         if data_centers['res'] == '0':
             data_centers.pop('res', None)

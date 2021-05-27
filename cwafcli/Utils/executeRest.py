@@ -12,6 +12,7 @@ endpoint = None
 
 
 def execute(resturl, param, method=None, body=None):
+    global IncapConfigurations
     response = None
     try:
         del param["func"]
