@@ -52,7 +52,7 @@ class Site:
     def create(args):
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
-        print(param)
+        logging.debug("Create site params {}".format(param))
         return execute("https://my.imperva.com/api/prov/v1/sites/add".format(**param),
                        param, body=param)
 
@@ -60,6 +60,7 @@ class Site:
     def read(args):
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
+        logging.debug("Read site params {}".format(param))
         return execute("https://my.imperva.com/api/prov/v1/sites/status".format(**param),
                        param, body=param)
 
@@ -67,6 +68,7 @@ class Site:
     def update(args):
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
+        logging.debug("Update site params {}".format(param))
         return execute("https://my.imperva.com/api/prov/v1/sites/configure".format(**param),
                        param, body=param)
 
@@ -74,6 +76,7 @@ class Site:
     def list(args):
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
+        logging.debug("List site params {}".format(param))
         return execute("https://my.imperva.com/api/prov/v1/sites/list".format(**param),
                        param, body=param)
 
@@ -81,6 +84,7 @@ class Site:
     def delete(args):
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
+        logging.debug("Delete site params {}".format(param))
         return execute("https://my.imperva.com/api/prov/v1/sites/delete".format(**param),
                        param, body=param)
 
