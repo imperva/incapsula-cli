@@ -53,32 +53,54 @@ class Site:
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
         logging.debug("Create site params {}".format(param))
-        return execute("https://my.imperva.com/api/prov/v1/sites/add".format(**param),
+        response = execute("https://my.imperva.com/api/prov/v1/sites/add".format(**param),
                        param, body=param)
+        if args.output == "friendly":
+            from ..Sites import Site
+            return Site(response).log(response)
+        else:
+            return response
 
     @staticmethod
     def read(args):
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
         logging.debug("Read site params {}".format(param))
-        return execute("https://my.imperva.com/api/prov/v1/sites/status".format(**param),
+        response = execute("https://my.imperva.com/api/prov/v1/sites/status".format(**param),
                        param, body=param)
+        if args.output == "friendly":
+            from ..Sites import Site
+            return Site(response).log(response)
+        else:
+            return response
 
     @staticmethod
     def update(args):
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
         logging.debug("Update site params {}".format(param))
-        return execute("https://my.imperva.com/api/prov/v1/sites/configure".format(**param),
+        response = execute("https://my.imperva.com/api/prov/v1/sites/configure".format(**param),
                        param, body=param)
+        if args.output == "friendly":
+            from ..Sites import Site
+            return Site(response).log(response)
+        else:
+            return response
 
     @staticmethod
     def list(args):
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
         logging.debug("List site params {}".format(param))
-        return execute("https://my.imperva.com/api/prov/v1/sites/list".format(**param),
+        response = execute("https://my.imperva.com/api/prov/v1/sites/list".format(**param),
                        param, body=param)
+        if args.output == "friendly":
+            from cwafcli.Utils.table_formatter import TableFormatter
+            format_site = TableFormatter(headers=['domain', 'status', 'site_id', 'log_level'], data=response['sites'])
+            from cwafcli.Utils.print_table import PrintTable
+            return PrintTable(label='Sites', data=format_site.headers).print_all()
+        else:
+            return response
 
     @staticmethod
     def delete(args):

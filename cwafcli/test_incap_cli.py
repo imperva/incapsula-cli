@@ -74,25 +74,77 @@ class TestIncapCLI(unittest.TestCase):
     def test_h_add_policy(self):
         print("Tesing add policy.")
         policy = {
-            "name": "Block EU IP Policy",
-            "description": "This is policy blocks all requests from Europe",
-            "enabled": True,
-            "accountId": 1814107,
-            "policyType": "ACL",
-            "defaultPolicyConfig": [],
-            "policySettings": [
-                {
-                    "settingsAction": "BLOCK",
-                    "policySettingType": "IP",
-                    "data": {
-                        "ips": [
-                            "178.12.11.1"
+                    "accountId": 2398,
+                    "defaultPolicyConfig": [],
+                    "description": "Block a list of countries based on attack.",
+                    "enabled": True,
+                    "name": "Dynamic Country Blocks",
+                    "policySettings": [
+                      {
+                        "data": {
+                          "geo": {
+                            "continents": [
+                              "AS"
+                            ],
+                            "countries": []
+                          }
+                        },
+                        "policyDataExceptions": [],
+                        "policySettingType": "GEO",
+                        "settingsAction": "BLOCK"
+                      },
+                      {
+                        "data": {
+                          "ips": [
+                            "100.64.0.0/16"
+                          ]
+                        },
+                        "policyDataExceptions": [],
+                        "policySettingType": "IP",
+                        "settingsAction": "BLOCK"
+                      },
+                      {
+                        "data": {
+                          "urls": [
+                            {
+                              "pattern": "EQUALS",
+                              "url": "/admin"
+                            }
+                          ]
+                        },
+                        "policyDataExceptions": [
+                          {
+                            "comment": "Blah Blah Blah",
+                            "data": [
+                              {
+                                "exceptionType": "GEO",
+                                "values": [
+                                  "CA"
+                                ]
+                              },
+                              {
+                                "exceptionType": "IP",
+                                "values": [
+                                  "198.43.121.14"
+                                ]
+                              },
+                              {
+                                "exceptionType": "CLIENT_ID",
+                                "values": [
+                                  "1"
+                                ]
+                              }
+                            ],
+                            "exceptionAssetMapping": [],
+                          }
                         ],
-                    },
-                    "policyDataExceptions": []
-                }
-            ]
-        }
+                        "policySettingType": "URL",
+                        "settingsAction": "BLOCK"
+                      }
+                    ],
+                    "policyType": "ACL"
+                  }
+
         test_incap_cli = testing(['policy', 'create', json.dumps(policy)])
         unittest.TestCase.policy_id = test_incap_cli["value"]["id"]
         self.assertGreater(test_incap_cli["value"]["id"], 0), 'Failed to add the incapRule on site ID: {}'.format(unittest.TestCase.site_id)

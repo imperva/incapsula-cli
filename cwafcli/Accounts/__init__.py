@@ -1,9 +1,4 @@
 from cwafcli.Accounts.account import Account
-from cwafcli.Accounts.cAccount import c_account
-from cwafcli.Accounts.rAccounts import r_accounts
-from cwafcli.Accounts.rAudit import r_audit
-from cwafcli.Accounts.rSubAccounts import SubAccount
-from cwafcli.Accounts.subscription import r_subscription
 from cwafcli.Statistics.stats import Stats
 
 
@@ -42,19 +37,23 @@ def account_parse(subparsers):
                                          'logs integration SKU and which collects the logs. '
                                          'If not specified, operation will be performed on the account '
                                          'identified by the authentication parameters')
-    account_add_parser.set_defaults(func=c_account)
+    account_add_parser.set_defaults(func=Account.create)
 
     account_audit_parser = account_subparsers.add_parser('audit',
                                                          help='Use this operation to get audit events for an account.',
                                                          usage='incap [options] account audit [options]')
-    account_audit_parser.add_argument('--account_id',
+    account_audit_parser.add_argument('--caid',
                                       help='Numeric identifier of the account to operate on. If not specified, '
                                            'operation will be performed on the account identified by the authentication'
                                            ' parameters.')
-    account_audit_parser.add_argument('--time_range', default='today',
-                                      help='Time range to fetch data for. For a detailed description, '
-                                           'i.e. last_7_days | last_30_days | last_90_days | month_to_date')
-    account_audit_parser.add_argument('--start', default='',
+    account_audit_parser.add_argument('--offset',
+                                      help='Offset is the position of a particular record in the dataset. '
+                                           'You can retrieve a subset of records starting with the offset value. '
+                                           'The offset and limit parameters work together. '
+                                           'Valid values for the offset parameter are multiples of the limit. '
+                                           'For example, if you define limit as 50, you can define offset as either '
+                                           '0, 50, 100, 150, or any multiple of 50.')
+    account_audit_parser.add_argument('start', default='', type=int,
                                       help='Start date in milliseconds since 1970; '
                                            'All dates should be specified as number of milliseconds since midnight 1970 '
                                            '(UNIX time * 1000).')
@@ -62,11 +61,11 @@ def account_parse(subparsers):
                                                                 'All dates should be specified as number of milliseconds '
                                                                 'since midnight 1970 (UNIX time * 1000).')
     account_audit_parser.add_argument('--type', default='',
-                                      help='The api key of the event type, such as audit.account_login.')
-    account_audit_parser.add_argument('--page_size', default='50',
-                                      help='The number of objects to return in the response. Default: 50.')
-    account_audit_parser.add_argument('--page_num', default='0', help='The page to return starting from ..0. Default: 0.')
-    account_audit_parser.set_defaults(func=r_audit)
+                                      help='The action that was performed in the account, such as ACCOUNT_LOGIN')
+    account_audit_parser.add_argument('--limit', default='50',
+                                      help='The number of objects to return in the response. Defaults to 50. '
+                                           'Maximum is 100')
+    account_audit_parser.set_defaults(func=Account.audit)
 
     account_status_parser = account_subparsers.add_parser('status',
                                                           help='Use this operation to get information '
@@ -88,19 +87,19 @@ def account_parse(subparsers):
     account_list_parser.add_argument('--page_size', default='50',
                                      help='The number of objects to return in the response. Default: 50.')
     account_list_parser.add_argument('--page_num', default='0', help='The page to return starting from ..0. Default: 0.')
-    account_list_parser.set_defaults(func=r_accounts)
+    account_list_parser.set_defaults(func=Account.list)
 
-    account_subList_parser = account_subparsers.add_parser('sublist',
+    account_sublist_parser = account_subparsers.add_parser('sublist',
                                                            help='Use this operation to get audit events for an account.',
                                                            usage='incap [options] account sublist [options]')
-    account_subList_parser.add_argument('--account_id',
+    account_sublist_parser.add_argument('--account_id',
                                         help='Numeric identifier of the account to operate on. If not specified, '
                                              'operation will be performed on the account identified by the authentication'
                                              ' parameters.')
-    account_subList_parser.add_argument('--page_size', default='50',
+    account_sublist_parser.add_argument('--page_size', default='50',
                                         help='The number of objects to return in the response. Default: 50.')
-    account_subList_parser.add_argument('--page_num', default='0', help='The page to return starting from ..0. Default: 0.')
-    account_subList_parser.set_defaults(func=SubAccount.list)
+    account_sublist_parser.add_argument('--page_num', default='0', help='The page to return starting from ..0. Default: 0.')
+    account_sublist_parser.set_defaults(func=Account.list_sub_account)
 
     account_reseller_audit = account_subparsers.add_parser('subscription',
                                                            help='Use this operation to get subscription details for an '
@@ -110,7 +109,7 @@ def account_parse(subparsers):
                                         help='Numeric identifier of the account to operate on. If not specified, '
                                              'operation will be performed on the account identified by '
                                              'the authentication parameters.')
-    account_reseller_audit.set_defaults(func=r_subscription)
+    account_reseller_audit.set_defaults(func=Account.get_subscription)
 
     account_stats_parser = account_subparsers.add_parser('stats',
                                                          help="Use this operation to get site statistics for one or more "
@@ -139,3 +138,13 @@ def account_parse(subparsers):
                                                             "Multiple statistics can be specified in a comma separated "
                                                             "list. For possible values see below.")
     account_stats_parser.set_defaults(func=Stats.commit)
+
+    account_reseller_delete = account_subparsers.add_parser('delete',
+                                                           help='Use this operation to get subscription details for an '
+                                                                'account.',
+                                                           usage='incap [options] account delete account_id')
+    account_reseller_delete.add_argument('account_id',
+                                        help='Numeric identifier of the account to operate on. If not specified, '
+                                             'operation will be performed on the account identified by '
+                                             'the authentication parameters.')
+    account_reseller_delete.set_defaults(func=Account.delete)

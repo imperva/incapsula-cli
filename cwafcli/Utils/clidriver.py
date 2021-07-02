@@ -41,57 +41,9 @@ def main(args=None):
 
     if type(response) is requests.exceptions.HTTPError:
         logging.error(response)
-    elif response:
+    elif type(response) is dict:
         if args.output == "json":
             print(json.dumps(response, sort_keys=True, indent=4))
-        if args.output == "friendly" and "domain" in response:
-            from ..Sites import Site
-            Site(response).log(response)
-        if args.output == "friendly" and "sites" in response:
-            from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['domain', 'status', 'site_id', 'log_level'], data=response['sites'])
-            from cwafcli.Utils.print_table import PrintTable
-            PrintTable(label='Sites', data=format_site.headers).print_all()
-        if args.output == "friendly" and "delivery_rules" in response:
-            from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['name', 'action', 'rewrite_name', 'from', 'to'], data=response['delivery_rules']['Rewrite'])
-            from cwafcli.Utils.print_table import PrintTable
-            PrintTable(label='Rewrite', data=format_site.headers).print_all()
-        if args.output == "friendly" and "custom_error_response_rules" in response:
-            from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['name', 'id', 'filter', 'error_type', 'error_response_format'], data=response['custom_error_response_rules']['RewriteResponse'])
-            from cwafcli.Utils.print_table import PrintTable
-            PrintTable(label='Custom Error Response Rules', data=format_site.headers).print_all()
-        if args.output == "friendly" and "Redirect" in response:
-            from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['name', 'id', 'filter', 'from', 'to', 'response_code'], data=response['delivery_rules']['Redirect'])
-            from cwafcli.Utils.print_table import PrintTable
-            PrintTable(label='Redirect', data=format_site.headers).print_all()
-        if args.output == "friendly" and "delivery_rules" in response:
-            from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['name', 'id', 'filter', 'action'], data=response['delivery_rules']['RewriteResponse'])
-            from cwafcli.Utils.print_table import PrintTable
-            PrintTable(label='Rewrite Response', data=format_site.headers).print_all()
-        if args.output == "friendly" and "delivery_rules" in response:
-            from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['name', 'id', 'filter', 'from', 'to', 'response_code'], data=response['delivery_rules']['SimplifiedRedirect'])
-            from cwafcli.Utils.print_table import PrintTable
-            PrintTable(label='Simplified Redirect', data=format_site.headers).print_all()
-        if args.output == "friendly" and "incap_rules" in response:
-            from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['name', 'id', 'filter', 'action'], data=response['incap_rules']['All'])
-            from cwafcli.Utils.print_table import PrintTable
-            PrintTable(label='Security Rules', data=format_site.headers).print_all()
-        if args.output == "friendly" and "incap_rules" in response:
-            from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['name', 'id', 'filter', 'enabled'], data=response['incap_rules']['WafOverride'])
-            from cwafcli.Utils.print_table import PrintTable
-            PrintTable(label='WAF Override', data=format_site.headers).print_all()
-        if args.output == "friendly" and "rate_rules" in response:
-            from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['name', 'id', 'filter', 'context', 'interval', 'context', 'enabled'], data=response['rate_rules']['Rates'])
-            from cwafcli.Utils.print_table import PrintTable
-            PrintTable(label='Rates', data=format_site.headers).print_all()
         else:
             for k, v in sorted(response.items()):
                 if type(response[k]) is str:
@@ -114,6 +66,7 @@ def main(args=None):
                         else:
                             val = ''.join(sub)
                             print("{} = {}".format(k.upper(), val))
+
 
 def testing(args=None):
     args = parser.parse_args(args=args)
