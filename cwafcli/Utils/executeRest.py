@@ -79,14 +79,15 @@ def execute(resturl, param, method=None, body=None):
     session = requests.Session()
     session.mount("https://", adapter)
 
-    auth = {"api_id": param["api_id"],
-            "api_key": param["api_key"]}
+    auth = {"api_id": param.pop("api_id"),
+            "api_key": param.pop("api_key")
+            }
 
     logging.debug('curl -d "{}" {}?api_id={api_id}&api_key={api_key}'.format(body, endpoint, **auth))
 
     try:
         if method is None:
-            response = session.post(url=endpoint, params=param, timeout=(5, 15),
+            response = session.post(url=endpoint, params=param, timeout=(10, 30),
                 headers={'content-type': 'application/x-www-form-urlencoded',
                          'x-API-Id': auth["api_id"],
                          'x-API-Key': auth["api_key"]

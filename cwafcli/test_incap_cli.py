@@ -10,14 +10,14 @@ class TestIncapCLI(unittest.TestCase):
 
     def test_a_site_add(self):
         print('Add site: nobodyknows.dev.impervademo.com')
-        test_incap_cli = testing(['site', 'add', "nobodyknows.dev.impervademo.com", '--force_ssl=true', '--site_ip=198.132.33.2'])
+        test_incap_cli = testing(['--output=json', 'site', 'add', "nobodyknows.dev.impervademo.com", '--force_ssl=true', '--site_ip=198.132.33.2'])
         print(test_incap_cli)
         unittest.TestCase.site_id = test_incap_cli['site_id']
         self.assertEqual("OK", test_incap_cli['res_message'].upper(), 'Failed to add site: nobodyknows.dev.impervademo.com.')
 
     def test_b_site_list(self):
         print('List sites.')
-        test_incap_cli = testing(['site', 'list'])
+        test_incap_cli = testing(['--output=json', 'site', 'list'])
         self.assertEqual("OK", test_incap_cli['res_message'].upper(), 'Failed to list sites.')
 
     def test_c_site_set_waf(self):
@@ -62,12 +62,12 @@ class TestIncapCLI(unittest.TestCase):
 
     def test_f_site_status(self):
         print('Get site status.')
-        test_incap_cli = testing(['site', 'status', str(unittest.TestCase.site_id)])
+        test_incap_cli = testing(['--output=json', 'site', 'status', str(unittest.TestCase.site_id)])
         self.assertEqual("OK", test_incap_cli['res_message'].upper(), 'Failed to get site status on site ID: {}'.format(unittest.TestCase.site_id))
 
     def test_g_add_incaprule(self):
         print("Tesing add incapRule.")
-        test_incap_cli = testing(['rule', 'add-rule', '--name=Testing block crawlers', '--action=RULE_ACTION_ALERT', '--filter=ClientType == Crawler', '{}'.format(str(unittest.TestCase.site_id))])
+        test_incap_cli = testing(['--output=json', 'rule', 'add-rule', '--name=Testing block crawlers', '--action=RULE_ACTION_ALERT', '--filter=ClientType == Crawler', '{}'.format(str(unittest.TestCase.site_id))])
         print(test_incap_cli)
         self.assertGreater(test_incap_cli["rule_id"], 0), 'Failed to add the incapRule on site ID: {}'.format(unittest.TestCase.site_id)
 
