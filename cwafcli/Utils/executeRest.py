@@ -71,7 +71,6 @@ def execute(resturl, param, method=None, body=None):
     retry_strategy = Retry(
         total=3,
         status_forcelist=[429],
-        allowed_methods=["POST", "PUT", "GET", "DELETE"],
         backoff_factor=2
     )
 
