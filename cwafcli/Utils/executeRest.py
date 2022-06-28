@@ -14,6 +14,8 @@ endpoint = None
 def execute(resturl, param, method=None, body=None):
     global IncapConfigurations
     response = None
+
+
     try:
         del param["func"]
     except:
@@ -86,7 +88,7 @@ def execute(resturl, param, method=None, body=None):
 
     try:
         if method is None:
-            response = session.post(url=endpoint, params=param, timeout=(10, 30),
+            response = session.post(url=endpoint, data=param, timeout=(10, 30),
                 headers={'content-type': 'application/x-www-form-urlencoded',
                          'x-API-Id': auth["api_id"],
                          'x-API-Key': auth["api_key"]
