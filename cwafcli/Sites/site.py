@@ -1,3 +1,4 @@
+import json
 import time
 import logging
 
@@ -91,16 +92,29 @@ class Site:
     def list(args):
         logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
         param = vars(args)
+        param["page_num"] = 0
+        param["page_size"] = 50
         logging.debug("List site params {}".format(param))
-        response = execute("https://my.imperva.com/api/prov/v1/sites/list".format(**param),
-                       param, body=param)
+        sites = []
+        site_list = {}
+        while True:
+            response = execute("https://my.imperva.com/api/prov/v1/sites/list?page_num={}".format(param["page_num"]),
+                param, body=param)
+
+            if len(response["sites"]) > 0:
+                for site in response["sites"]:
+                    sites.append(site)
+                param["page_num"] += 1
+            else:
+                break
+        site_list["sites"] = sites
         if args.output == "friendly":
             from cwafcli.Utils.table_formatter import TableFormatter
-            format_site = TableFormatter(headers=['domain', 'status', 'site_id', 'log_level'], data=response['sites'])
+            format_site = TableFormatter(headers=['domain', 'status', 'site_id', 'log_level'], data=site_list["sites"])
             from cwafcli.Utils.print_table import PrintTable
             return PrintTable(label='Sites', data=format_site.headers).print_all()
         else:
-            return response
+            return site_list
 
     @staticmethod
     def delete(args):
