@@ -49,9 +49,7 @@ https://www.python.org/downloads/
     incap api_id api_key account_id
 ##### Advanced:
     incap config --profile=special_name --repo=/Users/<username>/your_repo_location --baseurl=https://my.incapsula.com 26012 ejf903rie-3983030ie23r2r39j0 2398
-#####Advanced:
-    incap config --profile=special_name --repo=/Users/<username>/your_repo_location --baseurl=https://my.imperva.com 26012 ejf903rie-3983030ie23r2r39j0 2398
-View the config with - *cat ~/.incap/config*
+#### View the config with - *cat ~/.incap/config*
 
 ## Using environment variables
     Set environment for the following:
