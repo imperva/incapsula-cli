@@ -51,6 +51,29 @@ class ADRuleRewrite:
                   self.allow_caching, self.add_missing, self.filter, self.action)
 
 
+class ADRuleRewriteResponse:
+    def __init__(self, data):
+        self.to = data.get('to') or ""
+        self.id = data['id']
+        self.enabled = data['enabled']
+        self.add_missing = str(data.get('add_missing'))
+        self.last_7_days_requests_count = data['last_7_days_requests_count']
+        self.name = data['name']
+        self.action = data['action']
+        self._from = data.get('from') or ""
+        self.filter = data['filter']
+        self.allow_caching = str(data.get('allow_caching'))
+        self.rewrite_name = data.get('rewrite_name') or ""
+
+    def log(self):
+        return '-------------------------------------------------------------------------------------------------\n' \
+               'Rule ID: %s -- Rule Name: %s\n' \
+               '--to="%s" --from="%s" --name="%s" --rewrite_name="%s" --allow_caching=%s' \
+               ' --add_missing=%s --filter="%s" --action=%s'\
+               % (self.id, self.name, self.to, self._from, self.name, self.rewrite_name,
+                  self.allow_caching, self.add_missing, self.filter, self.action)
+
+
 class ADRuleForward:
     def __init__(self, data):
         self.id = data['id']
@@ -59,17 +82,19 @@ class ADRuleForward:
         self.last_7_days_requests_count = data['last_7_days_requests_count']
         self.name = data['name']
         self.action = data['action']
-        self.dc_id = data['dc_id']
+        self.dc_id = data.get('dc_id') or ""
         self.filter = data['filter']
         self.allow_caching = str(data.get('allow_caching'))
+        self.port_forwarding_value = data.get("port_forwarding_value") or ""
+        self.port_forwarding_context = data.get("port_forwarding_context") or ""
 
     def log(self):
         return '-------------------------------------------------------------------------------------------------\n' \
                'Rule ID: %s -- Rule Name: %s\n' \
                '--name="%s" --dc_id="%s"' \
-               ' --allow_caching=%s --filter="%s" --action=%s'\
+               ' --allow_caching=%s --filter="%s" --action=%s --port_forwarding_value=%s --port_forwarding_context=%s'\
                % (self.id, self.name, self.name, self.dc_id,
-                  self.allow_caching, self.filter, self.action)
+                  self.allow_caching, self.filter, self.action, self.port_forwarding_value, self.port_forwarding_context)
 
 
 class IncapRule:
@@ -127,6 +152,11 @@ class IncapRule:
             result = execute(resturl, param)
             IncapRule._list(result)
             return result
+        elif action == "get":
+            resturl2 = "/sites/{site_id}/rules/{rule_id}".format(**param)
+            result = execute(resturl2, param, "GET")
+            url = "/sites/{site_id}/rules".format(**param)
+            execute(url, param, 'POST', result)
         else:
             result = execute(resturl, param)
             IncapRule._execute(result, action)
@@ -157,6 +187,14 @@ class IncapRule:
                 else:
                     logging.info('You have no IncapRules!!!')
 
+            if 'custom_error_response_rules' in result:
+                if 'RewriteResponse' in result['custom_error_response_rules']:
+                    for rule in result['custom_error_response_rules']['RewriteResponse']:
+                        incap_rule = IncapRule(rule)
+                        print(incap_rule.log())
+                else:
+                    logging.info('You have no IncapRules!!!')
+
             if 'delivery_rules' in result:
                 if 'Redirect' in result['delivery_rules']:
                     for rule in result['delivery_rules']['Redirect']:
@@ -175,16 +213,10 @@ class IncapRule:
                 if 'Rewrite' in result['delivery_rules']:
                     for rule in result['delivery_rules']['Rewrite']:
                         data = ""
-                        # del rule["id"]
-                        # del rule["enabled"]
-                        # del rule["priority"]
-                        # del rule["allow_caching"]
-                        # del rule["last_7_days_requests_count"]
-
                         for k, v in rule.items():
                             if k == "filter" and v == "":
                                 data += 'URL contains "^/"'
-                            elif k == "filter" and v is not "":
+                            elif k == "filter" and v != "":
                                 data += "--{}='{}' ".format(k, v)
                             else:
                                 data += '--{}="{}" '. format(k, v)
@@ -193,6 +225,21 @@ class IncapRule:
                         print(adr_rule.log())
                 else:
                     logging.info('You have no Rewrite Rules!!!')
+                if 'RewriteResponse' in result['delivery_rules']:
+                    for rule in result['delivery_rules']['RewriteResponse']:
+                        data = ""
+                        for k, v in rule.items():
+                            if k == "filter" and v == "":
+                                data += 'URL contains "^/"'
+                            elif k == "filter" and v != "":
+                                data += "--{}='{}' ".format(k, v)
+                            else:
+                                data += '--{}="{}" '. format(k, v)
+                        print("RULE: {}".format(rule))
+                        adr_rule = ADRuleRewriteResponse(rule)
+                        print(adr_rule.log())
+                else:
+                    logging.info('You have no RewriteResponse Rules!!!')
 
     @staticmethod
     def _copy(result, ):
@@ -235,7 +282,7 @@ class IncapRule:
                         for k, v in rule.items():
                             if k == "filter" and v == "":
                                 data += 'URL contains "^/"'
-                            elif k == "filter" and v is not "":
+                            elif k == "filter" and v != "":
                                 data += "--{}='{}' ".format(k, v)
                             else:
                                 data += '--{}="{}" '. format(k, v)

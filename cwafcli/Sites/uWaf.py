@@ -9,7 +9,6 @@ def u_security(args):
     #action = param['do']
     output = 'Update site {0} security configuration.'. format(args.site_id)
     logging.basicConfig(format='%(levelname)s - %(message)s',  level=getattr(logging, args.log.upper()))
-    print(output)
 
     if args.rule_id == 'ddos' and args.activation_mode == '':
         logging.warning('Activation mode param is required:\n'
@@ -48,11 +47,12 @@ def u_security(args):
 
     if int(result.get('res')) != 0:
         err = IncapError(result)
-        err.log()
+        return err
+        # err.log()
     else:
-        site = Site(result)
-        print('Updated {} Security(WAF) Rule for {}.'.format(args.rule_id.replace('_', ' '), site.domain))
-        return site
+        # site = Site(result)
+        # print('Updated {} Security(WAF) Rule for {}.'.format(args.rule_id.replace('_', ' '), site.domain))
+        return result
 
 
 def update(params):

@@ -6,7 +6,7 @@ from ..Sites.cSite import create
 from ..Utils.incapError import IncapError
 from ..Sites.acl import ACL
 from ..Sites.waf import Security
-from ..Config.configuration import IncapConfigurations
+
 import logging
 
 
@@ -18,7 +18,7 @@ def c_site_restore(args):
         "account_id": args.account_id,
         "domain": args.domain
     }
-
+    from ..Config.configuration import IncapConfigurations
     config = IncapConfigurations()
 
     if args.path == '':
