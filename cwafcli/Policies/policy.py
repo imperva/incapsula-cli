@@ -78,7 +78,8 @@ class AssetAssociation:
     @staticmethod
     def list(args):
         param = vars(args)
-        return execute("https://api.imperva.com/policies/v2/assets/{asset_type}/{asset_id}/policies", param, "GET")
+        return execute("https://api.imperva.com/policies/v2/assets/{asset_type}/{asset_id}/policies".format(**param),
+                       param, "GET")
 
     @staticmethod
     def override(args):

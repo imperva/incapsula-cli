@@ -43,6 +43,8 @@ def site_parse(subparsers):
              'Logs Integration SKU. Numeric identifier of the account that purchased the logs'
              ' integration SKU and which collects the logs. If not specified, operation will '
              'be performed on the account identified by the authentication parameters')
+    site_add_parser.add_argument('--generate_site_certificate', default='',
+        help='Site certificates are available only for a newly onboarded website. You cannot generate a site certificate for an existing site that is already configured for SSL and has an existing certificate associated with it in Imperva.')
     site_add_parser.add_argument('domain', help='The domain name of the site. '
                                                 'For example: www.example.com, hello.example.com, example.com')
     site_add_parser.add_argument('--naked_domain_san', default='true', help='Use “true” to add the naked domain '

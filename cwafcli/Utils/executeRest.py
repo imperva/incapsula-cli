@@ -1,5 +1,6 @@
 import json
 import os
+import time
 import urllib
 from urllib import parse
 
@@ -120,12 +121,43 @@ def execute(resturl, param, method=None, body=None):
                          'x-API-Id': auth["api_id"],
                          'x-API-Key': auth["api_key"]
                          })
+        elif method == "DOWNLOAD":
+            response = session.get(url=endpoint, params=auth, timeout=(5, 15),
+                headers={'accept': 'application/json',
+                         'x-API-Id': auth["api_id"],
+                         'x-API-Key': auth["api_key"]
+                         }, stream=True)
+            return response
+        print(response.status_code)
+        if response.status_code == 202 and response.request.url.__contains__("export") \
+            and not response.request.url.__contains__("download"):
+            from json import JSONDecodeError
+            print("Let's download")
+            try:
+                package_info = response.json()
+                package_info["account_id"] = param["account_id"]
+                package_info["profile"] = "api"
+                package_info["file_name"] = param["file_name"]
+                package_info["status_code"] = response.status_code
+                return package_info
+                # from ..Accounts.account import Account
+                # Account.download_export(package_info)
+            except JSONDecodeError:
+                return response
+        elif response.status_code == 202 and response.request.url.__contains__("download"):
+            return response.json()
+        elif response.status_code == 200 and response.request.url.__contains__("download"):
+            return response
+        elif response.status_code == 200:
+            return response.json()
 
         logging.debug(response.request.body)
         logging.debug(json.dumps(response.json(), sort_keys=True, indent=4))
+
         if response.status_code != 200:
             logging.error(response.text)
             response.raise_for_status()
+            return
         elif "res" in response.json() and int(response.json()["res"]) != 0:
             exit(logging.error(
                 "Error Code:({res}) - Message:({res_message}) - INFO:({debug_info})".format(**response.json())))

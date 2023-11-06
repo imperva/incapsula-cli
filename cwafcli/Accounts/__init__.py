@@ -148,3 +148,15 @@ def account_parse(subparsers):
                                              'operation will be performed on the account identified by '
                                              'the authentication parameters.')
     account_reseller_delete.set_defaults(func=Account.delete)
+
+    account_reseller_export = account_subparsers.add_parser('export',
+                                                           help='Use this operation to export an account with the '
+                                                                'native CWAF backend export-to-terraform.',
+                                                           usage='incap [options] account export account_id file_name')
+    account_reseller_export.add_argument('account_id',
+                                        help='Numeric identifier of the account to operate on. If not specified, '
+                                             'operation will be performed on the account identified by '
+                                             'the authentication parameters.')
+    account_reseller_export.add_argument('file_name',
+        help='Absolute path and file name to save export. Example: /Users/my_user/Repo/My-Account-Name.zip')
+    account_reseller_export.set_defaults(func=Account.export)

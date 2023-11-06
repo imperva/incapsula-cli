@@ -1,3 +1,4 @@
+import io
 import time
 import logging
 from ..Utils.executeRest import execute
@@ -99,6 +100,43 @@ class Account:
         return execute("https://my.imperva.com/api/prov/v1/accounts/delete".format(**param),
             param, body=param)
 
+    @staticmethod
+    def export(args):
+        logging.basicConfig(format='%(levelname)s - %(message)s', level=getattr(logging, args.log.upper()))
+        param = vars(args)
+        resp = execute("https://api.imperva.com/account-export-import/export?caid={account_id}".format(**param),
+            param, "POST", body=param)
+
+        if resp["status_code"] == 202:
+            Account.download_export(resp)
+        else:
+            print("Failed to initiate export.")
+            exit(resp)
+    @staticmethod
+    def download_export(param):
+        tick = "!"
+        while True:
+            response = execute("https://api.imperva.com/account-export-import/v3/export/download/{}?caid={}"
+                .format(param["handler"], param["account_id"]), param, "GET")
+
+            if type(response) == dict:
+                print(response)
+                print("Waiting for download{}".format(tick))
+                tick = tick + "!"
+                time.sleep(5)
+            else:
+                try:
+                    import shutil
+                    print("Save file {}".format(param["file_name"]))
+                    with execute("https://api.imperva.com/account-export-import/v3/export/download/{}?caid={}"
+                .format(param["handler"], param["account_id"]), param, "DOWNLOAD") as download:
+                        with open(param["file_name"], 'wb') as f:
+                            shutil.copyfileobj(download.raw, f)
+                        return
+                except io.FileIO as e:
+                    print(e)
+
+
 
 class SubAccount:
     def __init__(self, data):
@@ -114,7 +152,8 @@ class SubAccount:
 
 class Audit:
     def __init__(self, data):
-        self.createdAt = time.strftime('%Y-%m-%d %H:%M:%S %Z', time.localtime(int(data.get('createdAt'))/1000.0)) or ''
+        self.createdAt = time.strftime('%Y-%m-%d %H:%M:%S %Z',
+            time.localtime(int(data.get('createdAt')) / 1000.0)) or ''
         self.account_id = data.get('account_id') or ''
         self.user_id = data.get('user_id') or ''
         self.type_key = data.get('type_key') or ''
