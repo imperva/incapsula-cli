@@ -73,18 +73,51 @@ https://www.python.org/downloads/
 ## Delete a site
     incap site delete 123456
 
-## List all incap_rules
-    incap site list_incaprule 123456
+## List all incap_rules (Legacy)
+    incap rule list_incaprule 123456
 
-## Add an IncapRule to a site
-    incap site add_incaprule --name="Testing block crawlers" --action=RULE_ACTION_ALERT --filter="ClientType == Crawler" 123456
+## Add an IncapRule to a site (Legacy)
+    incap rule add_incaprule --name="Testing block crawlers" --action=RULE_ACTION_ALERT --filter="ClientType == Crawler" 123456
 
-## Update IncapRule on a site
-    incap site edit_incaprule --name="BA HTTP" --filter='(Method == POST;PUT)' --action=RULE_ACTION_ALERT 123456
+## Update IncapRule on a site (Legacy)
+    incap rule edit_incaprule --name="BA HTTP" --filter='(Method == POST;PUT)' --action=RULE_ACTION_ALERT 123456
 
-## Delete an IncapRule from a site
-    incap site del_incaprule 123456
+## Delete an IncapRule from a site (Legacy)
+    incap rule del_incaprule 123456
 
+## Adding rule with API v2 on a site
+    incap add-rule 123456 '{     
+                "action": "RULE_ACTION_BLOCK_IP",
+                "enabled": "true",
+                "filter": "ASN == 21",
+                "name": "Example rule to block ip"
+            }'
+
+## Getting a rule with API v2 on a site
+    incap rule get-rule 123456 654321
+
+## Duplicate a rule with API v2 from a site to another
+    incap rule dup-rule 123456 654231 456123 -- (from_site_id from_rule_id to_site_id)
+
+## Update rule with API v2 on a site - update in place and ID remains the same
+    incap update-rule 123456 654321 '{     
+                "action": "RULE_ACTION_BLOCK_IP",
+                "enabled": "true",
+                "filter": "ASN == 16409",
+                "name": "Example rule to block ip from AWS."
+            }'
+
+## Override rule with API v2 on a site - overrides and creates new ID
+    incap override-rule 123456 654321 '{     
+                "action": "RULE_ACTION_BLOCK_IP",
+                "enabled": "true",
+                "filter": "ASN == 16409",
+                "name": "Example rule to block ip from AWS."
+            }'
+
+## Delete a rule with API v2 on a site
+    incap rule del-rule 123456 654321
+    
 ## Update security rule action to block IP for SQL Injection
     incap site security  --security_rule_action=block_ip sql_injection 123456
 
