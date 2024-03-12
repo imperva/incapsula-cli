@@ -1,0 +1,3 @@
+include cwafcli/CSP/docs/*.md
+prune venv/
+prune test/

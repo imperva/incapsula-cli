@@ -5,6 +5,7 @@ setuptools.setup(
     name='cwaf-cli',
     version=__version__,
     packages=setuptools.find_namespace_packages(),
+    include_package_data=True,
     entry_points={
         "console_scripts": [
             "incap=cwafcli.__main__:main"

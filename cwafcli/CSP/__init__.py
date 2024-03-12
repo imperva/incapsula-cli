@@ -52,7 +52,10 @@ def read(args):
 
 
 def get_params() -> list:
-    with open("cwafcli/CSP/docs/WebsitesApi.md", "r") as f:
+    pwd = os.path.dirname(__file__)
+    doc = "docs/WebsitesApi.md"
+    abs_path = os.path.join(pwd, doc)
+    with open(abs_path, "r") as f:
         lines = f.read()
         needed = lines.split("\n------------- | ------------- | -------------\n")
 
