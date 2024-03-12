@@ -12,3 +12,7 @@ cwafcli/src/Utils/updateDNS.py
 /build/
 /cwaf_cli.egg-info/
 /dist/
+/cwafcli/SDK/
+/cwafcli/ABP/
+
+/swagger/

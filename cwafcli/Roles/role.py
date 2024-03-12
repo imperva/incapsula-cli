@@ -22,7 +22,7 @@ class Role:
     def read(args):
         param = vars(args)
         return execute("https://api.imperva.com/user-management/v1/roles/{role_id}".format(**param),
-            param, "GET", param)
+            param, "GET")
 
     @staticmethod
     def list(args):

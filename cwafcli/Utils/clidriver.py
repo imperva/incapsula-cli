@@ -9,6 +9,7 @@ from ..Rules import rule_parse
 from ..Cache import cache_parse
 from ..Accounts import account_parse
 from ..Roles import role_parse
+from ..CSP import create_subparser, get_params
 
 parser = argparse.ArgumentParser(prog='incap',
                                  usage='%(prog)s <resource> <command> [options]',
@@ -30,6 +31,11 @@ cache_parser = cache_parse(subparsers)
 infra_parser = infra_parse(subparsers)
 role_parser = role_parse(subparsers)
 
+subparser = subparsers.add_parser("csp", help="Testing CLI for CSP API.")
+website_parser = subparser.add_subparsers()
+for call, method, param, description in get_params():
+    create_subparser(website_parser, call, method, param, description)
+
 
 def main(args=None):
     import logging
@@ -41,7 +47,7 @@ def main(args=None):
 
     if type(response) is requests.exceptions.HTTPError:
         logging.error(response)
-    elif type(response) is dict:
+    elif type(response) is dict or type(response) is list:
         if args.output == "json":
             print(json.dumps(response, sort_keys=True, indent=4))
         else:
@@ -71,3 +77,4 @@ def main(args=None):
 def testing(args=None):
     args = parser.parse_args(args=args)
     return args.func(args)
+
