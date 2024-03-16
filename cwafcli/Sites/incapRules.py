@@ -193,7 +193,7 @@ class IncapRule:
                         incap_rule = IncapRule(rule)
                         print(incap_rule.log())
                 else:
-                    logging.info('You have no IncapRules!!!')
+                    logging.info('You have no CustomeErrorRules!!!')
 
             if 'delivery_rules' in result:
                 if 'Redirect' in result['delivery_rules']:
