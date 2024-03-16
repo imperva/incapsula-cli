@@ -40,7 +40,10 @@ class Site:
         self.policies = data.get('policies') or None
         if self.policies is not None:
             if self.policies.get('incap_rules'):
-                self.incap_rules = self.policies['incap_rules']['All']
+                try:
+                    self.incap_rules = self.policies['incap_rules']['All']
+                except KeyError:
+                    logging.debug("No All key")
             if self.policies.get('delivery_rules'):
                 self.adr_rules = self.policies['delivery_rules'] or {}
         elif data.get('incap_rules'):
