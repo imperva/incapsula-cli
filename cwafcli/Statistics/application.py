@@ -20,8 +20,8 @@ class Stats:
         param['stats'] = args.event_type
         logging.debug(param)
         resturl = 'https://my.incapsula.com/api/stats/v1'
-        result = execute(resturl, param)
-        print(result)
+        response = execute(resturl, param)
+        return response
 
     
     '''
