@@ -9,6 +9,7 @@ from ..Rules import rule_parse
 from ..Cache import cache_parse
 from ..Accounts import account_parse
 from ..Roles import role_parse
+from ..Statistics import statistics_parse
 from ..CSP import create_subparser, get_params
 
 parser = argparse.ArgumentParser(prog='incap',
@@ -33,6 +34,7 @@ role_parser = role_parse(subparsers)
 
 subparser = subparsers.add_parser("csp", help="Testing CLI for CSP API.")
 website_parser = subparser.add_subparsers()
+statistics_parser = statistics_parse(subparsers)
 for call, method, param, description in get_params():
     create_subparser(website_parser, call, method, param, description)
 
