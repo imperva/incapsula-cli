@@ -101,12 +101,14 @@ class Site:
         sites = []
         site_list = {}
         while True:
+            logging.debug(f"Params: {param}")
             response = execute("https://my.imperva.com/api/prov/v1/sites/list?page_num={}".format(param["page_num"]),
-                param, body=param)
+                param.copy(), body=param.copy()) # pass by value instead of by reference, this way the cli args don't get overwritten down the road
 
             if len(response["sites"]) > 0:
                 for site in response["sites"]:
                     sites.append(site)
+            if len(response["sites"]) == param["page_size"]: # Fixes a duplicated call to the API in the event that we've reached the end of the site list
                 param["page_num"] += 1
             else:
                 break
